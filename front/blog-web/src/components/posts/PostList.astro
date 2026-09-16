@@ -1,7 +1,11 @@
 ---
-import type { SiteContentEntry } from '@/core/content/posts';
-import { parseContentId } from '@/core/content/posts';
-interface Props { posts: { entry: SiteContentEntry; meta: NonNullable<ReturnType<typeof parseContentId>> }[]; }
+import type { SiteContentEntry } from '@/content/posts';
+import { parseContentId } from '@/content/posts';
+
+interface Props {
+  posts: { entry: SiteContentEntry; meta: NonNullable<ReturnType<typeof parseContentId>> }[];
+}
+
 const { posts } = Astro.props;
 ---
 <div class="stack">

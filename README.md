@@ -30,8 +30,10 @@ pnpm install
 前端 Rush 工作区依赖：
 
 ```bash
-pnpm --dir front install
-pnpm --dir front rush:update
+cd front
+nvm install
+nvm use
+pnpm install:all
 ```
 
 ## 前端命令

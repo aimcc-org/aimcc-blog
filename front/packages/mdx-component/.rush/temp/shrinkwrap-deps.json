@@ -1,0 +1,9 @@
+{
+  "@types/react-dom@19.3.0(@types/react@19.3.0)": "@types/react-dom@19.3.0(@types/react@19.3.0):d2aa3bfb006cd3c93f372493eebb380f4de07fc4ca80ad16c8ce21b45af777cb:",
+  "@types/react@19.3.0": "@types/react@19.3.0:0d6e041f0e32b119b240bbb5c23a983c970b7051659e7e04e2f028574985fbfa:",
+  "csstype@3.2.3": "csstype@3.2.3:2b6734c26b4fd8602f2dc1cab32541cbccfa4eb33afd578b7f786b4b929c9ef0:",
+  "react-dom@19.3.0(react@19.3.0)": "react-dom@19.3.0(react@19.3.0):9ffe43e09995f552a96a44c60ca83f4f591a674d3fd5b94598fa31b187ff8254:",
+  "react@19.3.0": "react@19.3.0:6948c072c7f6e53cc099c60ab9d2c02c5d2b24b5cb912440def2ecfa826eb531:",
+  "scheduler@0.28.0": "scheduler@0.28.0:b04e481a3133429b7ff22ca4196c4805bf73b89b84ff3f55adacf748cbb25a79:",
+  "typescript@5.9.3": "typescript@5.9.3:788f1a4e9f9272d707f584514dbd2c1acd76fc61e6215f6e8f3e886996dd9c43:"
+}

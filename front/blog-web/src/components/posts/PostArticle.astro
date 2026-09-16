@@ -1,7 +1,11 @@
 ---
 import { render } from 'astro:content';
-import type { SiteContentEntry } from '@/core/content/posts';
-interface Props { entry: SiteContentEntry; }
+import type { SiteContentEntry } from '@/content/posts';
+
+interface Props {
+  entry: SiteContentEntry;
+}
+
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---

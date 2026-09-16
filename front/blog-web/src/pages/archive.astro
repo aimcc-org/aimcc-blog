@@ -1,13 +1,13 @@
 ---
-import { currentProfile } from '@/config/build-profile';
-import { getProfilePosts } from '@/core/content/posts';
-import { layoutRegistry } from '@/registry/layouts';
-import { archiveTemplateRegistry } from '@/registry/templates';
+import { getProfilePosts } from '@/content/posts';
+import BaseLayout from '@/layouts/base/BaseLayout.astro';
+import ArchiveList from '@/components/posts/ArchiveList.astro';
 
 const posts = await getProfilePosts();
-const Layout = layoutRegistry[currentProfile.layouts.default];
-const ArchiveTemplate = archiveTemplateRegistry[currentProfile.templates.archive];
 ---
-<Layout title="归档">
-  <ArchiveTemplate posts={posts} />
-</Layout>
+<BaseLayout title="归档">
+  <main class="shell" style="padding:40px 0 80px;">
+    <h1>归档</h1>
+    <ArchiveList posts={posts} />
+  </main>
+</BaseLayout>

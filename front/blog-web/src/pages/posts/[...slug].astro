@@ -1,8 +1,7 @@
 ---
-import { currentProfile } from '@/config/build-profile';
-import { getProfilePosts } from '@/core/content/posts';
-import { layoutRegistry } from '@/registry/layouts';
-import { postTemplateRegistry } from '@/registry/templates';
+import { getProfilePosts } from '@/content/posts';
+import BaseLayout from '@/layouts/base/BaseLayout.astro';
+import PostArticle from '@/components/posts/PostArticle.astro';
 
 export async function getStaticPaths() {
   const posts = await getProfilePosts();
@@ -13,9 +12,19 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const Layout = layoutRegistry[currentProfile.layouts.post];
-const PostTemplate = postTemplateRegistry[currentProfile.templates.post];
 ---
-<Layout title={entry.data.title} description={entry.data.description}>
-  <PostTemplate entry={entry} />
-</Layout>
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <main class="shell" style="display:grid; grid-template-columns:minmax(0,1fr) var(--sidebar-width); gap:24px; padding:40px 0 80px; align-items:start;">
+    <section><PostArticle entry={entry} /></section>
+    <aside class="card" style="padding:20px; position:sticky; top:20px;">
+      <strong>{entry.data.category}</strong>
+      <p class="muted" style="font-size:14px; line-height:1.6;">{entry.data.description}</p>
+    </aside>
+  </main>
+</BaseLayout>
+<style>
+  @media (max-width: 820px) {
+    main { grid-template-columns: 1fr !important; }
+    aside { position: static !important; }
+  }
+</style>

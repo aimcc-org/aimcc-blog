@@ -7,20 +7,9 @@ export const profiles = {
       url: 'https://aimcc.example.com',
       lang: 'zh-CN',
     },
-    theme: 'minimal',
-    layouts: {
-      default: 'wide',
-      post: 'sidebar',
-    },
-    templates: {
-      home: 'blog',
-      post: 'reading',
-      archive: 'timeline',
-    },
     features: {
       toc: true,
       search: true,
-      profileCard: false,
     },
     content: {
       owners: ['main', 'shared'],

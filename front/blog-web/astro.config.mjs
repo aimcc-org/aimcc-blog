@@ -14,7 +14,7 @@ const profile = profiles[profileName];
 export default defineConfig({
   site: profile.site.url,
   output: 'static',
-  outDir: new URL(`./dist/${profileName}/`, import.meta.url),
+  outDir: `./dist/${profileName}`,
   integrations: [react(), sitemap()],
   vite: {
     define: {

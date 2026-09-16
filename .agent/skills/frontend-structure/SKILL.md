@@ -49,14 +49,10 @@ front/
 │   └── src/
 │       ├── components/
 │       ├── config/
-│       ├── core/
+│       ├── content/
 │       ├── layouts/
 │       ├── pages/
-│       ├── plugins/
-│       ├── registry/
 │       ├── styles/
-│       ├── templates/
-│       ├── themes/
 │       └── types/
 └── packages/
     └── mdx-component/
@@ -70,10 +66,11 @@ front/
 - 所有者目录是构建期作用域，不能自动变成 URL 前缀。
 - 文章资源优先与文章目录放在一起。
 - 新增、删除或重命名内容分类/profile 时，必须阅读 `.agent/skills/content-category/SKILL.md`。
+- 关键扩展约定记录在 `docs/infra/content-profiles.md`，避免后续新增 profile 时遗漏同步点。
 
 ### 主题
 
-主题负责视觉 token 和样式。优先使用 CSS 变量/设计 token。主题不能负责路由或业务数据获取。
+样式 token 放在 `front/blog-web/src/styles/`。在出现真实多 profile 视觉差异前，不新增多主题 registry。
 
 ### 布局
 
@@ -81,7 +78,7 @@ front/
 
 ### 模板
 
-模板负责页面类型的组合，例如首页、文章页、归档页渲染。较大块的视觉页面组合应放在这里，而不是放进路由文件。
+页面类型组合优先放在 `front/blog-web/src/components/` 中。只有当第二个 profile 确实需要不同页面实现时，才重新引入 templates/registry 层。
 
 ### Profile
 

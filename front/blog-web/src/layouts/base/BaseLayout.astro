@@ -12,7 +12,7 @@ const { title, description = currentProfile.site.description } = Astro.props;
 const pageTitle = title ? `${title} · ${currentProfile.site.title}` : currentProfile.site.title;
 ---
 <!doctype html>
-<html lang={currentProfile.site.lang} data-theme={currentProfile.theme}>
+<html lang={currentProfile.site.lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />

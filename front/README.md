@@ -5,8 +5,10 @@
 ## 安装
 
 ```bash
-pnpm install
-pnpm rush:update
+nvm install
+nvm use
+# pnpm install 优先下面的，能够所有目录安装
+pnpm install:all
 ```
 
 ## 开发
@@ -27,9 +29,8 @@ pnpm --dir blog-web build:all
 ## 架构
 
 - `blog-web/content/<owner>/`：按所有者隔离的内容
-- `blog-web/src/themes/`：视觉系统
 - `blog-web/src/layouts/`：页面宏观结构
-- `blog-web/src/templates/`：页面类型组合
 - `blog-web/profiles.config.mjs`：站点组合/构建 profile
-- `blog-web/src/registry/`：显式主题/布局/模板注册表
+- `blog-web/src/content/`：内容查询和 profile 过滤
+- `blog-web/src/components/`：页面组件
 - `packages/mdx-component/`：公共 MDX 组件包

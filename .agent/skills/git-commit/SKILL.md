@@ -31,7 +31,7 @@ type(scope): subject
 
 ```text
 feat(front): add profile-aware post renderer
-feat(theme): add minimal theme
+feat(layout): simplify blog layout
 feat(content-main): add Astro article
 fix(layout): correct sidebar overflow
 build(front): add Pagefind build step

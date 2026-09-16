@@ -1,6 +1,4 @@
-@import '../themes/base/tokens.css';
-@import '../themes/minimal/theme.css';
-@import '../themes/fuwari/theme.css';
+@import './tokens.css';
 
 * { box-sizing: border-box; }
 html { font-family: var(--font-body); background: var(--color-bg); color: var(--color-text); }

@@ -31,6 +31,13 @@ front/
 │   ├── public/
 │   ├── scripts/
 │   ├── src/
+│   │   ├── components/
+│   │   ├── config/
+│   │   ├── content/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── styles/
+│   │   └── types/
 │   ├── astro.config.mjs
 │   ├── package.json
 │   ├── prettier.config.mjs
@@ -42,7 +49,7 @@ front/
 
 ### Profile
 
-Profile 选择一个站点的内容范围、主题、布局、模板和功能开关。当前仅包含 `main` 独立构建。新增内容分类或独立构建 profile 时，必须同步使用 `.agent/skills/content-category/` 中的规则。
+Profile 选择一个站点的内容范围和功能开关。当前仅包含 `main` 独立构建。新增内容分类或独立构建 profile 时，必须同步使用 `.agent/skills/content-category/` 中的规则，并参考 `docs/infra/content-profiles.md`。
 
 ### 内容
 
@@ -51,14 +58,13 @@ Profile 选择一个站点的内容范围、主题、布局、模板和功能开
 - 所有者目录名是构建作用域，不是 URL 前缀。
 - 在可行时，文章专用资源应与文章放在同一目录。
 
-### 主题 / 布局 / 模板
+### 布局与组件
 
-- **Theme**：视觉 token 和样式。
 - **Layout**：页面宏观结构和 slots。
-- **Template**：页面类型组合，例如 home/post/archive。
-- **Page**：轻量的路由/数据边界，负责解析当前 profile 并委托渲染。
+- **Component**：页面内可复用 UI，例如文章列表、归档列表、文章正文。
+- **Page**：轻量的路由/数据边界，负责读取内容并组合布局与组件。
 
-差异表达优先级：theme token → layout → template → 可复用组件变体 → 组件覆盖。
+在出现第二个 profile 的真实差异前，不提前恢复多主题、多模板或 registry 层。
 
 ## 3. 构建输出
 
@@ -72,6 +78,8 @@ pnpm build:all
 Profile 构建脚本会把各 profile 的独立输出写入 `front/blog-web/dist/<profile>/`。
 
 `front/` 使用 Rush 管理多包结构。公共组件包放在 `front/packages/` 下，当前已有 `front/packages/mdx-component/`。
+
+`front/scripts/install-all.mjs` 是前端一键安装入口。它先安装 `front/` 工作区根依赖，再使用本地 `@microsoft/rush` 执行 `rush update`，避免要求开发者预先全局安装 Rush。
 
 ## 4. 仓库治理
 
@@ -87,7 +95,7 @@ type(scope): subject
 
 ```text
 feat(front): add profile-aware renderer
-feat(theme): add minimal theme
+feat(layout): simplify blog layout
 feat(content-main): add Astro architecture article
 fix(server): handle empty token
 ```

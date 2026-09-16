@@ -20,10 +20,11 @@ description: 在 AIMCC Blog 中新增、删除或调整 blog-web 内容分类/pr
   - `front/blog-web/profiles.config.mjs`
   - `front/blog-web/src/types/profile.ts`
   - `front/blog-web/src/env.d.ts`
-  - `front/blog-web/src/core/content/posts.ts`
+  - `front/blog-web/src/content/posts.ts`
   - `front/blog-web/package.json` 中的 `dev:<profile>`、`build:<profile>` 和 `build:all`
   - `front/blog-web/content/<profile>/pages/about.md`
   - 至少一篇 `front/blog-web/content/<profile>/posts/.../index.md`
+  - `docs/infra/content-profiles.md`
 
 ## 新增独立构建分类
 
@@ -34,7 +35,7 @@ description: 在 AIMCC Blog 中新增、删除或调整 blog-web 内容分类/pr
 3. 在 `ProfileName`、`ImportMetaEnv.SITE_PROFILE` 和 `parseContentId` owner 白名单中加入该 key。
 4. 在 `package.json` 增加对应 `dev:<key>`、`build:<key>`，并把它加入 `build:all`。
 5. 创建对应内容目录，至少补齐 about 页面和一篇示例文章。
-6. 同步更新 `README.md`、`ARCHITECTURE.md` 或 `front/README.md` 中可见的构建命令和目录说明。
+6. 同步更新 `README.md`、`ARCHITECTURE.md`、`front/README.md` 和 `docs/infra/content-profiles.md` 中可见的构建命令和目录说明。
 
 ## 删除分类
 

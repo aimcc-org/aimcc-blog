@@ -1,8 +1,12 @@
 {
   "name": "@aimcc/blog-web",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@9.14.4",
+  "engines": {
+    "node": "26.x"
+  },
   "scripts": {
     "dev": "astro dev",
     "dev:main": "cross-env SITE_PROFILE=main astro dev",
