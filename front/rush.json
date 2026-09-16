@@ -1,0 +1,21 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.150.0",
+  "pnpmVersion": "9.14.4",
+  "nodeSupportedVersionRange": ">=20.0.0",
+  "projectFolderMinDepth": 1,
+  "projectFolderMaxDepth": 2,
+  "ensureConsistentVersions": true,
+  "projects": [
+    {
+      "packageName": "@aimcc/blog-web",
+      "projectFolder": "blog-web",
+      "reviewCategory": "production"
+    },
+    {
+      "packageName": "@aimcc/mdx-component",
+      "projectFolder": "packages/mdx-component",
+      "reviewCategory": "libraries"
+    }
+  ]
+}

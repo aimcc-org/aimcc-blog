@@ -1,0 +1,22 @@
+---
+import BaseLayout from '@/layouts/base/BaseLayout.astro';
+import { currentProfile } from '@/config/build-profile';
+interface Props { title?: string; description?: string; }
+const props = Astro.props;
+---
+<BaseLayout {...props}>
+  <main class="shell" style="display:grid; grid-template-columns:minmax(0,1fr) var(--sidebar-width); gap:24px; padding:40px 0 80px; align-items:start;">
+    <section><slot /></section>
+    <aside class="card" style="padding:20px; position:sticky; top:20px;">
+      <strong>{currentProfile.site.title}</strong>
+      <p class="muted" style="font-size:14px; line-height:1.6;">{currentProfile.site.description}</p>
+      {currentProfile.features.profileCard && <small class="muted">Profile card enabled</small>}
+    </aside>
+  </main>
+</BaseLayout>
+<style>
+  @media (max-width: 820px) {
+    main { grid-template-columns: 1fr !important; }
+    aside { position: static !important; }
+  }
+</style>

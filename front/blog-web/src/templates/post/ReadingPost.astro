@@ -1,0 +1,15 @@
+---
+import { render } from 'astro:content';
+import type { SiteContentEntry } from '@/core/content/posts';
+interface Props { entry: SiteContentEntry; }
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<article class="card" style="padding:clamp(24px,5vw,52px);">
+  <header style="margin-bottom:34px;">
+    <div class="muted" style="font-size:13px;">{entry.data.published.toISOString().slice(0, 10)}</div>
+    <h1 style="font-size:clamp(34px,6vw,58px); margin:10px 0 14px;">{entry.data.title}</h1>
+    <p class="muted" style="font-size:18px;">{entry.data.description}</p>
+  </header>
+  <div class="prose"><Content /></div>
+</article>

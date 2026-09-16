@@ -1,0 +1,10 @@
+---
+import BaseLayout from '@/layouts/base/BaseLayout.astro';
+interface Props { title?: string; description?: string; }
+const props = Astro.props;
+---
+<BaseLayout {...props}>
+  <main class="shell" style="max-width: var(--content-width); padding: 40px 0 80px;">
+    <slot />
+  </main>
+</BaseLayout>

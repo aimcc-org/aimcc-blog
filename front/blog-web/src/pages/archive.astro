@@ -1,0 +1,13 @@
+---
+import { currentProfile } from '@/config/build-profile';
+import { getProfilePosts } from '@/core/content/posts';
+import { layoutRegistry } from '@/registry/layouts';
+import { archiveTemplateRegistry } from '@/registry/templates';
+
+const posts = await getProfilePosts();
+const Layout = layoutRegistry[currentProfile.layouts.default];
+const ArchiveTemplate = archiveTemplateRegistry[currentProfile.templates.archive];
+---
+<Layout title="归档">
+  <ArchiveTemplate posts={posts} />
+</Layout>

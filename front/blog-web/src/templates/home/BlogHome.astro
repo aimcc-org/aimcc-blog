@@ -1,0 +1,16 @@
+---
+import type { SiteContentEntry } from '@/core/content/posts';
+import { parseContentId } from '@/core/content/posts';
+interface Props { posts: { entry: SiteContentEntry; meta: NonNullable<ReturnType<typeof parseContentId>> }[]; }
+const { posts } = Astro.props;
+---
+<div class="stack">
+  {posts.map(({ entry, meta }) => (
+    <article class="card" style="padding:26px;">
+      <div class="muted" style="font-size:13px;">{entry.data.published.toISOString().slice(0, 10)}</div>
+      <a href={`/posts/${meta.slug}/`} style="text-decoration:none;"><h2>{entry.data.title}</h2></a>
+      <p class="muted">{entry.data.description}</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">{entry.data.tags.map((tag) => <small>#{tag}</small>)}</div>
+    </article>
+  ))}
+</div>

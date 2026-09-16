@@ -1,0 +1,33 @@
+{
+  "name": "@aimcc/blog-web",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.14.4",
+  "scripts": {
+    "dev": "astro dev",
+    "dev:main": "cross-env SITE_PROFILE=main astro dev",
+    "build": "node ./scripts/build-profile.mjs main",
+    "build:main": "node ./scripts/build-profile.mjs main",
+    "build:all": "node ./scripts/build-profile.mjs main",
+    "check": "astro check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.3.0",
+    "@astrojs/sitemap": "^3.6.0",
+    "astro": "^5.13.10",
+    "pagefind": "^1.4.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "cross-env": "^7.0.3",
+    "prettier": "^3.6.2",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.9.2"
+  }
+}

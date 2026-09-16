@@ -1,0 +1,11 @@
+node_modules/
+common/temp/
+common/autoinstallers/
+
+blog-web/node_modules/
+blog-web/.astro/
+blog-web/dist/
+blog-web/public/pagefind/
+
+packages/*/node_modules/
+packages/*/dist/

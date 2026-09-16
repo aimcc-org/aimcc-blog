@@ -1,0 +1,17 @@
+---
+import { render } from 'astro:content';
+import { currentProfile } from '@/config/build-profile';
+import { getProfilePage } from '@/core/content/posts';
+import { layoutRegistry } from '@/registry/layouts';
+
+const entry = await getProfilePage('about');
+if (!entry) throw new Error(`Missing about page for profile ${currentProfile.id}`);
+const { Content } = await render(entry);
+const Layout = layoutRegistry[currentProfile.layouts.default];
+---
+<Layout title={entry.data.title} description={entry.data.description}>
+  <article class="card prose" style="padding:32px;">
+    <h1>{entry.data.title}</h1>
+    <Content />
+  </article>
+</Layout>
