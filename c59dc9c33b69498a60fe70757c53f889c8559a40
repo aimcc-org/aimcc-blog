@@ -1,0 +1,83 @@
+server/pom.xml
+  0649c1aa0985ab2d 11
+server/src/main/java/com/aimcc/blog/ServerApplication.java
+  0649c1aa0985ab2d 1
+server/src/test/java/com/aimcc/blog/ServerApplicationTests.java
+  0649c1aa0985ab2d 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "c59dc9c33b69498a60fe70757c53f889c8559a40",
+  "prompts": {
+    "0649c1aa0985ab2d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb94966f-c72b-4a74-9064-30b1cb5d710f",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 29,
+      "total_deletions": 3,
+      "accepted_lines": 27,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/example/server/ServerApplication.java": {
+          "additions": 1,
+          "deletions": 1
+        },
+        "server/src/test/java/com/example/server/ServerApplicationTests.java": {
+          "additions": 1,
+          "deletions": 1
+        },
+        "server/src/main/java/com/aimcc/blog/ServerApplication.java": {
+          "additions": 13,
+          "accepted_lines": 13
+        },
+        "server/pom.xml": {
+          "additions": 1,
+          "deletions": 1,
+          "accepted_lines": 1
+        },
+        "server/src/test/java/com/aimcc/blog/ServerApplicationTests.java": {
+          "additions": 13,
+          "accepted_lines": 13
+        }
+      }
+    },
+    "71ed844a359fe984": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f032e6-d549-402d-aff7-a471574cebfc",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 96,
+      "total_deletions": 0,
+      "accepted_lines": 20,
+      "overriden_lines": 2,
+      "per_file_stats": {
+        "server/pom.xml": {
+          "additions": 11,
+          "accepted_lines": 11
+        },
+        "server/src/main/java/com/aimcc/blog/demo/PingMapper.java": {
+          "additions": 14
+        },
+        "server/src/main/java/com/aimcc/blog/demo/DbCheckRunner.java": {
+          "additions": 33
+        },
+        "server/src/main/resources/application.yaml": {
+          "additions": 11,
+          "accepted_lines": 9,
+          "overriden_lines": 2
+        },
+        "server/src/main/java/com/aimcc/blog/demo/DbPingController.java": {
+          "additions": 27
+        }
+      }
+    }
+  }
+}
