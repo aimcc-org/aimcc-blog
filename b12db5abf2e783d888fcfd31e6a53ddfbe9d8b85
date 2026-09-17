@@ -1,0 +1,57 @@
+server/pom.xml
+  71ed844a359fe984 39-48
+server/src/main/resources/application.yaml
+  71ed844a359fe984 4-5,7,9-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "b12db5abf2e783d888fcfd31e6a53ddfbe9d8b85",
+  "prompts": {
+    "0649c1aa0985ab2d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb94966f-c72b-4a74-9064-30b1cb5d710f",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 27,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/test/java/com/aimcc/blog/ServerApplicationTests.java": {
+          "accepted_lines": 13
+        },
+        "server/pom.xml": {
+          "accepted_lines": 1
+        },
+        "server/src/main/java/com/aimcc/blog/ServerApplication.java": {
+          "accepted_lines": 13
+        }
+      }
+    },
+    "71ed844a359fe984": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f032e6-d549-402d-aff7-a471574cebfc",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 20,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/resources/application.yaml": {
+          "accepted_lines": 9
+        },
+        "server/pom.xml": {
+          "accepted_lines": 11
+        }
+      }
+    }
+  }
+}
