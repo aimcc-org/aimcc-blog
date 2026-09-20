@@ -1,10 +1,11 @@
 package com.aimcc.blog.service;
 
-import com.aimcc.blog.entity.Article;
+import com.aimcc.blog.dto.ArticleDetailVO;
+import com.aimcc.blog.dto.ArticleListVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * 文章服务
+ * 文章服务（对外只暴露 VO，不暴露 entity）
  */
 public interface ArticleService {
 
@@ -15,8 +16,8 @@ public interface ArticleService {
      * @param size 每页条数
      * @param sort 排序：new 最新 / hot 热门 / recommend 推荐
      */
-    Page<Article> listArticles(int page, int size, String sort);
+    Page<ArticleListVO> listArticles(int page, int size, String sort);
 
     /** 按 id 查询文章详情 */
-    Article getArticleById(Long id);
+    ArticleDetailVO getArticleById(Long id);
 }

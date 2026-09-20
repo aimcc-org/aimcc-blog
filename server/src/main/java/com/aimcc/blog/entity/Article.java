@@ -36,6 +36,9 @@ public class Article {
     /** 是否精选：0否 1是 */
     private Integer isTop;
 
+    /** 浏览量（详情页访问时自增） */
+    private Integer viewCount;
+
     /** 状态：0草稿 1已发布 */
     private Integer status;
 
