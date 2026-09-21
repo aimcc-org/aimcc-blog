@@ -1,26 +1,62 @@
 ---
-import '@/styles/global.css';
-import SiteHeader from '@/components/common/SiteHeader.astro';
-import { currentProfile } from '@/config/build-profile';
+import "@/styles/global.css";
+import SiteHeader from "@/components/common/SiteHeader.astro";
+import { currentProfile } from "@/config/build-profile";
+import { ClientRouter } from "astro:transitions";
 
 interface Props {
   title?: string;
   description?: string;
+  showHeader?: boolean;
+  enableTransitions?: boolean;
 }
 
-const { title, description = currentProfile.site.description } = Astro.props;
-const pageTitle = title ? `${title} · ${currentProfile.site.title}` : currentProfile.site.title;
+const {
+  title,
+  description = currentProfile.site.description,
+  showHeader = true,
+  enableTransitions = false,
+} = Astro.props;
+const pageTitle = title
+  ? `${title} · ${currentProfile.site.title}`
+  : currentProfile.site.title;
 ---
+
 <!doctype html>
 <html lang={currentProfile.site.lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={currentProfile.site.url} />
+    <meta name="twitter:card" content="summary" />
     <title>{pageTitle}</title>
+    {enableTransitions && <ClientRouter />}
+    <script is:inline>
+      (() => {
+        const applyTheme = () => {
+          const stored = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          document.documentElement.classList.toggle(
+            "dark",
+            stored === "dark" || (!stored && prefersDark),
+          );
+        };
+        applyTheme();
+        if (!window.__aimccThemeTransitionBound) {
+          document.addEventListener("astro:after-swap", applyTheme);
+          window.__aimccThemeTransitionBound = true;
+        }
+      })();
+    </script>
   </head>
   <body>
-    <SiteHeader />
+    {showHeader && <SiteHeader />}
     <slot />
   </body>
 </html>

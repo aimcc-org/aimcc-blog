@@ -1,0 +1,30 @@
+---
+import BaseLayout from "@/layouts/base/BaseLayout.astro";
+import HomeNavbar from "@/components/home/HomeNavbar.astro";
+import HeroBanner from "@/components/home/HeroBanner.astro";
+import HomeFooter from "@/components/home/HomeFooter.astro";
+import "@/styles/home.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  showHeader={false}
+  enableTransitions
+>
+  <div class="home-page">
+    <HomeNavbar />
+    <HeroBanner />
+    <main class="home-main shell" transition:animate="none">
+      <slot />
+    </main>
+    <HomeFooter />
+  </div>
+</BaseLayout>

@@ -1,0 +1,23 @@
+---
+import { currentProfile } from "@/config/build-profile";
+import HomeControls from "@/components/islands/HomeControls";
+---
+
+<header class="home-nav-wrap" transition:persist="home-navbar">
+  <div class="home-nav shell">
+    <a
+      class="home-nav__brand"
+      href="/"
+      aria-label={`${currentProfile.site.title} 首页`}
+    >
+      <span class="home-nav__mark">A</span>
+      <span>{currentProfile.site.title}</span>
+    </a>
+    <nav class="home-nav__links" aria-label="主导航">
+      <a class="is-active" href="/">首页</a>
+      <a href="/archive/">归档</a>
+      <a href="/about/">关于</a>
+    </nav>
+    <HomeControls client:load />
+  </div>
+</header>

@@ -1,0 +1,14 @@
+---
+import { currentProfile } from "@/config/build-profile";
+---
+
+<section class="home-card profile-card" aria-labelledby="profile-title">
+  <div class="profile-card__avatar" aria-hidden="true">AI</div>
+  <h2 id="profile-title">{currentProfile.site.title}</h2>
+  <p>{currentProfile.site.description}</p>
+  <div class="profile-card__links" aria-label="社交链接">
+    <a href="https://github.com/aimcc-org/aimcc-blog" aria-label="GitHub"
+      >GitHub</a
+    >
+  </div>
+</section>

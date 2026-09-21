@@ -1,0 +1,29 @@
+---
+interface CategoryItem {
+  name: string;
+  count: number;
+  href?: string;
+}
+
+interface Props {
+  categories: CategoryItem[];
+}
+
+const { categories } = Astro.props;
+---
+
+{
+  categories.length > 0 && (
+    <section class="home-card taxonomy-card" aria-labelledby="categories-title">
+      <h2 id="categories-title">Categories</h2>
+      <div class="taxonomy-card__list">
+        {categories.map((item) => (
+          <div class="taxonomy-card__row">
+            <span>{item.name}</span>
+            <span>{item.count}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}

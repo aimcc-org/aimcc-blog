@@ -1,17 +1,15 @@
 ---
-import { currentProfile } from '@/config/build-profile';
-import { getProfilePosts } from '@/content/posts';
-import BaseLayout from '@/layouts/base/BaseLayout.astro';
-import PostList from '@/components/posts/PostList.astro';
+import { currentProfile } from "@/config/build-profile";
+import { getProfilePosts } from "@/content/posts";
+import { toPostSummary } from "@/types/post";
+import BlogHomeLayout from "@/layouts/home/BlogHomeLayout.astro";
+import HomeSidebar from "@/components/home/sidebar/HomeSidebar.astro";
+import PostList from "@/components/home/post/PostList.astro";
 
-const posts = await getProfilePosts();
+const posts = (await getProfilePosts()).map(toPostSummary);
 ---
-<BaseLayout>
-  <main class="shell" style="padding:40px 0 80px;">
-    <section style="padding: 32px 0 44px;">
-      <p class="muted" style="margin:0 0 8px;">{currentProfile.site.description}</p>
-      <h1 style="font-size:clamp(40px,8vw,78px); line-height:1; margin:0;">{currentProfile.site.title}</h1>
-    </section>
-    <PostList posts={posts} />
-  </main>
-</BaseLayout>
+
+<BlogHomeLayout description={currentProfile.site.description}>
+  <HomeSidebar posts={posts} />
+  <PostList posts={posts} />
+</BlogHomeLayout>

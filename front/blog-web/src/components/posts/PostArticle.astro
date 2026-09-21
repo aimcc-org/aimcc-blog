@@ -1,6 +1,6 @@
 ---
-import { render } from 'astro:content';
-import type { SiteContentEntry } from '@/content/posts';
+import { render } from "astro:content";
+import type { SiteContentEntry } from "@/content/posts";
 
 interface Props {
   entry: SiteContentEntry;
@@ -9,11 +9,43 @@ interface Props {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
-<article class="card" style="padding:clamp(24px,5vw,52px);">
-  <header style="margin-bottom:34px;">
-    <div class="muted" style="font-size:13px;">{entry.data.published.toISOString().slice(0, 10)}</div>
-    <h1 style="font-size:clamp(34px,6vw,58px); margin:10px 0 14px;">{entry.data.title}</h1>
-    <p class="muted" style="font-size:18px;">{entry.data.description}</p>
+
+<article class="card post-article">
+  <header class="post-article__header">
+    <div class="muted post-article__date">
+      {entry.data.published.toISOString().slice(0, 10)}
+    </div>
+    <h1>{entry.data.title}</h1>
+    <p class="muted">{entry.data.description}</p>
   </header>
   <div class="prose"><Content /></div>
 </article>
+<style>
+  .post-article {
+    padding: 2.5rem;
+  }
+  .post-article__header {
+    margin-bottom: 2rem;
+  }
+  .post-article__date {
+    font-size: 0.85rem;
+  }
+  .post-article h1 {
+    margin: 0.6rem 0 0.8rem;
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  .post-article__header p {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  @media (max-width: 767px) {
+    .post-article {
+      padding: 1.35rem;
+    }
+    .post-article h1 {
+      font-size: 2rem;
+    }
+  }
+</style>

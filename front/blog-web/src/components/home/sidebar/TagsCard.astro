@@ -1,0 +1,29 @@
+---
+interface TagItem {
+  name: string;
+  count?: number;
+  href?: string;
+}
+
+interface Props {
+  tags: TagItem[];
+}
+
+const { tags } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <section class="home-card taxonomy-card" aria-labelledby="tags-title">
+      <h2 id="tags-title">Tags</h2>
+      <div class="tag-cloud">
+        {tags.map((item) => (
+          <span class="tag-cloud__item">
+            #{item.name}
+            {item.count ? <span>{item.count}</span> : null}
+          </span>
+        ))}
+      </div>
+    </section>
+  )
+}

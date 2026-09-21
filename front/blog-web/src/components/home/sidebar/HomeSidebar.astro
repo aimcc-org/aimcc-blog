@@ -1,0 +1,33 @@
+---
+import type { PostSummary } from "@/types/post";
+import ProfileCard from "./ProfileCard.astro";
+import CategoriesCard from "./CategoriesCard.astro";
+import TagsCard from "./TagsCard.astro";
+
+interface Props {
+  posts: PostSummary[];
+}
+
+const { posts } = Astro.props;
+
+const categories = [
+  ...posts.reduce((map, post) => {
+    if (post.category)
+      map.set(post.category, (map.get(post.category) ?? 0) + 1);
+    return map;
+  }, new Map<string, number>()),
+].map(([name, count]) => ({ name, count }));
+
+const tags = [
+  ...posts.reduce((map, post) => {
+    for (const tag of post.tags) map.set(tag, (map.get(tag) ?? 0) + 1);
+    return map;
+  }, new Map<string, number>()),
+].map(([name, count]) => ({ name, count }));
+---
+
+<aside class="home-sidebar" transition:persist="home-sidebar">
+  <ProfileCard />
+  <CategoriesCard categories={categories} />
+  <TagsCard tags={tags} />
+</aside>
