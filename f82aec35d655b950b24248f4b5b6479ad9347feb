@@ -1,0 +1,103 @@
+docs/handoff-2026-09-17.md
+  1316f3f3ae1a55e4 9,105-113
+server/src/main/java/com/aimcc/blog/service/impl/ArticleServiceImpl.java
+  1316f3f3ae1a55e4 5-6,10,18-21,28,31-33,35,37-39,42,47-51,53-83,93-97
+server/src/main/java/com/aimcc/blog/service/ArticleService.java
+  1316f3f3ae1a55e4 15-18,20
+server/src/main/java/com/aimcc/blog/dto/ArticleListVO.java
+  1316f3f3ae1a55e4 6,34-36
+server/src/main/java/com/aimcc/blog/mapper/TagMapper.java
+  1316f3f3ae1a55e4 3,8,20-25
+server/src/main/java/com/aimcc/blog/controller/ArticleController.java
+  1316f3f3ae1a55e4 25,30-32
+server/src/main/java/com/aimcc/blog/dto/TagItemVO.java
+  1316f3f3ae1a55e4 1-18
+server/src/main/resources/mapper/TagMapper.xml
+  1316f3f3ae1a55e4 16-29
+server/src/main/java/com/aimcc/blog/dto/ArticleTagRow.java
+  1316f3f3ae1a55e4 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "f82aec35d655b950b24248f4b5b6479ad9347feb",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 240,
+      "total_deletions": 57,
+      "accepted_lines": 400,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/service/impl/ArticleServiceImpl.java": {
+          "additions": 75,
+          "deletions": 30,
+          "accepted_lines": 59
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "additions": 4,
+          "accepted_lines": 37
+        },
+        "server/src/main/java/com/aimcc/blog/service/ArticleService.java": {
+          "additions": 5,
+          "deletions": 4,
+          "accepted_lines": 5
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/tagmapper.java": {
+          "additions": 8,
+          "deletions": 2,
+          "accepted_lines": 8
+        },
+        "server/src/main/java/com/aimcc/blog/dto/ArticleTagRow.java": {
+          "additions": 19,
+          "accepted_lines": 19
+        },
+        "server/src/main/java/com/aimcc/blog/controller/ArticleController.java": {
+          "additions": 4,
+          "deletions": 3,
+          "accepted_lines": 4
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "additions": 59,
+          "deletions": 14,
+          "accepted_lines": 128
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/TagMapper.java": {
+          "additions": 8,
+          "deletions": 2,
+          "accepted_lines": 8
+        },
+        "docs/handoff-2026-09-17.md": {
+          "additions": 10,
+          "deletions": 2,
+          "accepted_lines": 10
+        },
+        "server/src/main/java/com/aimcc/blog/dto/TagItemVO.java": {
+          "additions": 18,
+          "accepted_lines": 18
+        },
+        "server/src/main/resources/mapper/TagMapper.xml": {
+          "additions": 14,
+          "accepted_lines": 14
+        },
+        "server/src/main/java/com/aimcc/blog/dto/ArticleListVO.java": {
+          "additions": 4,
+          "accepted_lines": 4
+        },
+        "server/src/main/resources/db/migration/V1__init.sql": {
+          "accepted_lines": 74
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articletagrow.java": {
+          "additions": 12,
+          "accepted_lines": 12
+        }
+      }
+    }
+  }
+}
