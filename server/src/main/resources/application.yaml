@@ -12,6 +12,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:
+  # mapper XML 文件位置（联表等自定义 SQL 的住处）
+  mapper-locations: classpath:mapper/*.xml
   configuration:
     # 开发期打印 SQL，上线前删掉
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

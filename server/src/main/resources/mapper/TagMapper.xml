@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aimcc.blog.mapper.TagMapper">
+
+    <!-- 标签云：每个标签 + 实时文章数（空标签也显示，计 0 篇） -->
+    <select id="selectTagCloud" resultType="com.aimcc.blog.dto.TagVO">
+        select t.id,
+               t.name,
+               count(at.article_id) as article_count
+        from tag t
+                 left join article_tag at on t.id = at.tag_id
+        group by t.id, t.name
+        order by article_count desc
+    </select>
+
+</mapper>
