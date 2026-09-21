@@ -1,8 +1,8 @@
 -- ============================================================
 -- AIMCC Blog 数据库初始化脚本
 -- 用法：在本地 MySQL 中执行本文件（DBeaver：连接上后新建 SQL 编辑器粘贴执行）
--- 注意：建库建表可重复执行（IF NOT EXISTS）；第 4 部分数据插入若重复执行会重复插行，
---       重复执行前请先 TRUNCATE TABLE profile, article;
+-- 注意：建库建表可重复执行（IF NOT EXISTS）；第 6 部分数据插入若重复执行会重复插行，
+--       重复执行前请先 TRUNCATE TABLE profile, article, tag, article_tag;
 -- ============================================================
 
 -- 1. 建库（utf8mb4 支持完整 Unicode 含 emoji；unicode_ci 为大小写不敏感的排序规则）
@@ -47,8 +47,24 @@ CREATE TABLE IF NOT EXISTS article (
     KEY idx_status_published (status, published_at)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT '文章表';
 
--- 4. 初始数据
--- 4.1 博主资料（记得换成自己的真实资料与链接）
+-- 4. 标签表（name 唯一约束：标签云不允许重复标签名）
+CREATE TABLE IF NOT EXISTS tag (
+    id         BIGINT      NOT NULL AUTO_INCREMENT COMMENT '主键',
+    name       VARCHAR(64) NOT NULL                COMMENT '标签名（唯一）',
+    created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_tag_name (name)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT '标签表';
+
+-- 5. 文章-标签中间表（多对多连线；联合主键 = 同一组合只许出现一次，无自增 id）
+CREATE TABLE IF NOT EXISTS article_tag (
+    article_id BIGINT NOT NULL COMMENT '文章 id（逻辑关联 article.id）',
+    tag_id     BIGINT NOT NULL COMMENT '标签 id（逻辑关联 tag.id）',
+    PRIMARY KEY (article_id, tag_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT '文章-标签关系表';
+
+-- 6. 初始数据
+-- 6.1 博主资料（记得换成自己的真实资料与链接）
 INSERT INTO profile (nickname, avatar, bio, quote, years_of_dev, github_url, x_url, bilibili_url, email)
 VALUES ('AIMCC',
         'https://avatars.githubusercontent.com/u/00000000',
@@ -60,7 +76,7 @@ VALUES ('AIMCC',
         'https://space.bilibili.com/000000',
         'me@aimcc.blog');
 
--- 4.2 文章测试数据（3 已发布其中 1 精选、1 草稿——草稿不会出现在列表接口，
+-- 6.2 文章测试数据（3 已发布其中 1 精选、1 草稿——草稿不会出现在列表接口，
 --     精选那篇可用于验证 sort=recommend）
 INSERT INTO article (title, summary, cover_image, content, reading_minutes, is_top, status, published_at)
 VALUES ('用 Spring Boot 搭建个人博客：从零到第一个接口',
@@ -83,3 +99,11 @@ VALUES ('用 Spring Boot 搭建个人博客：从零到第一个接口',
         NULL,
         '# 标签系统构想\n\n（写作中……）',
         1, 0, 0, NULL);
+
+-- 6.3 标签与连线（4 个标签；已发布 3 篇文章的挂载关系）
+INSERT INTO tag (name) VALUES ('Java'), ('后端'), ('建站'), ('踩坑');
+
+INSERT INTO article_tag (article_id, tag_id) VALUES
+    (1, 1), (1, 2), (1, 3),
+    (2, 1), (2, 2),
+    (3, 2), (3, 4);
