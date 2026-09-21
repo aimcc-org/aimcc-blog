@@ -13,4 +13,18 @@
         order by article_count desc
     </select>
 
+    <!-- 批量查若干文章的标签连线（行形状：文章id + 标签id + 标签名，内部组装用） -->
+    <select id="selectTagsByArticleIds" resultType="com.aimcc.blog.dto.ArticleTagRow">
+        select at.article_id,
+               t.id   as tag_id,
+               t.name as tag_name
+        from article_tag at
+                 left join tag t on at.tag_id = t.id
+        where at.article_id in
+        <foreach collection="articleIds" item="aid" open="(" separator="," close=")">
+            #{aid}
+        </foreach>
+        order by at.article_id
+    </select>
+
 </mapper>

@@ -3,6 +3,7 @@ package com.aimcc.blog.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 文章列表 VO：首页卡片用，刻意不含正文 content（列表页用不到，省流量）
@@ -30,4 +31,7 @@ public class ArticleListVO {
 
     /** 发布时间 */
     private LocalDateTime publishedAt;
+
+    /** 标签列表（列表接口批量联查后组装） */
+    private List<TagItemVO> tags;
 }

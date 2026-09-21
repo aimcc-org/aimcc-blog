@@ -22,13 +22,14 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    /** 文章分页列表 */
+    /** 文章分页列表（tagId 可选：只返回挂了该标签的文章） */
     @GetMapping
     public ApiResult<Page<ArticleListVO>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "new") String sort) {
-        return ApiResult.ok(articleService.listArticles(page, size, sort));
+            @RequestParam(defaultValue = "new") String sort,
+            @RequestParam(required = false) Long tagId) {
+        return ApiResult.ok(articleService.listArticles(page, size, sort, tagId));
     }
 
     /** 文章详情 */
