@@ -1,0 +1,36 @@
+docs/handoff-2026-09-17.md
+  1316f3f3ae1a55e4 12,56,90-104,118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "413fc7cec89ef4fa11a73dc92a96c6c96acdd529",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 18,
+      "total_deletions": 2,
+      "accepted_lines": 130,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 83
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 29
+        },
+        "docs/handoff-2026-09-17.md": {
+          "additions": 18,
+          "deletions": 2,
+          "accepted_lines": 18
+        }
+      }
+    }
+  }
+}
