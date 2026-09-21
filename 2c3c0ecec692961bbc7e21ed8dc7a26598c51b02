@@ -1,0 +1,40 @@
+server/sql/init.sql
+  1316f3f3ae1a55e4 4-5,50-67,79,102-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "2c3c0ecec692961bbc7e21ed8dc7a26598c51b02",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 30,
+      "total_deletions": 5,
+      "accepted_lines": 142,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 29
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 83
+        },
+        "server/sql/init.sql": {
+          "additions": 29,
+          "deletions": 5,
+          "accepted_lines": 29
+        },
+        "docs/handoff-2026-09-17.md": {
+          "additions": 1,
+          "accepted_lines": 1
+        }
+      }
+    }
+  }
+}
