@@ -1,15 +1,17 @@
 ---
 import { currentProfile } from "@/config/build-profile";
 import { getProfilePosts } from "@/content/posts";
+import { getSiteStats, getTagCloud } from "@/lib/api";
 import { toPostSummary } from "@/types/post";
 import BlogHomeLayout from "@/layouts/home/BlogHomeLayout.astro";
 import HomeSidebar from "@/components/home/sidebar/HomeSidebar.astro";
 import PostList from "@/components/home/post/PostList.astro";
 
 const posts = (await getProfilePosts()).map(toPostSummary);
+const [stats, apiTags] = await Promise.all([getSiteStats(), getTagCloud()]);
 ---
 
 <BlogHomeLayout description={currentProfile.site.description}>
-  <HomeSidebar posts={posts} />
+  <HomeSidebar posts={posts} stats={stats} apiTags={apiTags ?? undefined} />
   <PostList posts={posts} />
 </BlogHomeLayout>

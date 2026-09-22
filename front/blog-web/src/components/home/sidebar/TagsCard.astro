@@ -1,5 +1,6 @@
 ---
 interface TagItem {
+  id?: number;
   name: string;
   count?: number;
   href?: string;
@@ -18,10 +19,14 @@ const { tags } = Astro.props;
       <h2 id="tags-title">Tags</h2>
       <div class="tag-cloud">
         {tags.map((item) => (
-          <span class="tag-cloud__item">
+          <a
+            class="tag-cloud__item"
+            href={item.href ?? `/?tag=${encodeURIComponent(item.name)}#posts`}
+            data-tag-id={item.id}
+          >
             #{item.name}
             {item.count ? <span>{item.count}</span> : null}
-          </span>
+          </a>
         ))}
       </div>
     </section>

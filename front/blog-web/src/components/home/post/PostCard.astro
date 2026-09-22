@@ -20,7 +20,11 @@ const stats = [
   .join(" | ");
 ---
 
-<article class="post-card" style={`--stagger-index:${index}`}>
+<article
+  class="post-card"
+  style={`--stagger-index:${index}`}
+  data-tags={post.tags.join("|")}
+>
   <a
     class={`post-card__link${post.cover ? " has-cover" : ""}`}
     href={`/posts/${post.slug}/#article`}

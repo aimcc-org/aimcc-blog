@@ -1,11 +1,49 @@
 ---
 import { currentProfile } from "@/config/build-profile";
+import type { ApiStats } from "@/lib/api";
+
+interface Props {
+  stats?: ApiStats | null;
+  fallbackArticleCount: number;
+}
+
+const { stats, fallbackArticleCount } = Astro.props;
+type ProfileStat = {
+  label: string;
+  value: number;
+};
+
+const profileStats: ProfileStat[] = [
+  {
+    label: "Posts",
+    value: stats?.articleCount ?? fallbackArticleCount,
+  },
+];
+
+if (stats?.yearsOfDev) {
+  profileStats.push({
+    label: "Years",
+    value: stats.yearsOfDev,
+  });
+}
 ---
 
 <section class="home-card profile-card" aria-labelledby="profile-title">
   <div class="profile-card__avatar" aria-hidden="true">AI</div>
   <h2 id="profile-title">{currentProfile.site.title}</h2>
   <p>{currentProfile.site.description}</p>
+  {
+    profileStats.length > 0 && (
+      <dl class="profile-card__stats" aria-label="站点统计">
+        {profileStats.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
   <div class="profile-card__links" aria-label="社交链接">
     <a href="https://github.com/aimcc-org/aimcc-blog" aria-label="GitHub"
       >GitHub</a

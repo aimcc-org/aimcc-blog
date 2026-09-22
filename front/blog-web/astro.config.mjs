@@ -20,5 +20,10 @@ export default defineConfig({
     define: {
       'import.meta.env.SITE_PROFILE': JSON.stringify(profileName),
     },
+    server: {
+      fs: {
+        allow: ['..'],
+      },
+    },
   },
 });
