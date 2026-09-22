@@ -74,6 +74,7 @@ pnpm --dir front/blog-web build:main
 | GET | `/api/articles` | 文章分页列表（`?page=&size=&sort=new\|hot\|recommend`） |
 | GET | `/api/articles/{id}` | 文章详情（浏览量 +1） |
 | GET | `/api/tags` | 标签云（标签名 + 实时文章数） |
+| GET | `/api/stats` | 站点统计（已发布文章数 + 博主年限） |
 
 ### 数据库变更规范
 
