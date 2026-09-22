@@ -15,7 +15,7 @@ const { posts } = Astro.props;
   class="home-posts"
   aria-label="文章列表"
   transition:name="home-content"
-  transition:animate="slide"
+  transition:animate="fade"
 >
   <div class="home-posts__list">
     {posts.map((post, index) => <PostCard post={post} index={index} />)}
