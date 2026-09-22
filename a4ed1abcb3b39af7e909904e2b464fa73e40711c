@@ -1,0 +1,98 @@
+server/src/main/java/com/aimcc/blog/service/AdminAuthService.java
+  1316f3f3ae1a55e4 1-12
+server/src/main/java/com/aimcc/blog/entity/AdminUser.java
+  1316f3f3ae1a55e4 1-32
+server/src/main/java/com/aimcc/blog/dto/AdminLoginRequest.java
+  1316f3f3ae1a55e4 1-16
+server/pom.xml
+  1316f3f3ae1a55e4 63-73
+server/src/main/resources/db/migration/V3__create_admin_user.sql
+  1316f3f3ae1a55e4 8-14,18
+server/src/main/java/com/aimcc/blog/mapper/AdminUserMapper.java
+  1316f3f3ae1a55e4 1-9
+server/src/main/java/com/aimcc/blog/controller/AdminAuthController.java
+  1316f3f3ae1a55e4 1-27
+server/src/main/java/com/aimcc/blog/tools/HashGenerator.java
+  1316f3f3ae1a55e4 1-28
+server/src/main/java/com/aimcc/blog/service/impl/AdminAuthServiceImpl.java
+  1316f3f3ae1a55e4 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "a4ed1abcb3b39af7e909904e2b464fa73e40711c",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 193,
+      "total_deletions": 11,
+      "accepted_lines": 452,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/service/AdminAuthService.java": {
+          "additions": 12,
+          "accepted_lines": 12
+        },
+        "server/src/main/java/com/aimcc/blog/tools/HashGenerator.java": {
+          "additions": 28,
+          "accepted_lines": 28
+        },
+        "server/src/main/resources/db/migration/V1__init.sql": {
+          "accepted_lines": 74
+        },
+        "server/pom.xml": {
+          "additions": 11,
+          "accepted_lines": 11
+        },
+        "server/src/main/java/com/aimcc/blog/dto/AdminLoginRequest.java": {
+          "additions": 16,
+          "accepted_lines": 16
+        },
+        "docs/handoff-2026-09-17.md": {
+          "additions": 7,
+          "deletions": 3,
+          "accepted_lines": 7
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/AdminUserMapper.java": {
+          "additions": 9,
+          "accepted_lines": 9
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articletagrow.java": {
+          "accepted_lines": 12
+        },
+        "server/src/main/java/com/aimcc/blog/controller/AdminAuthController.java": {
+          "additions": 27,
+          "accepted_lines": 27
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 37
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 128
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/AdminAuthServiceImpl.java": {
+          "additions": 43,
+          "accepted_lines": 43
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/tagmapper.java": {
+          "accepted_lines": 8
+        },
+        "server/src/main/resources/db/migration/V3__create_admin_user.sql": {
+          "additions": 8,
+          "deletions": 8,
+          "accepted_lines": 8
+        },
+        "server/src/main/java/com/aimcc/blog/entity/AdminUser.java": {
+          "additions": 32,
+          "accepted_lines": 32
+        }
+      }
+    }
+  }
+}
