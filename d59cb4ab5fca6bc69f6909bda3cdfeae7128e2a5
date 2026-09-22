@@ -1,0 +1,41 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "d59cb4ab5fca6bc69f6909bda3cdfeae7128e2a5",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 1,
+      "accepted_lines": 259,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 128
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/ArticleMapper.java": {
+          "deletions": 1
+        },
+        "server/src/main/resources/db/migration/V1__init.sql": {
+          "accepted_lines": 74
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 37
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articletagrow.java": {
+          "accepted_lines": 12
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/tagmapper.java": {
+          "accepted_lines": 8
+        }
+      }
+    }
+  }
+}
