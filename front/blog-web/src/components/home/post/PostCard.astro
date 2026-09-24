@@ -24,6 +24,7 @@ const stats = [
   class="post-card"
   style={`--stagger-index:${index}`}
   data-tags={post.tags.join("|")}
+  data-category={post.category || "未分类"}
 >
   <a
     class:list={["post-card__link", { "is-featured": index === 0 }]}

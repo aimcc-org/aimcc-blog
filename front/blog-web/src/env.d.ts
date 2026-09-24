@@ -11,4 +11,5 @@ interface ImportMeta {
 
 interface Window {
   __aimccReadingProgressHandler?: () => void;
+  __aimccReadingProgressRoot?: HTMLElement;
 }

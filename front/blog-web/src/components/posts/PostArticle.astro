@@ -80,30 +80,50 @@ const cover =
 
 <script>
   const updateReadingProgress = () => {
+    const scrollRoot = document.querySelector<HTMLElement>(
+      ".home-scroll-region",
+    );
     const article = document.querySelector<HTMLElement>(".post-article");
     const bar = document.querySelector<HTMLElement>("[data-reading-progress]");
     const label = document.querySelector<HTMLElement>("[data-reading-percent]");
-    if (!article || !bar || !label) return;
+    if (!scrollRoot || !article || !bar || !label) return;
 
-    const start = article.offsetTop;
-    const distance = Math.max(article.offsetHeight - window.innerHeight, 1);
+    const start =
+      article.getBoundingClientRect().top -
+      scrollRoot.getBoundingClientRect().top +
+      scrollRoot.scrollTop;
+    const distance = Math.max(
+      article.offsetHeight - scrollRoot.clientHeight,
+      1,
+    );
     const percent = Math.min(
       100,
-      Math.max(0, ((window.scrollY - start) / distance) * 100),
+      Math.max(0, ((scrollRoot.scrollTop - start) / distance) * 100),
     );
     bar.style.width = `${percent}%`;
     label.textContent = `${Math.round(percent)}%`;
   };
 
   const bindReadingProgress = () => {
-    if (window.__aimccReadingProgressHandler) {
-      window.removeEventListener(
+    const scrollRoot = document.querySelector<HTMLElement>(
+      ".home-scroll-region",
+    );
+    if (!scrollRoot) return;
+
+    if (
+      window.__aimccReadingProgressRoot &&
+      window.__aimccReadingProgressHandler
+    ) {
+      window.__aimccReadingProgressRoot.removeEventListener(
         "scroll",
         window.__aimccReadingProgressHandler,
       );
     }
     window.__aimccReadingProgressHandler = updateReadingProgress;
-    window.addEventListener("scroll", updateReadingProgress, { passive: true });
+    window.__aimccReadingProgressRoot = scrollRoot;
+    scrollRoot.addEventListener("scroll", updateReadingProgress, {
+      passive: true,
+    });
     updateReadingProgress();
   };
 

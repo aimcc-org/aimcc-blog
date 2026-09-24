@@ -35,17 +35,21 @@ const { posts } = Astro.props;
 <script>
   const params = new URLSearchParams(window.location.search);
   const activeTag = params.get("tag")?.toLowerCase();
+  const activeCategory = params.get("category")?.toLowerCase();
   const postCards = [...document.querySelectorAll<HTMLElement>(".post-card")];
   const empty = document.querySelector<HTMLElement>(".home-posts__empty");
 
-  if (activeTag) {
+  if (activeTag || activeCategory) {
     let visibleCount = 0;
 
     for (const card of postCards) {
       const tags = (card.dataset.tags ?? "")
         .split("|")
         .map((tag) => tag.toLowerCase());
-      const visible = tags.includes(activeTag);
+      const category = (card.dataset.category ?? "").toLowerCase();
+      const visible =
+        (!activeTag || tags.includes(activeTag)) &&
+        (!activeCategory || category === activeCategory);
       card.hidden = !visible;
       if (visible) visibleCount += 1;
     }

@@ -14,7 +14,6 @@ export async function getStaticPaths() {
 }
 
 const { entry, posts, activeSlug } = Astro.props;
-const activePost = posts.find((post) => post.slug === activeSlug);
 ---
 
 <BlogHomeLayout
@@ -22,7 +21,6 @@ const activePost = posts.find((post) => post.slug === activeSlug);
   description={entry.data.description}
   posts={posts}
   activeSlug={activeSlug}
-  activePost={activePost}
 >
   <section
     id="article"

@@ -12,7 +12,6 @@ const posts = (await getProfilePosts()).map(toPostSummary);
   description={currentProfile.site.description}
   posts={posts}
   activeSlug={posts[0]?.slug}
-  activePost={posts[0]}
 >
   <PostList posts={posts} />
 </BlogHomeLayout>
