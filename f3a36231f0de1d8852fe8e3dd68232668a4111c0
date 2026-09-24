@@ -1,0 +1,71 @@
+server/src/main/java/com/aimcc/blog/service/impl/ArticleServiceImpl.java
+  1316f3f3ae1a55e4 1-36
+server/src/main/java/com/aimcc/blog/service/ArticleService.java
+  1316f3f3ae1a55e4 1-22
+server/pom.xml
+  82907b68994a5923 43-48
+server/src/main/java/com/aimcc/blog/config/MybatisPlusConfig.java
+  1316f3f3ae1a55e4 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "f3a36231f0de1d8852fe8e3dd68232668a4111c0",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 81,
+      "total_deletions": 2,
+      "accepted_lines": 80,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "additions": 1,
+          "deletions": 1,
+          "accepted_lines": 1
+        },
+        "server/src/main/java/com/aimcc/blog/service/ArticleService.java": {
+          "additions": 22,
+          "accepted_lines": 22
+        },
+        "server/src/main/java/com/aimcc/blog/config/MybatisPlusConfig.java": {
+          "additions": 21,
+          "accepted_lines": 21
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/ArticleServiceImpl.java": {
+          "additions": 37,
+          "deletions": 1,
+          "accepted_lines": 36
+        }
+      }
+    },
+    "82907b68994a5923": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "412811f7-f871-4cd8-9bdc-47a8bf0eccf9",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 0,
+      "accepted_lines": 88,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/pom.xml": {
+          "additions": 6,
+          "accepted_lines": 6
+        },
+        "docs/handoff-2026-09-17.md": {
+          "accepted_lines": 82
+        }
+      }
+    }
+  }
+}

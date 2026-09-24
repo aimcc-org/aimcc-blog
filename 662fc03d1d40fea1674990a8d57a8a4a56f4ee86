@@ -1,0 +1,80 @@
+server/mvnw
+  b4e773aa382062e4 1-295
+server/src/test/java/com/example/server/ServerApplicationTests.java
+  b4e773aa382062e4 1-13
+server/.gitattributes
+  b4e773aa382062e4 1-2
+server/src/main/java/com/example/server/ServerApplication.java
+  b4e773aa382062e4 1-13
+server/.mvn/wrapper/maven-wrapper.properties
+  b4e773aa382062e4 1-3
+server/mvnw.cmd
+  b4e773aa382062e4 1-189
+server/src/main/resources/application.yaml
+  b4e773aa382062e4 1-3
+server/.gitignore
+  b4e773aa382062e4 1-33
+server/pom.xml
+  b4e773aa382062e4 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "ea00477add0db574485f7bdf0516c46dea69adb2",
+  "prompts": {
+    "b4e773aa382062e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f8f30ac5-8a8b-47d8-b285-74875ae00c19",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 605,
+      "total_deletions": 1,
+      "accepted_lines": 605,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/pom.xml": {
+          "additions": 54,
+          "accepted_lines": 54
+        },
+        "server/.gitattributes": {
+          "additions": 2,
+          "accepted_lines": 2
+        },
+        "server/src/main/java/com/example/server/ServerApplication.java": {
+          "additions": 13,
+          "accepted_lines": 13
+        },
+        "server/src/test/java/com/example/server/ServerApplicationTests.java": {
+          "additions": 13,
+          "accepted_lines": 13
+        },
+        "server/mvnw.cmd": {
+          "additions": 189,
+          "accepted_lines": 189
+        },
+        "server/src/main/resources/application.yaml": {
+          "additions": 3,
+          "accepted_lines": 3
+        },
+        "server": {
+          "deletions": 1
+        },
+        "server/.gitignore": {
+          "additions": 33,
+          "accepted_lines": 33
+        },
+        "server/mvnw": {
+          "additions": 295,
+          "accepted_lines": 295
+        },
+        "server/.mvn/wrapper/maven-wrapper.properties": {
+          "additions": 3,
+          "accepted_lines": 3
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+README.md
+  1316f3f3ae1a55e4 77
+docs/handoff-2026-09-17.md
+  1316f3f3ae1a55e4 11,25,45,56-59,111,113-119,121-125,129-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "2a100d1499d46497e421f6857092266869a95791",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 7,
+      "accepted_lines": 291,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/dto/articletagrow.java": {
+          "accepted_lines": 12
+        },
+        "README.md": {
+          "additions": 1,
+          "accepted_lines": 1
+        },
+        "docs/handoff-2026-09-17.md": {
+          "additions": 10,
+          "deletions": 7,
+          "accepted_lines": 31
+        },
+        "server/src/main/resources/db/migration/V1__init.sql": {
+          "accepted_lines": 74
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/tagmapper.java": {
+          "accepted_lines": 8
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 128
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 37
+        }
+      }
+    }
+  }
+}

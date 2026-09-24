@@ -1,0 +1,38 @@
+server/sql/init.sql
+  82907b68994a5923 1-42
+README.md
+  82907b68994a5923 58-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "05b92d1964e12d9c53040583f5c329f33b24f5b0",
+  "prompts": {
+    "82907b68994a5923": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "412811f7-f871-4cd8-9bdc-47a8bf0eccf9",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 60,
+      "total_deletions": 0,
+      "accepted_lines": 142,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "docs/handoff-2026-09-17.md": {
+          "accepted_lines": 82
+        },
+        "README.md": {
+          "additions": 18,
+          "accepted_lines": 18
+        },
+        "server/sql/init.sql": {
+          "additions": 42,
+          "accepted_lines": 42
+        }
+      }
+    }
+  }
+}

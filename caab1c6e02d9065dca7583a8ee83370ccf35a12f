@@ -1,0 +1,65 @@
+server/src/main/resources/db/migration/V2__create_tag_tables.sql
+  1316f3f3ae1a55e4 1-28
+server/pom.xml
+  1316f3f3ae1a55e4 49-62
+server/src/main/resources/application.yaml
+  1316f3f3ae1a55e4 7-12
+README.md
+  1316f3f3ae1a55e4 60,64,74-80
+server/src/main/resources/db/migration/V1__init.sql
+  1316f3f3ae1a55e4 2-3,6,23-34,52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "caab1c6e02d9065dca7583a8ee83370ccf35a12f",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 148,
+      "total_deletions": 55,
+      "accepted_lines": 260,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/resources/db/migration/V1__init.sql": {
+          "additions": 74,
+          "accepted_lines": 74
+        },
+        "server/src/main/resources/db/migration/V2__create_tag_tables.sql": {
+          "additions": 28,
+          "accepted_lines": 28
+        },
+        "server/src/main/resources/application.yaml": {
+          "additions": 6,
+          "accepted_lines": 6
+        },
+        "server/pom.xml": {
+          "additions": 14,
+          "accepted_lines": 14
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 83
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 29
+        },
+        "server/sql/init.sql": {
+          "additions": 17,
+          "deletions": 52,
+          "accepted_lines": 17
+        },
+        "README.md": {
+          "additions": 9,
+          "deletions": 3,
+          "accepted_lines": 9
+        }
+      }
+    }
+  }
+}

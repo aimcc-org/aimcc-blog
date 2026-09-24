@@ -1,0 +1,74 @@
+server/src/main/java/com/aimcc/blog/common/ApiResult.java
+  71ed844a359fe984 1-31
+server/src/main/java/com/aimcc/blog/config/package-info.java
+  71ed844a359fe984 1-4
+server/pom.xml
+  71ed844a359fe984 48-52,67-79
+server/src/main/java/com/aimcc/blog/service/DemoService.java
+  71ed844a359fe984 1-10
+server/src/main/java/com/aimcc/blog/service/impl/DemoServiceImpl.java
+  71ed844a359fe984 1-21
+server/src/main/java/com/aimcc/blog/mapper/DemoMapper.java
+  71ed844a359fe984 1-14
+server/src/main/java/com/aimcc/blog/entity/package-info.java
+  71ed844a359fe984 1-5
+server/src/main/java/com/aimcc/blog/controller/DemoController.java
+  71ed844a359fe984 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "255e07aac942e58fd38b6307b67ec472c3189d99",
+  "prompts": {
+    "71ed844a359fe984": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f032e6-d549-402d-aff7-a471574cebfc",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 169,
+      "total_deletions": 41,
+      "accepted_lines": 128,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/common/ApiResult.java": {
+          "additions": 64,
+          "deletions": 33,
+          "accepted_lines": 31
+        },
+        "server/src/main/java/com/aimcc/blog/entity/package-info.java": {
+          "additions": 5,
+          "accepted_lines": 5
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/DemoMapper.java": {
+          "additions": 14,
+          "accepted_lines": 14
+        },
+        "server/src/main/java/com/aimcc/blog/service/DemoService.java": {
+          "additions": 10,
+          "accepted_lines": 10
+        },
+        "server/pom.xml": {
+          "additions": 18,
+          "accepted_lines": 18
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/DemoServiceImpl.java": {
+          "additions": 25,
+          "deletions": 4,
+          "accepted_lines": 21
+        },
+        "server/src/main/java/com/aimcc/blog/controller/DemoController.java": {
+          "additions": 29,
+          "deletions": 4,
+          "accepted_lines": 25
+        },
+        "server/src/main/java/com/aimcc/blog/config/package-info.java": {
+          "additions": 4,
+          "accepted_lines": 4
+        }
+      }
+    }
+  }
+}

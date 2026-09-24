@@ -1,0 +1,29 @@
+docs/命令速查.md
+  1316f3f3ae1a55e4 1-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "4b84237a3068b8641938ca32f3b1eb255ea7e25f",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 87,
+      "total_deletions": 0,
+      "accepted_lines": 87,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "docs/命令速查.md": {
+          "additions": 87,
+          "accepted_lines": 87
+        }
+      }
+    }
+  }
+}

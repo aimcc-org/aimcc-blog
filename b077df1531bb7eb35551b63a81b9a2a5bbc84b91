@@ -1,0 +1,76 @@
+server/src/main/java/com/aimcc/blog/entity/Tag.java
+  1316f3f3ae1a55e4 10-12,16-17,21,24
+server/src/main/java/com/aimcc/blog/service/TagService.java
+  1316f3f3ae1a55e4 1-14
+docs/handoff-2026-09-17.md
+  1316f3f3ae1a55e4 103
+server/src/main/java/com/aimcc/blog/controller/TagController.java
+  1316f3f3ae1a55e4 1-28
+server/src/main/java/com/aimcc/blog/mapper/TagMapper.java
+  1316f3f3ae1a55e4 3,8-9,12-16
+server/src/main/resources/application.yaml
+  1316f3f3ae1a55e4 15-16
+server/src/main/java/com/aimcc/blog/dto/TagVO.java
+  1316f3f3ae1a55e4 1-19
+server/src/main/java/com/aimcc/blog/service/impl/TagServiceImpl.java
+  1316f3f3ae1a55e4 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "b077df1531bb7eb35551b63a81b9a2a5bbc84b91",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 99,
+      "total_deletions": 0,
+      "accepted_lines": 213,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/resources/application.yaml": {
+          "additions": 2,
+          "accepted_lines": 2
+        },
+        "server/src/main/java/com/aimcc/blog/dto/articlelistvo.java": {
+          "accepted_lines": 29
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/articleserviceimpl.java": {
+          "accepted_lines": 83
+        },
+        "server/src/main/java/com/aimcc/blog/entity/Tag.java": {
+          "additions": 7,
+          "accepted_lines": 7
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/TagServiceImpl.java": {
+          "additions": 21,
+          "accepted_lines": 21
+        },
+        "docs/handoff-2026-09-17.md": {
+          "accepted_lines": 2
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/TagMapper.java": {
+          "additions": 8,
+          "accepted_lines": 8
+        },
+        "server/src/main/java/com/aimcc/blog/service/TagService.java": {
+          "additions": 14,
+          "accepted_lines": 14
+        },
+        "server/src/main/java/com/aimcc/blog/dto/TagVO.java": {
+          "additions": 19,
+          "accepted_lines": 19
+        },
+        "server/src/main/java/com/aimcc/blog/controller/TagController.java": {
+          "additions": 28,
+          "accepted_lines": 28
+        }
+      }
+    }
+  }
+}

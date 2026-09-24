@@ -1,0 +1,58 @@
+server/src/main/java/com/aimcc/blog/service/impl/ProfileServiceImpl.java
+  82907b68994a5923 1-22
+server/src/main/java/com/aimcc/blog/entity/Profile.java
+  82907b68994a5923 1-53
+server/src/main/java/com/aimcc/blog/service/ProfileService.java
+  82907b68994a5923 1-13
+server/src/main/resources/application.yaml
+  82907b68994a5923 6-8
+server/src/main/java/com/aimcc/blog/mapper/ProfileMapper.java
+  82907b68994a5923 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "152b56b31274be2a904e4e1e80c6c5051e877f24",
+  "prompts": {
+    "82907b68994a5923": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "412811f7-f871-4cd8-9bdc-47a8bf0eccf9",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 182,
+      "total_deletions": 3,
+      "accepted_lines": 182,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/entity/Profile.java": {
+          "additions": 53,
+          "accepted_lines": 53
+        },
+        "server/src/main/java/com/aimcc/blog/service/impl/ProfileServiceImpl.java": {
+          "additions": 22,
+          "accepted_lines": 22
+        },
+        "docs/handoff-2026-09-17.md": {
+          "additions": 82,
+          "accepted_lines": 82
+        },
+        "server/src/main/java/com/aimcc/blog/service/ProfileService.java": {
+          "additions": 13,
+          "accepted_lines": 13
+        },
+        "server/src/main/resources/application.yaml": {
+          "additions": 3,
+          "deletions": 3,
+          "accepted_lines": 3
+        },
+        "server/src/main/java/com/aimcc/blog/mapper/ProfileMapper.java": {
+          "additions": 9,
+          "accepted_lines": 9
+        }
+      }
+    }
+  }
+}

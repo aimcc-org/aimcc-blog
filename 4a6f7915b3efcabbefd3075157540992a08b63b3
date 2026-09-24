@@ -1,0 +1,59 @@
+server/src/main/java/com/aimcc/blog/service/impl/AdminAuthServiceImpl.java
+  1316f3f3ae1a55e4 5,44-75
+server/src/main/java/com/aimcc/blog/service/AdminAuthService.java
+  1316f3f3ae1a55e4 4,13-15
+server/src/main/java/com/aimcc/blog/controller/AdminAuthController.java
+  1316f3f3ae1a55e4 5,28-32
+server/src/main/java/com/aimcc/blog/config/SaTokenConfig.java
+  1316f3f3ae1a55e4 1-22
+server/src/main/java/com/aimcc/blog/exception/GlobalExceptionHandler.java
+  1316f3f3ae1a55e4 3,29-34
+server/src/main/java/com/aimcc/blog/dto/AdminRegisterRequest.java
+  1316f3f3ae1a55e4 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "4a6f7915b3efcabbefd3075157540992a08b63b3",
+  "prompts": {
+    "1316f3f3ae1a55e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "507ee8b8-c1b5-449c-aa69-06f86906b539",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "程凯",
+      "messages": [],
+      "total_additions": 94,
+      "total_deletions": 0,
+      "accepted_lines": 94,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "server/src/main/java/com/aimcc/blog/service/impl/AdminAuthServiceImpl.java": {
+          "additions": 34,
+          "accepted_lines": 34
+        },
+        "server/src/main/java/com/aimcc/blog/controller/AdminAuthController.java": {
+          "additions": 7,
+          "accepted_lines": 7
+        },
+        "server/src/main/java/com/aimcc/blog/config/SaTokenConfig.java": {
+          "additions": 22,
+          "accepted_lines": 22
+        },
+        "server/src/main/java/com/aimcc/blog/service/AdminAuthService.java": {
+          "additions": 4,
+          "accepted_lines": 4
+        },
+        "server/src/main/java/com/aimcc/blog/exception/GlobalExceptionHandler.java": {
+          "additions": 8,
+          "accepted_lines": 8
+        },
+        "server/src/main/java/com/aimcc/blog/dto/AdminRegisterRequest.java": {
+          "additions": 19,
+          "accepted_lines": 19
+        }
+      }
+    }
+  }
+}
