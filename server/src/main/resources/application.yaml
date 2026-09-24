@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: server
+  data:
+    # Redis：本地和服务器各跑一个，应用统一连 localhost:6379（密码两边设成同一个）
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
   flyway:
     enabled: true
     # 首次接入 Flyway 的存量库：把已有表结构视为「V1 已完成」，从 V2 开始执行
