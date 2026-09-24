@@ -2,7 +2,6 @@
 import { getProfilePosts } from "@/content/posts";
 import { toPostSummary } from "@/types/post";
 import BlogHomeLayout from "@/layouts/home/BlogHomeLayout.astro";
-import HomeSidebar from "@/components/home/sidebar/HomeSidebar.astro";
 import PostArticle from "@/components/posts/PostArticle.astro";
 
 export async function getStaticPaths() {
@@ -10,15 +9,21 @@ export async function getStaticPaths() {
   const posts = profilePosts.map(toPostSummary);
   return profilePosts.map(({ entry, meta }) => ({
     params: { slug: meta.slug },
-    props: { entry, posts },
+    props: { entry, posts, activeSlug: meta.slug },
   }));
 }
 
-const { entry, posts } = Astro.props;
+const { entry, posts, activeSlug } = Astro.props;
+const activePost = posts.find((post) => post.slug === activeSlug);
 ---
 
-<BlogHomeLayout title={entry.data.title} description={entry.data.description}>
-  <HomeSidebar posts={posts} />
+<BlogHomeLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  posts={posts}
+  activeSlug={activeSlug}
+  activePost={activePost}
+>
   <section
     id="article"
     class="home-article"
@@ -26,9 +31,6 @@ const { entry, posts } = Astro.props;
     transition:name="home-content"
     transition:animate="fade"
   >
-    <a class="home-article__back" href="/#posts" aria-label="返回文章列表"
-      >← <span>返回文章列表</span></a
-    >
     <PostArticle entry={entry} />
   </section>
 </BlogHomeLayout>

@@ -1,16 +1,21 @@
 ---
 import BaseLayout from "@/layouts/base/BaseLayout.astro";
 import HomeNavbar from "@/components/home/HomeNavbar.astro";
-import HeroBanner from "@/components/home/HeroBanner.astro";
+import ArticleRail from "@/components/home/ArticleRail.astro";
+import DateSpine from "@/components/home/DateSpine.astro";
 import HomeFooter from "@/components/home/HomeFooter.astro";
+import type { PostSummary } from "@/types/post";
 import "@/styles/home.css";
 
 interface Props {
   title?: string;
   description?: string;
+  posts: PostSummary[];
+  activeSlug?: string;
+  activePost?: PostSummary;
 }
 
-const { title, description } = Astro.props;
+const { title, description, posts, activeSlug, activePost } = Astro.props;
 ---
 
 <BaseLayout
@@ -21,9 +26,10 @@ const { title, description } = Astro.props;
 >
   <div class="home-page">
     <HomeNavbar />
-    <HeroBanner />
-    <main class="home-main shell" transition:animate="none">
-      <slot />
+    <ArticleRail posts={posts} activeSlug={activeSlug} />
+    <main class="editorial-shell shell" transition:animate="none">
+      <DateSpine post={activePost ?? posts[0]} />
+      <div class="editorial-content"><slot /></div>
     </main>
     <HomeFooter />
   </div>

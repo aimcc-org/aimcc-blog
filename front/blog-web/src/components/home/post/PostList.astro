@@ -1,7 +1,6 @@
 ---
 import type { PostSummary } from "@/types/post";
 import PostCard from "./PostCard.astro";
-import Pagination from "./Pagination.astro";
 
 interface Props {
   posts: PostSummary[];
@@ -17,11 +16,20 @@ const { posts } = Astro.props;
   transition:name="home-content"
   transition:animate="fade"
 >
+  <header class="home-posts__intro">
+    <div>
+      <span class="eyebrow"><i></i> AI 研究札记</span>
+      <h1>记录正在发生的<br /><em>智能协作实验</em></h1>
+    </div>
+    <p>
+      从工具到工作流，从模型评估到人与 AI
+      的协作方式。这里保存实践中的判断、方法和仍待回答的问题。
+    </p>
+  </header>
   <div class="home-posts__list">
     {posts.map((post, index) => <PostCard post={post} index={index} />)}
   </div>
   <p class="home-posts__empty" hidden>当前标签下暂无文章。</p>
-  <Pagination current={1} total={1} />
 </section>
 
 <script>

@@ -13,8 +13,8 @@ const date = new Intl.DateTimeFormat("zh-CN", {
   day: "2-digit",
 }).format(new Date(post.publishedAt));
 const stats = [
-  post.wordCount ? `${post.wordCount.toLocaleString()} words` : null,
-  post.readingTime ? `${post.readingTime} min` : null,
+  post.wordCount ? `${post.wordCount.toLocaleString()} 字` : null,
+  post.readingTime ? `阅读约 ${post.readingTime} 分钟` : null,
 ]
   .filter(Boolean)
   .join(" | ");
@@ -26,17 +26,17 @@ const stats = [
   data-tags={post.tags.join("|")}
 >
   <a
-    class={`post-card__link${post.cover ? " has-cover" : ""}`}
+    class:list={["post-card__link", { "is-featured": index === 0 }]}
     href={`/posts/${post.slug}/`}
   >
-    {
-      post.cover && (
-        <div class="post-card__cover">
-          <img src={post.cover} alt="" loading="lazy" />
-          <span aria-hidden="true">›</span>
-        </div>
-      )
-    }
+    <div class="post-card__cover">
+      <img
+        src={post.cover ?? "/images/ai-workflow-city.png"}
+        alt=""
+        loading={index === 0 ? "eager" : "lazy"}
+      />
+      <span class="post-card__cover-label">观察 · 构建 · 复盘</span>
+    </div>
     <div class="post-card__body">
       <h2>{post.title}</h2>
       <div class="post-card__meta">
@@ -48,9 +48,9 @@ const stats = [
       <div class="post-card__footer">
         <span>{stats}</span>
         {
-          !post.cover && (
+          (
             <span class="post-card__arrow" aria-hidden="true">
-              ›
+              →
             </span>
           )
         }

@@ -82,7 +82,7 @@ export default function HomeControls() {
           />
           <section className="home-dialog__panel">
             <div className="home-dialog__header">
-              <h2 id="home-search-title">Search</h2>
+              <h2 id="home-search-title">搜索文章</h2>
               <button
                 className="home-nav__icon-button"
                 type="button"
@@ -94,7 +94,7 @@ export default function HomeControls() {
             </div>
             <input
               className="home-dialog__input"
-              placeholder="Search is coming soon"
+              placeholder="搜索功能即将上线"
               disabled
             />
             <p>搜索入口已预留，后续可以接入 Pagefind 或服务端搜索 API。</p>

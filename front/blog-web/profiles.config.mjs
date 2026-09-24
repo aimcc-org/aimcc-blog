@@ -1,18 +1,18 @@
 export const profiles = {
   main: {
-    id: 'main',
+    id: "main",
     site: {
-      title: 'AIMCC Blog',
-      description: 'AI / Engineering / Collaboration',
-      url: 'https://aimcc.example.com',
-      lang: 'zh-CN',
+      title: "AIMCC",
+      description: "AI、工程与协作的实验研究日志",
+      url: "https://aimcc.example.com",
+      lang: "zh-CN",
     },
     features: {
       toc: true,
       search: true,
     },
     content: {
-      owners: ['main', 'shared'],
+      owners: ["main", "shared"],
     },
   },
 };

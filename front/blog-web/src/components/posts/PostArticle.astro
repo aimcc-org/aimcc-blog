@@ -8,44 +8,105 @@ interface Props {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const date = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(entry.data.published);
+const latinWords =
+  entry.body?.match(/[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*/g)?.length ?? 0;
+const cjkChars = entry.body?.match(/[\u4e00-\u9fff]/g)?.length ?? 0;
+const readingTime = Math.max(1, Math.ceil((latinWords + cjkChars) / 300));
+const cover =
+  (entry.data.image as { src?: string } | undefined)?.src ??
+  "/images/ai-workflow-city.png";
 ---
 
-<article class="card post-article">
-  <header class="post-article__header">
-    <div class="muted post-article__date">
-      {entry.data.published.toISOString().slice(0, 10)}
+<article class="post-article">
+  <header class="post-article__hero">
+    <div class="post-article__intro">
+      <span class="eyebrow"><i></i> {entry.data.category || "研究札记"}</span>
+      <h1>{entry.data.title}</h1>
+      <div class="post-article__tags" aria-label="文章标签">
+        {entry.data.tags.map((tag) => <span># {tag}</span>)}
+      </div>
+      {entry.data.description && <p>{entry.data.description}</p>}
+      <a class="post-article__back" href="/#posts">← 返回文章列表</a>
     </div>
-    <h1>{entry.data.title}</h1>
-    <p class="muted">{entry.data.description}</p>
+
+    <figure class="post-article__visual">
+      <img src={cover} alt="未来研究城市与数据路径" fetchpriority="high" />
+      <div class="post-article__stages" aria-hidden="true">
+        <span>观察</span><span>构建</span><span>复盘</span>
+      </div>
+      <figcaption>智能协作系统 / 观察 · 构建 · 复盘</figcaption>
+    </figure>
   </header>
-  <div class="prose"><Content /></div>
+
+  <div class="post-article__lower">
+    <div class="post-article__body">
+      <div class="prose"><Content /></div>
+    </div>
+
+    <aside class="post-article__meta" aria-label="文章信息">
+      <div class="post-article__read-time">
+        <span aria-hidden="true">◷</span>
+        阅读约 {readingTime} 分钟
+      </div>
+      <dl>
+        <div><dt>日期</dt><dd>{date}</dd></div>
+        <div>
+          <dt>主题</dt>
+          <dd>
+            {entry.data.tags.length ? entry.data.tags.join(" / ") : "未分类"}
+          </dd>
+        </div>
+      </dl>
+      <div class="post-article__progress-label">
+        <span>阅读进度</span><strong data-reading-percent>0%</strong>
+      </div>
+      <div class="post-article__progress" aria-hidden="true">
+        <i data-reading-progress></i>
+      </div>
+      <a href="/archive/">继续探索 <span aria-hidden="true">→</span></a>
+      {
+        entry.data.description && (
+          <blockquote>“{entry.data.description}”</blockquote>
+        )
+      }
+    </aside>
+  </div>
 </article>
-<style>
-  .post-article {
-    padding: 2.5rem;
-  }
-  .post-article__header {
-    margin-bottom: 2rem;
-  }
-  .post-article__date {
-    font-size: 0.85rem;
-  }
-  .post-article h1 {
-    margin: 0.6rem 0 0.8rem;
-    font-size: 2.5rem;
-    line-height: 1.2;
-  }
-  .post-article__header p {
-    margin: 0;
-    font-size: 1.1rem;
-    line-height: 1.6;
-  }
-  @media (max-width: 767px) {
-    .post-article {
-      padding: 1.35rem;
+
+<script>
+  const updateReadingProgress = () => {
+    const article = document.querySelector<HTMLElement>(".post-article");
+    const bar = document.querySelector<HTMLElement>("[data-reading-progress]");
+    const label = document.querySelector<HTMLElement>("[data-reading-percent]");
+    if (!article || !bar || !label) return;
+
+    const start = article.offsetTop;
+    const distance = Math.max(article.offsetHeight - window.innerHeight, 1);
+    const percent = Math.min(
+      100,
+      Math.max(0, ((window.scrollY - start) / distance) * 100),
+    );
+    bar.style.width = `${percent}%`;
+    label.textContent = `${Math.round(percent)}%`;
+  };
+
+  const bindReadingProgress = () => {
+    if (window.__aimccReadingProgressHandler) {
+      window.removeEventListener(
+        "scroll",
+        window.__aimccReadingProgressHandler,
+      );
     }
-    .post-article h1 {
-      font-size: 2rem;
-    }
-  }
-</style>
+    window.__aimccReadingProgressHandler = updateReadingProgress;
+    window.addEventListener("scroll", updateReadingProgress, { passive: true });
+    updateReadingProgress();
+  };
+
+  bindReadingProgress();
+  document.addEventListener("astro:page-load", bindReadingProgress);
+</script>

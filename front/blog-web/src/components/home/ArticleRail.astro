@@ -1,0 +1,44 @@
+---
+import type { PostSummary } from "@/types/post";
+
+interface Props {
+  posts: PostSummary[];
+  activeSlug?: string;
+}
+
+const { posts, activeSlug } = Astro.props;
+const visiblePosts = posts.slice(0, 6);
+---
+
+<nav class="article-rail shell" aria-label="最新文章">
+  <a class="article-rail__edge article-rail__edge--start" href="/#posts">
+    <span>最新</span>
+    <span aria-hidden="true">←</span>
+  </a>
+  <div class="article-rail__track">
+    {
+      visiblePosts.map((post, index) => {
+        const isActive = post.slug === activeSlug;
+        const issue = String(posts.length - index).padStart(3, "0");
+
+        return (
+          <a
+            class:list={["article-rail__item", { "is-active": isActive }]}
+            href={`/posts/${post.slug}/`}
+            aria-current={isActive ? "page" : undefined}
+          >
+            <span class="article-rail__issue">
+              <span class="article-rail__pixel" aria-hidden="true" />
+              {issue}
+            </span>
+            <span class="article-rail__title">{post.title}</span>
+          </a>
+        );
+      })
+    }
+  </div>
+  <a class="article-rail__edge article-rail__edge--end" href="/archive/">
+    <span aria-hidden="true">→</span>
+    <span>更早文章</span>
+  </a>
+</nav>
