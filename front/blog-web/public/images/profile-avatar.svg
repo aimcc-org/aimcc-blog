@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#192a4a"/><stop offset="1" stop-color="#4b6d9a"/></linearGradient></defs>
+  <rect width="160" height="160" rx="16" fill="url(#bg)"/>
+  <path d="M0 126 126 0h34L0 160Z" fill="#ff8751" opacity=".2"/>
+  <text x="80" y="97" text-anchor="middle" font-family="system-ui,sans-serif" font-size="54" font-weight="800" fill="#edf3ff">AI</text>
+</svg>

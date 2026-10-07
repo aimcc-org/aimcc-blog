@@ -391,6 +391,14 @@ body:has(.home-page) {
   border-top: 1px solid var(--color-border);
 }
 
+.article-index__bottom {
+  min-height: 0;
+  max-height: 70dvh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
 .article-index__footer a {
   color: var(--color-primary-hover);
   font-size: 0.7rem;
@@ -996,6 +1004,15 @@ body:has(.home-page) {
   }
   .article-index__footer {
     display: none;
+  }
+  .article-index {
+    grid-template-rows: auto auto auto;
+    overflow-y: auto;
+  }
+  .article-index__categories,
+  .article-index__bottom {
+    overflow: visible;
+    max-height: none;
   }
   .editorial-shell {
     width: calc(100% - 20px);

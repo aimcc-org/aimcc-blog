@@ -1,0 +1,26 @@
+{
+  "nickname": "AIMCC",
+  "avatar": "/images/profile-avatar.svg",
+  "role": "Front-end / AI Developer",
+  "location": "北京 · 朝阳",
+  "online": true,
+  "bio": "关注前端、AI 应用、Agent、\n工具效率与摄影创作。\n记录学习与实践，探索更有趣的可能性。",
+  "skills": [
+    "React",
+    "TypeScript",
+    "Ant Design",
+    "AI / LLM",
+    "LangChain",
+    "Agent",
+    "RAG",
+    "Node.js",
+    "PostgreSQL"
+  ],
+  "resumeUrl": "/about/",
+  "githubUrl": "https://github.com/aimcc-org",
+  "email": "hello@example.com",
+  "now": {
+    "description": "前端与 AI 应用的学习、构建与实践。",
+    "activities": ["研究 Agent 工作流", "构建个人工具", "记录学习与复盘"]
+  }
+}

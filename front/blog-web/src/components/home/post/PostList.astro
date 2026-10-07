@@ -27,7 +27,14 @@ const { posts } = Astro.props;
     </p>
   </header>
   <div class="home-posts__list">
-    {posts.map((post, index) => <PostCard post={post} index={index} />)}
+    {
+      posts.map((post, index) => (
+        <>
+          {index === 1 && <h2 class="home-posts__section-title">最近文章</h2>}
+          <PostCard post={post} index={index} />
+        </>
+      ))
+    }
   </div>
   <p class="home-posts__empty" hidden>当前标签下暂无文章。</p>
 </section>

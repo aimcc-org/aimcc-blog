@@ -43,15 +43,22 @@ const stats = [
       <div class="post-card__meta">
         <time datetime={post.publishedAt}>{date}</time>
         {post.category && <span>{post.category}</span>}
-        {post.tags.slice(0, 3).map((tag) => <span>#{tag}</span>)}
+        {post.tags.slice(0, 2).map((tag) => <span>#{tag}</span>)}
+        {
+          post.tags.length > 2 && (
+            <span aria-label={`另有 ${post.tags.length - 2} 个标签`}>
+              +{post.tags.length - 2}
+            </span>
+          )
+        }
       </div>
       {post.description && <p>{post.description}</p>}
       <div class="post-card__footer">
         <span>{stats}</span>
         {
           (
-            <span class="post-card__arrow" aria-hidden="true">
-              →
+            <span class="post-card__arrow">
+              {index === 0 ? "阅读全文 →" : "→"}
             </span>
           )
         }

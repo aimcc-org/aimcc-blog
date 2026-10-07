@@ -7,7 +7,10 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+const toc = headings.filter(
+  (heading) => heading.depth === 2 || heading.depth === 3,
+);
 const date = new Intl.DateTimeFormat("zh-CN", {
   year: "numeric",
   month: "long",
@@ -45,10 +48,44 @@ const cover =
 
   <div class="post-article__lower">
     <div class="post-article__body">
+      {
+        toc.length > 0 && (
+          <details class="post-article__mobile-toc">
+            <>
+              <summary>文章目录</summary>
+              <nav aria-label="文章目录">
+                {toc.map((heading) => (
+                  <a
+                    href={`#${heading.slug}`}
+                    class:list={{ "is-nested": heading.depth === 3 }}
+                  >
+                    {heading.text}
+                  </a>
+                ))}
+              </nav>
+            </>
+          </details>
+        )
+      }
       <div class="prose"><Content /></div>
     </div>
 
     <aside class="post-article__meta" aria-label="文章信息">
+      {
+        toc.length > 0 && (
+          <nav class="post-article__toc" aria-label="文章目录">
+            <h2>文章目录</h2>
+            {toc.map((heading) => (
+              <a
+                href={`#${heading.slug}`}
+                class:list={{ "is-nested": heading.depth === 3 }}
+              >
+                {heading.text}
+              </a>
+            ))}
+          </nav>
+        )
+      }
       <div class="post-article__read-time">
         <span aria-hidden="true">◷</span>
         阅读约 {readingTime} 分钟
