@@ -95,7 +95,12 @@ public class ArticleServiceImpl implements ArticleService {
         updateWrapper.eq(Article::getId, id);
         updateWrapper.setSql("view_count = view_count + 1");
         articleMapper.update(null, updateWrapper);
-        return toDetailVO(article);
+        // Return the current database value rather than the snapshot read before the increment.
+        Article updatedArticle = articleMapper.selectById(id);
+        if (updatedArticle == null || updatedArticle.getStatus() != 1) {
+            throw new BizException(404, "文章不存在");
+        }
+        return toDetailVO(updatedArticle);
     }
 
     /** entity → 列表 VO，手动逐字段赋值 */
