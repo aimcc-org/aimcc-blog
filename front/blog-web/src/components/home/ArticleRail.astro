@@ -58,7 +58,7 @@ const categories = [
   </div>
 
   <div class="article-index__bottom">
-    <ProfileCard />
+    <ProfileCard persistKey={drawer ? "profile-drawer" : "profile-desktop"} />
     <footer class="article-index__footer">
       <a href="/#posts">全部文章</a>
       <a href="/archive/">归档 <span aria-hidden="true">→</span></a>

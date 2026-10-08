@@ -534,21 +534,6 @@ body:has(.home-page) {
   background: linear-gradient(180deg, transparent 55%, rgb(8 25 59 / 42%));
 }
 
-.post-card__cover-label {
-  position: absolute;
-  right: 0.75rem;
-  bottom: 0.75rem;
-  z-index: 1;
-  padding: 0.38rem 0.55rem;
-  border: 1px solid rgb(255 255 255 / 36%);
-  border-radius: 4px;
-  color: white;
-  background: rgb(13 42 94 / 38%);
-  backdrop-filter: blur(12px);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-}
-
 .post-card__body {
   position: relative;
   min-width: 0;

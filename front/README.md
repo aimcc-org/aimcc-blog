@@ -41,7 +41,7 @@ pnpm --dir blog-web build:all
 - 浏览器存储不可用、空间不足或其他标签页修改草稿时，会停止自动保存并提示导出备份，避免覆盖已有数据。
 - 登录 token 保存在当前标签页的 `sessionStorage`，通过服务端 `/api/admin/session` 校验，退出会调用 `/api/admin/logout` 撤销登录。
 
-开发时 `/api` 自动代理到 `http://localhost:8080`，可用 `API_PROXY_TARGET` 覆盖目标。生产部署需将同源 `/api` 反向代理到后端；如设置 `PUBLIC_API_BASE_URL` 为跨域地址，后端须允许该前端来源及 `satoken` 请求头。前后端需一起更新以提供新增的登录状态、退出接口。
+开发时 `/api` 自动代理到 `http://47.96.92.202:8080`，可用 `API_PROXY_TARGET` 覆盖目标。生产部署需将同源 `/api` 反向代理到后端；如设置 `PUBLIC_API_BASE_URL` 为跨域地址，后端须允许该前端来源及 `satoken` 请求头。前后端需一起更新以提供新增的登录状态、退出接口。
 
 后台页面已从 sitemap 和搜索索引排除，并标记为禁止搜索引擎索引。
 

@@ -1,5 +1,6 @@
 ---
 import type { PostSummary } from "@/types/post";
+import TagArticleResults from "@/components/islands/TagArticleResults";
 import PostCard from "./PostCard.astro";
 
 interface Props {
@@ -26,29 +27,40 @@ const { posts } = Astro.props;
       的协作方式。这里保存实践中的判断、方法和仍待回答的问题。
     </p>
   </header>
-  <div class="home-posts__list">
-    {
-      posts.map((post, index) => (
-        <>
-          {index === 1 && <h2 class="home-posts__section-title">最近文章</h2>}
-          <PostCard post={post} index={index} />
-        </>
-      ))
-    }
+  <TagArticleResults client:load />
+  <div data-local-posts>
+    <div class="home-posts__list">
+      {
+        posts.map((post, index) => (
+          <>
+            {index === 1 && <h2 class="home-posts__section-title">最近文章</h2>}
+            <PostCard post={post} index={index} />
+          </>
+        ))
+      }
+    </div>
+    <p class="home-posts__empty" hidden>当前标签下暂无文章。</p>
   </div>
-  <p class="home-posts__empty" hidden>当前标签下暂无文章。</p>
 </section>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const activeTag = params.get("tag")?.toLowerCase();
-  const activeCategory = params.get("category")?.toLowerCase();
-  const postCards = [...document.querySelectorAll<HTMLElement>(".post-card")];
-  const empty = document.querySelector<HTMLElement>(".home-posts__empty");
+  import { readTagIds } from "@/lib/tag-filter";
 
-  if (activeTag || activeCategory) {
+  function applyPostFilter() {
+    const params = new URLSearchParams(window.location.search);
+    const localPosts =
+      document.querySelector<HTMLElement>("[data-local-posts]");
+    if (!localPosts) return;
+    localPosts.hidden =
+      readTagIds(window.location.search).length > 0 || !params.get("category");
+    if (localPosts.hidden) return;
+    const activeTag = params.get("tag")?.toLowerCase();
+    const activeCategory = params.get("category")?.toLowerCase();
+    const postCards = [
+      ...localPosts.querySelectorAll<HTMLElement>(".post-card"),
+    ];
+    const empty = localPosts.querySelector<HTMLElement>(".home-posts__empty");
     let visibleCount = 0;
-
     for (const card of postCards) {
       const tags = (card.dataset.tags ?? "")
         .split("|")
@@ -60,7 +72,10 @@ const { posts } = Astro.props;
       card.hidden = !visible;
       if (visible) visibleCount += 1;
     }
-
     if (empty) empty.hidden = visibleCount > 0;
   }
+  applyPostFilter();
+  document.addEventListener("astro:page-load", applyPostFilter);
+  window.addEventListener("popstate", applyPostFilter);
+  window.addEventListener("aimcc:tag-filter-change", applyPostFilter);
 </script>

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fetchArticleList } from "../src/lib/article-list.ts";
+import {
+  fetchArticleList,
+  fetchArticleListBatch,
+} from "../src/lib/article-list.ts";
 
 const data = {
   records: [
@@ -25,10 +28,21 @@ test("request the latest article page and forward abort signal", async (t) => {
     assert.equal(parsed.searchParams.get("page"), "2");
     assert.equal(parsed.searchParams.get("size"), "20");
     assert.equal(parsed.searchParams.get("sort"), "new");
+    assert.equal(parsed.searchParams.has("tagId"), false);
     assert.equal(options.signal, controller.signal);
     return Response.json({ code: 200, data });
   });
   assert.deepEqual(await fetchArticleList("/api", 2, controller.signal), data);
+});
+test("pass tagId on every page of a filtered list", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const parsed = new URL(url, "https://example.test");
+    assert.equal(parsed.searchParams.get("tagId"), "2");
+    const current = Number(parsed.searchParams.get("page"));
+    return Response.json({ code: 200, data: { ...data, current } });
+  });
+  await fetchArticleList("/api", 1, undefined, 2);
+  await fetchArticleList("/api", 2, undefined, 2);
 });
 test("reject failed HTTP responses", async (t) => {
   t.mock.method(
@@ -58,4 +72,85 @@ test("accept an empty first page", async (t) => {
     Response.json({ code: 200, data: empty }),
   );
   assert.deepEqual(await fetchArticleList("/api"), empty);
+});
+
+test("multi-select requests each tag, deduplicates articles and preserves pagination", async (t) => {
+  const calls = [];
+  const controller = new AbortController();
+  t.mock.method(globalThis, "fetch", async (url, options) => {
+    assert.equal(options.signal, controller.signal);
+    const params = new URL(url, "https://example.test").searchParams;
+    const tagId = Number(params.get("tagId"));
+    const current = Number(params.get("page"));
+    calls.push([tagId, current]);
+    const records =
+      current === 1
+        ? tagId === 1
+          ? [{ id: 1 }, { id: 2 }]
+          : [{ id: 2 }, { id: 3 }]
+        : tagId === 1
+          ? [{ id: 4 }]
+          : [];
+    return Response.json({
+      code: 200,
+      data: { records, current, size: 2, total: tagId === 1 ? 3 : 2 },
+    });
+  });
+  const first = await fetchArticleListBatch(
+    "/api",
+    1,
+    controller.signal,
+    [1, 2, 1],
+  );
+  assert.deepEqual(
+    first.records.map((article) => article.id),
+    [1, 2, 3],
+  );
+  assert.equal(first.hasMore, true);
+  const second = await fetchArticleListBatch(
+    "/api",
+    2,
+    controller.signal,
+    [1, 2],
+  );
+  assert.deepEqual(
+    second.records.map((article) => article.id),
+    [4],
+  );
+  assert.equal(second.hasMore, false);
+  assert.deepEqual(calls, [
+    [1, 1],
+    [2, 1],
+    [1, 2],
+    [2, 2],
+  ]);
+});
+
+test("no selected tags requests the unfiltered list", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    assert.equal(
+      new URL(url, "https://example.test").searchParams.has("tagId"),
+      false,
+    );
+    return Response.json({
+      code: 200,
+      data: { records: [], current: 1, size: 20, total: 0 },
+    });
+  });
+  assert.deepEqual(await fetchArticleListBatch("/api"), {
+    records: [],
+    hasMore: false,
+  });
+});
+
+test("a failed selected-tag request fails the whole batch", async (t) => {
+  t.mock.method(
+    globalThis,
+    "fetch",
+    async () => new Response(null, { status: 503 }),
+  );
+  await assert.rejects(
+    fetchArticleListBatch("/api", 1, undefined, [1, 2]),
+    /503/,
+  );
 });

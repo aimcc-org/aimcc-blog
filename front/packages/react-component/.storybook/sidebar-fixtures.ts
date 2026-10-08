@@ -4,7 +4,7 @@ export const sidebarProfile = {
   location: "北京 · 朝阳",
   bio: "专注于前端、AI 应用与 Agent，用技术记录与思考，探索更有趣的可能性。",
   online: true,
-  skills: [
+  tags: [
     "React",
     "TypeScript",
     "Ant Design",

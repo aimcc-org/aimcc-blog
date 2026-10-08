@@ -31,7 +31,7 @@ export const Minimal: Story = {
     role: undefined,
     location: undefined,
     bio: undefined,
-    skills: [],
+    tags: [],
     resumeHref: undefined,
     githubHref: undefined,
     contactHref: undefined,
@@ -42,6 +42,6 @@ export const LongContent: Story = {
   args: {
     name: "AIMCC · 前端开发与设计工程",
     role: "Front-end Developer & AI Application Engineer",
-    skills: ["React", "TypeScript", "一个很长的技能标签用于验证换行"],
+    tags: ["React", "TypeScript", "一个很长的标签用于验证换行"],
   },
 };

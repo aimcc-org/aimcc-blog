@@ -1,9 +1,27 @@
 import { useId } from "react";
+import type { MouseEvent } from "react";
 import { ProfileIcon } from "./profile-icons.js";
 import type { UserProfileProps } from "./UserProfile.js";
 
-export interface SidebarUserProfileProps extends UserProfileProps {
-  /** Initial state of the independent introduction and skills disclosure. */
+export interface SidebarProfileTag {
+  id: number;
+  name: string;
+  href: string;
+  active?: boolean;
+}
+
+export interface SidebarUserProfileProps extends Omit<
+  UserProfileProps,
+  "skills" | "maxVisibleSkills"
+> {
+  /** Tags supplied by the caller, independently of personal profile data. */
+  tags?: (string | SidebarProfileTag)[];
+  maxVisibleTags?: number;
+  onTagClick?: (
+    tag: SidebarProfileTag,
+    event: MouseEvent<HTMLAnchorElement>,
+  ) => void;
+  /** Initial state of the independent introduction and tags disclosure. */
   defaultExpanded?: boolean;
 }
 
@@ -15,8 +33,9 @@ export function SidebarUserProfile({
   bio,
   avatar,
   online,
-  skills = [],
-  maxVisibleSkills = 9,
+  tags = [],
+  maxVisibleTags = 9,
+  onTagClick,
   resumeHref,
   githubHref,
   contactHref,
@@ -24,10 +43,12 @@ export function SidebarUserProfile({
   defaultExpanded = true,
 }: SidebarUserProfileProps) {
   const id = useId();
-  const limit = Number.isFinite(maxVisibleSkills)
-    ? Math.max(0, Math.floor(maxVisibleSkills))
+  const limit = Number.isFinite(maxVisibleTags)
+    ? Math.max(0, Math.floor(maxVisibleTags))
     : 9;
-  const extra = skills.slice(limit);
+  const extra = tags
+    .slice(limit)
+    .map((tag) => (typeof tag === "string" ? tag : tag.name));
   return (
     <section
       className={`sidebar-user-profile ${className}`.trim()}
@@ -64,26 +85,39 @@ export function SidebarUserProfile({
           )}
         </div>
       </div>
-      {(bio || skills.length > 0) && (
+      {(bio || tags.length > 0) && (
         <details
           className="sidebar-user-profile__summary"
           open={defaultExpanded}
         >
           <summary>
-            简介与技能 <span aria-hidden="true">＋</span>
+            简介与标签 <span aria-hidden="true">＋</span>
           </summary>
           {bio && <p className="sidebar-user-profile__bio">{bio}</p>}
-          {skills.length > 0 && (
-            <div className="sidebar-user-profile__skills">
-              <h3>技能标签</h3>
-              <ul aria-label="技能标签">
-                {skills.slice(0, limit).map((skill, index) => (
-                  <li key={index}>{skill}</li>
+          {tags.length > 0 && (
+            <div className="sidebar-user-profile__tags">
+              <h3>标签</h3>
+              <ul aria-label="标签">
+                {tags.slice(0, limit).map((tag, index) => (
+                  <li key={typeof tag === "string" ? index : tag.id}>
+                    {typeof tag === "string" ? (
+                      tag
+                    ) : (
+                      <a
+                        href={tag.href}
+                        data-tag-id={tag.id}
+                        aria-current={tag.active ? "true" : undefined}
+                        onClick={(event) => onTagClick?.(tag, event)}
+                      >
+                        {tag.name}
+                      </a>
+                    )}
+                  </li>
                 ))}
                 {extra.length > 0 && (
                   <li
                     title={extra.join("、")}
-                    aria-label={`另外 ${extra.length} 项技能：${extra.join("、")}`}
+                    aria-label={`另外 ${extra.length} 个标签：${extra.join("、")}`}
                   >
                     +{extra.length}
                   </li>

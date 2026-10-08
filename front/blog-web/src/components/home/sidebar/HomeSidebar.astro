@@ -21,20 +21,13 @@ const categories = [
   }, new Map<string, number>()),
 ].map(([name, count]) => ({ name, count }));
 
-const localTags = [
-  ...posts.reduce((map, post) => {
-    for (const tag of post.tags) map.set(tag, (map.get(tag) ?? 0) + 1);
-    return map;
-  }, new Map<string, number>()),
-].map(([name, count]) => ({ name, count }));
-
 const tags =
   apiTags?.map((tag) => ({
     id: tag.id,
     name: tag.name,
     count: tag.articleCount,
     href: `/?tag=${encodeURIComponent(tag.name)}#posts`,
-  })) ?? localTags;
+  })) ?? [];
 ---
 
 <aside class="home-sidebar" transition:persist="home-sidebar">

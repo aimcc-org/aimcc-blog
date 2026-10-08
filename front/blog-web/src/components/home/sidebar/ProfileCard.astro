@@ -4,8 +4,13 @@ import type { PersonalProfile } from "@/types/profile";
 import SidebarProfile from "@/components/islands/SidebarProfile";
 interface Props {
   profile?: PersonalProfile;
+  persistKey?: string;
 }
 const profile = Astro.props.profile ?? (await getPersonalProfile());
 ---
 
-<SidebarProfile profile={profile} />
+<SidebarProfile
+  profile={profile}
+  client:load
+  transition:persist={Astro.props.persistKey ?? "profile-sidebar"}
+/>

@@ -13,7 +13,10 @@ export type {
 } from "./ArticleTimeline.js";
 
 export { SidebarUserProfile } from "./SidebarUserProfile.js";
-export type { SidebarUserProfileProps } from "./SidebarUserProfile.js";
+export type {
+  SidebarUserProfileProps,
+  SidebarProfileTag,
+} from "./SidebarUserProfile.js";
 export { CategoryIndex } from "./CategoryIndex.js";
 export type { CategoryIndexProps, CategoryIndexItem } from "./CategoryIndex.js";
 export { NowCard } from "./NowCard.js";

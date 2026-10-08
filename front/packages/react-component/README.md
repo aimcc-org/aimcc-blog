@@ -79,7 +79,7 @@ import "@aimcc/react-component/styles.css";
 
 归档页的 `ArticleTimelineFeed` 在浏览器调用 `GET /api/articles?page=1&size=20&sort=new`，加载更多时追加下一页，重新聚合并去重。接口失败显示重试入口，不使用本地内容冒充接口数据。接口没有 slug，因此当前 API 文章只展示标题，不生成不存在的详情地址。Storybook 使用示例数据。
 
-本地 Astro 开发服务将 `/api` 代理到 `http://localhost:8080`，需要启动后端。生产部署需将同源 `/api` 反向代理到后端，或设置 `PUBLIC_API_BASE_URL` 并配置对应 CORS。页面在客户端加载接口数据，不受静态站点构建时间限制。
+本地 Astro 开发服务将 `/api` 代理到 `http://47.96.92.202:8080`，需要启动后端。生产部署需将同源 `/api` 反向代理到后端，或设置 `PUBLIC_API_BASE_URL` 并配置对应 CORS。页面在客户端加载接口数据，不受静态站点构建时间限制。
 
 ```bash
 pnpm --dir packages/react-component test

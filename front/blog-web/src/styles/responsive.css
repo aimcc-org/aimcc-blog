@@ -522,7 +522,6 @@
   .post-card__link:not(.is-featured) .post-card__body {
     padding: 12px;
   }
-  .post-card__link:not(.is-featured) .post-card__cover-label,
   .post-card__link:not(.is-featured) p {
     display: none;
   }
