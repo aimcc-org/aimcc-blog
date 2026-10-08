@@ -1,9 +1,6 @@
 ---
-interface CategoryItem {
-  name: string;
-  count: number;
-  href?: string;
-}
+import { CategoryList } from "@aimcc/react-component";
+import type { CategoryItem } from "@aimcc/react-component";
 
 interface Props {
   categories: CategoryItem[];
@@ -12,18 +9,4 @@ interface Props {
 const { categories } = Astro.props;
 ---
 
-{
-  categories.length > 0 && (
-    <section class="home-card taxonomy-card" aria-labelledby="categories-title">
-      <h2 id="categories-title">Categories</h2>
-      <div class="taxonomy-card__list">
-        {categories.map((item) => (
-          <div class="taxonomy-card__row">
-            <span>{item.name}</span>
-            <span>{item.count}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
+{categories.length > 0 && <CategoryList categories={categories} />}

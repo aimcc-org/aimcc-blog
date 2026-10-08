@@ -10,3 +10,10 @@ blog-web/public/pagefind/
 
 packages/*/node_modules/
 packages/*/dist/
+
+packages/*/storybook-static/
+
+# Rush build logs and incremental caches
+**/rush-logs/
+**/.rush/temp/chunked-rush-logs/
+**/.rush/temp/package-deps_*.json

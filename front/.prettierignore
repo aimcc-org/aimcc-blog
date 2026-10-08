@@ -5,3 +5,7 @@ blog-web/dist/
 blog-web/.astro/
 blog-web/public/pagefind/
 packages/*/dist/
+
+packages/*/storybook-static/
+**/.rush/
+**/rush-logs/

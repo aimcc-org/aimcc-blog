@@ -1,13 +1,12 @@
 ---
-import { getProfilePosts } from '@/content/posts';
-import BaseLayout from '@/layouts/base/BaseLayout.astro';
-import ArchiveList from '@/components/posts/ArchiveList.astro';
-
-const posts = await getProfilePosts();
+import BaseLayout from "@/layouts/base/BaseLayout.astro";
+import ArticleTimelineFeed from "@/components/islands/ArticleTimelineFeed";
 ---
+
 <BaseLayout title="归档">
-  <main class="shell" style="padding:40px 0 80px;">
+  <main class="shell" style="padding:40px 0 80px; max-width: 860px;">
     <h1>归档</h1>
-    <ArchiveList posts={posts} />
+    <ArticleTimelineFeed client:load />
+    <noscript>请启用 JavaScript 以加载文章时间线。</noscript>
   </main>
 </BaseLayout>

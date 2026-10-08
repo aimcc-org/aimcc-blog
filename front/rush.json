@@ -16,6 +16,11 @@
       "packageName": "@aimcc/mdx-component",
       "projectFolder": "packages/mdx-component",
       "reviewCategory": "libraries"
+    },
+    {
+      "packageName": "@aimcc/react-component",
+      "projectFolder": "packages/react-component",
+      "reviewCategory": "libraries"
     }
   ]
 }

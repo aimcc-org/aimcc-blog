@@ -1,0 +1,229 @@
+.user-profile {
+  --profile-soft: color-mix(
+    in srgb,
+    var(--color-primary) 9%,
+    var(--color-surface-solid)
+  );
+  padding: 1.25rem;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent) 4%, transparent),
+      transparent 65%
+    ),
+    var(--color-surface-solid);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  text-align: left;
+}
+.user-profile,
+.user-profile * {
+  box-sizing: border-box;
+}
+.user-profile__eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.user-profile__eyebrow span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+.user-profile__eyebrow span:last-child {
+  color: var(--color-subtle);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.user-profile__eyebrow svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+.user-profile__identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.user-profile__avatar {
+  flex: 0 0 5.5rem;
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+}
+.user-profile__avatar-content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  color: white;
+  background: linear-gradient(135deg, #102b57, #087cff 65%, #54c8e8);
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+.user-profile__avatar-content img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-profile__status {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--color-surface-solid);
+  border-radius: 50%;
+  background: #26b51d;
+}
+.user-profile__details {
+  min-width: 0;
+}
+.user-profile h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.user-profile__role {
+  margin: 0.35rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.user-profile__location {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.65rem 0 0;
+  color: var(--color-subtle);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.user-profile__location svg {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+.user-profile__bio {
+  margin: 1.1rem 0 1.3rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.user-profile__skills {
+  margin-top: 1.25rem;
+}
+.user-profile h3 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-weight: 800;
+}
+.user-profile__skills ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.55rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.user-profile__skills li {
+  max-width: 100%;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  color: var(--color-muted);
+  background: var(--profile-soft);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.user-profile__actions {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1.35rem;
+}
+.user-profile__actions a {
+  min-height: 2.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid
+    color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
+  border-radius: 0.45rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.user-profile__actions a:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+.user-profile__actions a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+.user-profile__actions .user-profile__resume {
+  min-height: 2.75rem;
+  gap: 0.6rem;
+  border-color: #1765df;
+  border-radius: 0.55rem;
+  color: #fff;
+  background: #1765df;
+  box-shadow: 0 2px 4px rgb(23 101 223 / 16%);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.user-profile__actions .user-profile__resume:hover {
+  border-color: #1156c4;
+  background: #1156c4;
+  box-shadow: 0 3px 8px rgb(23 101 223 / 22%);
+}
+.user-profile__actions .user-profile__resume:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+.user-profile__resume svg {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.9;
+}
+.user-profile__links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+.user-profile__links svg {
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .user-profile__actions a {
+    transition: none;
+  }
+}

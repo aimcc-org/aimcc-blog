@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+}
+* {
+  box-sizing: border-box;
+}
+button {
+  font: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.storybook-theme {
+  padding: 1rem;
+  background: var(--color-bg);
+  color: var(--color-text);
+}

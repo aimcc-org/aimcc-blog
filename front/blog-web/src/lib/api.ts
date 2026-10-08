@@ -1,3 +1,5 @@
+import { fetchArticleList } from "./article-list";
+export type { ApiArticle, ApiArticlePage } from "./article-list";
 const DEFAULT_API_BASE_URL = "http://localhost:8080/api";
 
 const apiBaseUrl =
@@ -41,4 +43,11 @@ export function getSiteStats() {
 
 export function getTagCloud() {
   return getApiData<ApiTag[]>("/tags");
+}
+
+/** Browser requests use a same-origin /api by default (proxied in local dev). */
+export function getArticleList(page = 1, signal?: AbortSignal) {
+  const base =
+    import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
+  return fetchArticleList(base, page, signal);
 }

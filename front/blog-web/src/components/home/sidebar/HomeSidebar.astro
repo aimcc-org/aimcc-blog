@@ -1,7 +1,7 @@
 ---
 import type { PostSummary } from "@/types/post";
 import type { ApiStats, ApiTag } from "@/lib/api";
-import ProfileCard from "./ProfileCard.astro";
+import UserProfile from "./UserProfile.astro";
 import CategoriesCard from "./CategoriesCard.astro";
 import TagsCard from "./TagsCard.astro";
 
@@ -11,7 +11,7 @@ interface Props {
   apiTags?: ApiTag[];
 }
 
-const { posts, stats, apiTags } = Astro.props;
+const { posts, apiTags } = Astro.props;
 
 const categories = [
   ...posts.reduce((map, post) => {
@@ -38,7 +38,7 @@ const tags =
 ---
 
 <aside class="home-sidebar" transition:persist="home-sidebar">
-  <ProfileCard stats={stats} fallbackArticleCount={posts.length} />
+  <UserProfile />
   <CategoriesCard categories={categories} />
   <TagsCard tags={tags} />
 </aside>
