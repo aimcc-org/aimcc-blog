@@ -1,0 +1,14 @@
+---
+interface Props {
+  current: number;
+  total: number;
+}
+
+const { current, total } = Astro.props;
+---
+
+<nav class="home-pagination" aria-label="分页">
+  <a class="is-disabled" href="#" aria-disabled="true">‹</a>
+  <span>{current} / {total}</span>
+  <a class="is-disabled" href="#" aria-disabled="true">›</a>
+</nav>

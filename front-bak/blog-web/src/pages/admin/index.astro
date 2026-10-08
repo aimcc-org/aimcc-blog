@@ -1,0 +1,9 @@
+---
+import AdminLayout from "@/layouts/admin/AdminLayout.astro";
+import AdminWorkspace from "@/components/admin/AdminWorkspace";
+---
+
+<AdminLayout title="管理后台">
+  <AdminWorkspace page="home" client:only="react" />
+  <noscript>管理后台需要启用 JavaScript 才能登录。</noscript>
+</AdminLayout>

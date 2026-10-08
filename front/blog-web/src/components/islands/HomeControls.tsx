@@ -8,6 +8,7 @@ function applyTheme(theme: "light" | "dark") {
 export default function HomeControls() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark");
@@ -18,6 +19,7 @@ export default function HomeControls() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setSearchOpen(false);
+        setMenuOpen(false);
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -48,6 +50,21 @@ export default function HomeControls() {
         >
           <span aria-hidden="true">{theme === "dark" ? "☾" : "☼"}</span>
         </button>
+        <button
+          className="home-nav__icon-button home-nav__menu-button"
+          type="button"
+          aria-label="打开导航菜单"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span aria-hidden="true">☰</span>
+        </button>
+      </div>
+
+      <div className={`home-mobile-menu${menuOpen ? " is-open" : ""}`}>
+        <a href="/">首页</a>
+        <a href="/archive/">归档</a>
+        <a href="/about/">关于</a>
       </div>
 
       {searchOpen && (
@@ -65,7 +82,7 @@ export default function HomeControls() {
           />
           <section className="home-dialog__panel">
             <div className="home-dialog__header">
-              <h2 id="home-search-title">搜索文章</h2>
+              <h2 id="home-search-title">Search</h2>
               <button
                 className="home-nav__icon-button"
                 type="button"
@@ -77,7 +94,7 @@ export default function HomeControls() {
             </div>
             <input
               className="home-dialog__input"
-              placeholder="搜索功能即将上线"
+              placeholder="Search is coming soon"
               disabled
             />
             <p>搜索入口已预留，后续可以接入 Pagefind 或服务端搜索 API。</p>

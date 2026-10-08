@@ -1,0 +1,13 @@
+---
+import { getProfilePosts } from '@/content/posts';
+import BaseLayout from '@/layouts/base/BaseLayout.astro';
+import ArchiveList from '@/components/posts/ArchiveList.astro';
+
+const posts = await getProfilePosts();
+---
+<BaseLayout title="归档">
+  <main class="shell" style="padding:40px 0 80px;">
+    <h1>归档</h1>
+    <ArchiveList posts={posts} />
+  </main>
+</BaseLayout>

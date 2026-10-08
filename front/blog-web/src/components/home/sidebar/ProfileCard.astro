@@ -1,373 +1,52 @@
 ---
-import { getPersonalProfile } from "@/lib/profile";
-import type { PersonalProfile } from "@/types/profile";
+import { currentProfile } from "@/config/build-profile";
+import type { ApiStats } from "@/lib/api";
+
 interface Props {
-  profile?: PersonalProfile;
-  titleId?: string;
+  stats?: ApiStats | null;
+  fallbackArticleCount: number;
 }
-const titleId = Astro.props.titleId ?? "profile-title";
-const profile = Astro.props.profile ?? (await getPersonalProfile());
-const links = [
-  { label: "电子简历", href: profile.resumeUrl, icon: "resume" },
-  { label: "GitHub", href: profile.githubUrl, icon: "github" },
+
+const { stats, fallbackArticleCount } = Astro.props;
+type ProfileStat = {
+  label: string;
+  value: number;
+};
+
+const profileStats: ProfileStat[] = [
   {
-    label: "联系我",
-    href: profile.email ? `mailto:${profile.email}` : null,
-    icon: "mail",
+    label: "Posts",
+    value: stats?.articleCount ?? fallbackArticleCount,
   },
-].filter((link) => link.href);
+];
+
+if (stats?.yearsOfDev) {
+  profileStats.push({
+    label: "Years",
+    value: stats.yearsOfDev,
+  });
+}
 ---
 
-<section class="profile-card" aria-labelledby={titleId}>
-  <header class="profile-card__header">
-    <span><i aria-hidden="true"></i>ABOUT ME</span><span>// 个人信息</span>
-  </header>
-  <div class="profile-card__identity">
-    <div class="profile-card__avatar">
-      {
-        profile.avatar ? (
-          <img
-            src={profile.avatar}
-            alt={`${profile.nickname}的头像`}
-            width="80"
-            height="80"
-          />
-        ) : (
-          <span>{profile.nickname.slice(0, 2)}</span>
-        )
-      }
-      {
-        profile.online !== undefined && (
-          <i
-            class:list={[
-              "profile-card__status",
-              { "is-online": profile.online },
-            ]}
-            role="img"
-            aria-label={profile.online ? "在线" : "离线"}
-          />
-        )
-      }
-    </div>
-    <div class="profile-card__details">
-      <h2 id={titleId}>{profile.nickname}</h2>
-      {profile.role && <p class="profile-card__role">{profile.role}</p>}
-      {
-        profile.location && (
-          <p class="profile-card__location">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              aria-hidden="true"
-            >
-              <>
-                <path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" />
-                <circle cx="12" cy="10" r="2.5" />
-              </>
-            </svg>
-            {profile.location}
-          </p>
-        )
-      }
-    </div>
+<section class="home-card profile-card" aria-labelledby="profile-title">
+  <div class="profile-card__avatar" aria-hidden="true">AI</div>
+  <h2 id="profile-title">{currentProfile.site.title}</h2>
+  <p>{currentProfile.site.description}</p>
+  {
+    profileStats.length > 0 && (
+      <dl class="profile-card__stats" aria-label="站点统计">
+        {profileStats.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
+  <div class="profile-card__links" aria-label="社交链接">
+    <a href="https://github.com/aimcc-org/aimcc-blog" aria-label="GitHub"
+      >GitHub</a
+    >
   </div>
-  <details class="profile-card__summary" open data-profile-summary>
-    <summary>简介与技能 <span aria-hidden="true">＋</span></summary>
-    {profile.bio && <p class="profile-card__bio">{profile.bio}</p>}
-    {
-      (profile.skills?.length ?? 0) > 0 && (
-        <div class="profile-card__skills">
-          <>
-            <h3>技能标签</h3>
-            <ul aria-label="技能标签">
-              {profile.skills?.slice(0, 9).map((skill) => (
-                <li>{skill}</li>
-              ))}
-            </ul>
-          </>
-        </div>
-      )
-    }
-  </details>
-  <nav class="profile-card__links" aria-label="个人链接">
-    {
-      links.map((link) => (
-        <a
-          class:list={{ "is-primary": link.icon === "resume" }}
-          href={link.href!}
-          target={link.icon === "github" ? "_blank" : undefined}
-          rel={link.icon === "github" ? "noopener noreferrer" : undefined}
-        >
-          <>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              {link.icon === "resume" && (
-                <>
-                  <path d="M6 3h8l4 4v14H6Z" />
-                  <path d="M14 3v5h4M9 12h6M9 16h6" />
-                </>
-              )}
-              {link.icon === "github" && (
-                <>
-                  <path d="M9 19c-4 1-4-2-6-2m12 5v-4a3 3 0 0 0-.8-2.2c3-.3 5.8-1.5 5.8-6.3A5 5 0 0 0 18.7 6c.1-.3.6-1.7-.1-3.5 0 0-1.1-.4-3.6 1.3a12 12 0 0 0-6 0C6.5 2.1 5.4 2.5 5.4 2.5 4.7 4.3 5.2 5.7 5.3 6A5 5 0 0 0 4 9.5c0 4.8 2.8 6 5.8 6.3A3 3 0 0 0 9 18v4" />
-                </>
-              )}
-              {link.icon === "mail" && (
-                <>
-                  <rect x="3" y="5" width="18" height="14" rx="1" />
-                  <path d="m3 6 9 7 9-7M3 18l6-6m12 6-6-6" />
-                </>
-              )}
-            </svg>
-            <span>{link.label}</span>
-            <span class="profile-card__arrow" aria-hidden="true">
-              ↗
-            </span>
-          </>
-        </a>
-      ))
-    }
-  </nav>
 </section>
-<style>
-  .profile-card {
-    min-width: 0;
-    padding: 20px 8px 12px;
-    border-top: 1px dashed var(--color-border);
-    color: var(--color-text);
-    container-type: inline-size;
-    container-name: profile;
-    font-size: 14px;
-  }
-  .profile-card__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.95rem;
-    font-size: 13px;
-  }
-  .profile-card__header span:first-child {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-primary);
-    font-family: var(--font-mono);
-    font-weight: 700;
-  }
-  .profile-card__header span:last-child {
-    color: var(--color-subtle);
-  }
-  .profile-card__header i {
-    width: 0.35rem;
-    height: 0.35rem;
-    border-radius: 50%;
-    background: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-control-hover);
-  }
-  .profile-card__identity {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-  }
-  .profile-card__avatar {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 5rem;
-    height: 5rem;
-    flex: 0 0 auto;
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    background: var(--color-control-hover);
-  }
-  .profile-card__avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .profile-card__status {
-    position: absolute;
-    bottom: 0.35rem;
-    right: 0.35rem;
-    width: 0.7rem;
-    height: 0.7rem;
-    border: 2px solid var(--color-surface-solid);
-    border-radius: 50%;
-    background: var(--color-subtle);
-  }
-  .profile-card__status.is-online {
-    background: #7cdb35;
-  }
-  .profile-card__details {
-    min-width: 0;
-  }
-  h2 {
-    margin: 0;
-    font-size: 1.05rem;
-    line-height: 1.35;
-    overflow-wrap: anywhere;
-  }
-  .profile-card__role {
-    margin: 0.2rem 0 0;
-    color: var(--color-muted);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-  .profile-card__location {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin: 0.6rem 0 0;
-    color: var(--color-muted);
-    font-size: 13px;
-  }
-  svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    flex: 0 0 auto;
-  }
-  .profile-card__location svg {
-    width: 0.85rem;
-    height: 0.85rem;
-  }
-  .profile-card__bio {
-    margin: 0.75rem 0 0.9rem;
-    color: var(--color-muted);
-    white-space: pre-line;
-    font-size: 14px;
-    line-height: 1.65;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    overflow-wrap: anywhere;
-  }
-  h3 {
-    margin: 0 0 0.45rem;
-    font-size: 14px;
-  }
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-  li {
-    padding: 0.2rem 0.7rem;
-    border-radius: 999px;
-    background: var(--color-control-hover);
-    color: var(--color-muted);
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  .profile-card__links {
-    margin-top: 0.75rem;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-  .profile-card__links a {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 44px;
-    padding: 8px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-control);
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition:
-      color var(--transition-fast),
-      background var(--transition-fast);
-  }
-  .profile-card__links a:hover {
-    color: var(--color-primary);
-    background: var(--color-control-hover);
-  }
-  .profile-card__links svg {
-    color: var(--color-muted);
-  }
-  .profile-card__arrow {
-    margin-left: auto;
-    color: var(--color-subtle);
-    font-size: 0.95rem;
-  }
-  .profile-card__links a.is-primary {
-    grid-column: 1 / -1;
-    justify-content: center;
-    color: white;
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-  .profile-card__links a.is-primary:hover {
-    background: var(--color-primary-hover);
-  }
-  .is-primary svg,
-  .is-primary .profile-card__arrow {
-    color: inherit;
-  }
-  .is-primary .profile-card__arrow {
-    margin-left: 4px;
-  }
-  .profile-card__summary > summary {
-    display: none;
-    cursor: pointer;
-    padding: 12px 0;
-    color: var(--color-muted);
-    font-weight: 600;
-  }
-  @media (min-width: 1200px) and (max-height: 820px) {
-    .profile-card__summary > summary {
-      display: flex;
-      justify-content: space-between;
-    }
-  }
-  @container profile (max-width: 230px) {
-    .profile-card__identity {
-      gap: 10px;
-    }
-    .profile-card__avatar {
-      width: 64px;
-      height: 64px;
-    }
-    .profile-card__links {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-
-<script>
-  const bindProfileSummary = () => {
-    const compact = window.matchMedia(
-      "(min-width: 1200px) and (max-height: 820px)",
-    );
-    const update = () =>
-      document
-        .querySelectorAll<HTMLDetailsElement>("[data-profile-summary]")
-        .forEach((details) => {
-          details.open = !compact.matches;
-        });
-    update();
-    compact.addEventListener("change", update);
-    document.addEventListener(
-      "astro:before-swap",
-      () => compact.removeEventListener("change", update),
-      { once: true },
-    );
-  };
-  document.addEventListener("astro:page-load", bindProfileSummary);
-</script>

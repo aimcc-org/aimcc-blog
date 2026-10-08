@@ -13,8 +13,8 @@ const date = new Intl.DateTimeFormat("zh-CN", {
   day: "2-digit",
 }).format(new Date(post.publishedAt));
 const stats = [
-  post.wordCount ? `${post.wordCount.toLocaleString()} 字` : null,
-  post.readingTime ? `阅读约 ${post.readingTime} 分钟` : null,
+  post.wordCount ? `${post.wordCount.toLocaleString()} words` : null,
+  post.readingTime ? `${post.readingTime} min` : null,
 ]
   .filter(Boolean)
   .join(" | ");
@@ -24,41 +24,33 @@ const stats = [
   class="post-card"
   style={`--stagger-index:${index}`}
   data-tags={post.tags.join("|")}
-  data-category={post.category || "未分类"}
 >
   <a
-    class:list={["post-card__link", { "is-featured": index === 0 }]}
+    class={`post-card__link${post.cover ? " has-cover" : ""}`}
     href={`/posts/${post.slug}/`}
   >
-    <div class="post-card__cover">
-      <img
-        src={post.cover ?? "/images/ai-workflow-city.png"}
-        alt=""
-        loading={index === 0 ? "eager" : "lazy"}
-      />
-      <span class="post-card__cover-label">观察 · 构建 · 复盘</span>
-    </div>
+    {
+      post.cover && (
+        <div class="post-card__cover">
+          <img src={post.cover} alt="" loading="lazy" />
+          <span aria-hidden="true">›</span>
+        </div>
+      )
+    }
     <div class="post-card__body">
       <h2>{post.title}</h2>
       <div class="post-card__meta">
         <time datetime={post.publishedAt}>{date}</time>
         {post.category && <span>{post.category}</span>}
-        {post.tags.slice(0, 2).map((tag) => <span>#{tag}</span>)}
-        {
-          post.tags.length > 2 && (
-            <span aria-label={`另有 ${post.tags.length - 2} 个标签`}>
-              +{post.tags.length - 2}
-            </span>
-          )
-        }
+        {post.tags.slice(0, 3).map((tag) => <span>#{tag}</span>)}
       </div>
       {post.description && <p>{post.description}</p>}
       <div class="post-card__footer">
         <span>{stats}</span>
         {
-          (
-            <span class="post-card__arrow">
-              {index === 0 ? "阅读全文 →" : "→"}
+          !post.cover && (
+            <span class="post-card__arrow" aria-hidden="true">
+              ›
             </span>
           )
         }

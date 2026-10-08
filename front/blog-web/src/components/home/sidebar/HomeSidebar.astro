@@ -11,7 +11,7 @@ interface Props {
   apiTags?: ApiTag[];
 }
 
-const { posts, apiTags } = Astro.props;
+const { posts, stats, apiTags } = Astro.props;
 
 const categories = [
   ...posts.reduce((map, post) => {
@@ -38,7 +38,7 @@ const tags =
 ---
 
 <aside class="home-sidebar" transition:persist="home-sidebar">
-  <ProfileCard />
+  <ProfileCard stats={stats} fallbackArticleCount={posts.length} />
   <CategoriesCard categories={categories} />
   <TagsCard tags={tags} />
 </aside>

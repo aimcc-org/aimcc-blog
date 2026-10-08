@@ -4,43 +4,82 @@ import HomeControls from "@/components/islands/HomeControls";
 ---
 
 <header class="home-nav-wrap" transition:persist="home-navbar">
-  <div class="home-nav">
-    <button
-      class="home-nav__sidebar-button home-nav__icon-button"
-      type="button"
-      data-open-sidebar
-      aria-haspopup="dialog"
-      aria-controls="sidebar-drawer"
-      aria-label="打开导航与个人信息">☰</button
-    >
+  <div class="home-nav shell">
     <a
       class="home-nav__brand"
       href="/"
       aria-label={`${currentProfile.site.title} 首页`}
     >
-      <span class="home-nav__mark" aria-hidden="true">
-        <i></i><i></i><i></i><i></i><i></i>
-      </span>
-      <span class="home-nav__wordmark">AIMCC</span>
-      <span class="home-nav__descriptor">AI 研究札记 / 实验研究日志</span>
+      <span class="home-nav__mark">A</span>
+      <span>{currentProfile.site.title}</span>
     </a>
     <nav class="home-nav__links" aria-label="主导航">
       <a class="is-active" href="/">首页</a>
       <a href="/archive/">归档</a>
       <a href="/about/">关于</a>
     </nav>
-    <div class="home-nav__status" aria-label="站点状态">
-      <span class="home-nav__online"><i></i>在线</span>
-      <time datetime={new Date().toISOString()}>
-        {
-          new Intl.DateTimeFormat("zh-CN", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          }).format(new Date())
-        }
-      </time>
-    </div>
     <HomeControls client:load />
   </div>
 </header>
+
+<script>
+  const scrollStateKey = "__aimccHeaderScrollBound";
+
+  if (!(scrollStateKey in window)) {
+    Object.defineProperty(window, scrollStateKey, { value: true });
+
+    let lastY = window.scrollY;
+    let direction: "up" | "down" | null = null;
+    let directionStartY = lastY;
+    let frameRequested = false;
+
+    const showHeader = () => {
+      document.querySelector(".home-nav-wrap")?.classList.remove("is-hidden");
+    };
+
+    const updateHeader = () => {
+      frameRequested = false;
+      const currentY = Math.max(window.scrollY, 0);
+      const nextDirection = currentY > lastY ? "down" : "up";
+
+      if (currentY <= 24) {
+        showHeader();
+        direction = null;
+        directionStartY = currentY;
+      } else if (nextDirection !== direction) {
+        direction = nextDirection;
+        directionStartY = currentY;
+      } else {
+        const distance = Math.abs(currentY - directionStartY);
+        const header = document.querySelector(".home-nav-wrap");
+
+        if (direction === "down" && currentY > 96 && distance >= 12) {
+          header?.classList.add("is-hidden");
+        } else if (direction === "up" && distance >= 8) {
+          header?.classList.remove("is-hidden");
+        }
+      }
+
+      lastY = currentY;
+    };
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!frameRequested) {
+          frameRequested = true;
+          window.requestAnimationFrame(updateHeader);
+        }
+      },
+      { passive: true },
+    );
+
+    document.addEventListener("astro:before-swap", showHeader);
+    document.addEventListener("astro:after-swap", () => {
+      lastY = window.scrollY;
+      direction = null;
+      directionStartY = lastY;
+      showHeader();
+    });
+  }
+</script>

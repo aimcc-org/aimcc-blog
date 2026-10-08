@@ -1,0 +1,9 @@
+---
+import AdminLayout from "@/layouts/admin/AdminLayout.astro";
+import AdminWorkspace from "@/components/admin/AdminWorkspace";
+---
+
+<AdminLayout title="发布文章">
+  <AdminWorkspace page="publish" client:only="react" />
+  <noscript>文章编辑器需要启用 JavaScript。</noscript>
+</AdminLayout>

@@ -1,0 +1,20 @@
+/* Preserve the existing site defaults; utilities style the admin components. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source("../");
+
+@theme inline {
+  --color-admin-bg: var(--color-bg);
+  --color-admin-surface: var(--color-surface-solid);
+  --color-admin-text: var(--color-text);
+  --color-admin-muted: var(--color-muted);
+  --color-admin-subtle: var(--color-subtle);
+  --color-admin-border: var(--color-border);
+  --color-admin-primary: var(--color-primary);
+  --color-admin-primary-hover: var(--color-primary-hover);
+  --color-admin-accent: var(--color-accent);
+  --color-admin-hover: var(--color-control-hover);
+  --font-admin-display: var(--font-display);
+  --font-admin-mono: var(--font-mono);
+  --shadow-admin-card: var(--shadow-card);
+  --shadow-admin-floating: var(--shadow-floating);
+}

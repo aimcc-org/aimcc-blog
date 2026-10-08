@@ -4,7 +4,8 @@
 
 ```text
 repo/
-├── front/       # 前端 Rush 工作区
+├── front/       # 当前 Fuwari 风格前端 Rush 工作区
+├── front-bak/   # 布局回退前的前端源码备份
 ├── server/      # 后端应用
 ├── .agent/      # 仓库级 AI 工程规则
 ├── .husky/      # 仓库级 Git hooks
@@ -55,6 +56,8 @@ pnpm --dir front/blog-web build:main
 
 `front/` 使用 Rush 管理多包结构：`front/blog-web` 是博客前端页面，`front/packages/mdx-component` 是公共 MDX 组件包。
 
+当前 `front/` 恢复到 `1eaab39` 的 Fuwari 风格最后一版。`front-bak/` 保留回退前的阅读布局、个人资料页和 Tailwind 管理后台；两套工作区独立安装依赖，启动备份版本时可将上述命令中的 `front/` 替换为 `front-bak/`。
+
 ## Server（后端）
 
 技术栈：Spring Boot 4 + MyBatis-Plus + MySQL 8+ + Flyway（数据库迁移）。
@@ -75,6 +78,10 @@ pnpm --dir front/blog-web build:main
 | GET | `/api/articles/{id}` | 文章详情（浏览量 +1） |
 | GET | `/api/tags` | 标签云（标签名 + 实时文章数） |
 | GET | `/api/stats` | 站点统计（已发布文章数 + 博主年限） |
+| POST | `/api/admin/login` | 管理员登录，返回 Sa-Token |
+| GET | `/api/admin/session` | 校验管理员登录状态（需 `satoken` 请求头） |
+| POST | `/api/admin/logout` | 退出登录并撤销 token |
+| POST | `/api/admin/register` | 创建管理员账号（需登录） |
 
 ### 数据库变更规范
 

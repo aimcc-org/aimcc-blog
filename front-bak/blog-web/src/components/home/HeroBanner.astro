@@ -1,0 +1,22 @@
+---
+import { currentProfile } from "@/config/build-profile";
+---
+
+<section
+  class="hero-banner"
+  aria-label="首页横幅"
+  transition:persist="home-banner"
+>
+  <div class="hero-banner__visual">
+    <img
+      class="hero-banner__image"
+      src="/images/home-banner.jpg"
+      alt="青山、湖泊与晨光"
+      fetchpriority="high"
+    />
+    <div class="hero-banner__content shell">
+      <p>{currentProfile.site.description}</p>
+      <h1>{currentProfile.site.title}</h1>
+    </div>
+  </div>
+</section>
