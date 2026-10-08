@@ -8,3 +8,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  __aimccReadingProgressHandler?: () => void;
+  __aimccReadingProgressRoot?: HTMLElement;
+}

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { UserProfile } from "./UserProfile.js";
 
 const meta = {
-  title: "Blog/UserProfile",
+  title: "Blog/Profile/Profile",
   component: UserProfile,
   tags: ["autodocs"],
   decorators: [

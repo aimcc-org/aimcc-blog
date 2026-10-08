@@ -1,7 +1,7 @@
 ---
 import type { PostSummary } from "@/types/post";
 import type { ApiStats, ApiTag } from "@/lib/api";
-import UserProfile from "./UserProfile.astro";
+import ProfileCard from "./ProfileCard.astro";
 import CategoriesCard from "./CategoriesCard.astro";
 import TagsCard from "./TagsCard.astro";
 
@@ -38,7 +38,7 @@ const tags =
 ---
 
 <aside class="home-sidebar" transition:persist="home-sidebar">
-  <UserProfile />
+  <ProfileCard />
   <CategoriesCard categories={categories} />
   <TagsCard tags={tags} />
 </aside>

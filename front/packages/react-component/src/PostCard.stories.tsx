@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { PostCard } from "./PostCard.js";
 
 const meta = {
-  title: "Blog/PostCard",
+  title: "Blog/Cards/PostCard",
   component: PostCard,
   tags: ["autodocs"],
   args: {

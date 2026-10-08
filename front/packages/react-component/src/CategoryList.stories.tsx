@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CategoryList } from "./CategoryList.js";
 
 const meta = {
-  title: "Blog/CategoryList",
+  title: "Blog/Category/CategoryList",
   component: CategoryList,
   tags: ["autodocs"],
   decorators: [

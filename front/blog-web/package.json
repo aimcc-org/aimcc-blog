@@ -25,6 +25,8 @@
     "pagefind": "^1.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "@aimcc/react-component": "0.0.0"
   },
   "devDependencies": {
@@ -34,6 +36,8 @@
     "cross-env": "^7.0.3",
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "@tailwindcss/vite": "^4.1.0",
+    "tailwindcss": "^4.1.0"
   }
 }

@@ -1,1 +1,57 @@
-@import "@aimcc/react-component/tokens.css";
+:root {
+  color-scheme: light;
+  --page-width: 1600px;
+  --content-width: 720px;
+  --sidebar-width: 7rem;
+  --navbar-height: 64px;
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --radius-large: 8px;
+  --font-body:
+    "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Songti SC", STSong, "Noto Serif CJK SC", serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --color-bg: #edf3ff;
+  --color-surface: rgb(255 255 255 / 68%);
+  --color-surface-solid: #fbfdff;
+  --color-text: #091936;
+  --color-muted: rgb(21 48 94 / 72%);
+  --color-subtle: rgb(37 73 133 / 52%);
+  --color-border: rgb(56 103 185 / 18%);
+  --color-primary: #356df3;
+  --color-primary-hover: #174fcf;
+  --color-accent: #78a2ff;
+  --color-accent-strong: #ff6a2a;
+  --color-orange: #ff6a2a;
+  --color-pixel: rgb(70 119 214 / 13%);
+  --color-control-hover: rgb(53 109 243 / 9%);
+  --shadow-card:
+    0 1px 0 rgb(255 255 255 / 85%) inset, 0 18px 42px rgb(44 82 150 / 11%);
+  --shadow-floating:
+    0 1px 0 rgb(255 255 255 / 90%) inset, 0 24px 70px rgb(36 72 137 / 15%);
+  --transition-fast: 150ms ease;
+  --transition-base: 240ms ease;
+  --transition-slow: 520ms ease;
+}
+
+html.dark {
+  color-scheme: dark;
+  --color-bg: #060914;
+  --color-surface: rgb(12 20 38 / 82%);
+  --color-surface-solid: #0b1222;
+  --color-text: rgb(236 248 255 / 92%);
+  --color-muted: rgb(207 229 255 / 68%);
+  --color-subtle: rgb(207 229 255 / 45%);
+  --color-border: rgb(83 184 255 / 20%);
+  --color-primary: #3aa0ff;
+  --color-primary-hover: #6fc8ff;
+  --color-accent: #18e6ff;
+  --color-accent-strong: #21ffd9;
+  --color-orange: #ff8751;
+  --color-pixel: rgb(58 160 255 / 18%);
+  --color-control-hover: rgb(80 190 255 / 11%);
+  --shadow-card:
+    0 1px 0 rgb(116 221 255 / 10%) inset, 0 18px 50px rgb(0 0 0 / 34%);
+  --shadow-floating:
+    0 1px 0 rgb(116 221 255 / 14%) inset, 0 24px 76px rgb(0 0 0 / 46%);
+}

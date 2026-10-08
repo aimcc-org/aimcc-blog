@@ -84,3 +84,22 @@ import "@aimcc/react-component/styles.css";
 ```bash
 pnpm --dir packages/react-component test
 ```
+
+## front-bak 侧栏组件
+
+从旧版博客拆分独立组件，Storybook 按下面的目录组织，不组合整页布局：
+
+| Storybook 节点                | 导出组件             | 来源与用途                                               |
+| ----------------------------- | -------------------- | -------------------------------------------------------- |
+| `Blog/Profile/Profile`        | `UserProfile`        | 已有个人信息卡片，保留现有调用方式                       |
+| `Blog/Profile/UserProfile`    | `SidebarUserProfile` | 旧版左侧 About Me，紧凑身份、可折叠简介与技能、个人链接  |
+| `Blog/Category/CategoryList`  | `CategoryList`       | 已有分类卡片                                             |
+| `Blog/Category/CategoryIndex` | `CategoryIndex`      | 旧版左上索引改为一级分类与数量，不包含文章列表和展开节点 |
+| `Blog/Cards/PostCard`         | `PostCard`           | 已有文章卡片                                             |
+| `Blog/Cards/NowCard`          | `NowCard`            | 右侧当前动态、描述与活动列表                             |
+| `Blog/Cards/QuickLinks`       | `QuickLinks`         | 右侧快捷入口，外链可通过 `external` 打开新窗口           |
+| `Blog/Cards/AmbientCard`      | `AmbientCard`        | 右侧装饰图片与文字标语                                   |
+
+`SidebarUserProfile` 复用 `UserProfileProps`，新增 `defaultExpanded` 控制简介与技能的初始展开状态。两种个人信息卡片独立渲染和调试，共享图标。为兼容博客已有代码，原 `UserProfile` 导出保持不变，紧凑版使用 `SidebarUserProfile` 导出。
+
+`CategoryIndex.categories` 为 `{ name, count, href?, active? }[]`，数量为 0 也会显示，没有链接则展示普通行。数据聚合和实际链接由宿主提供。右侧卡片均通过 props 提供内容，不绑定站点配置和个人资料接口。静态图片放在包的 `public/images`，仅供 Storybook 示例使用。

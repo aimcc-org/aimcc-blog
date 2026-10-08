@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
@@ -17,14 +18,21 @@ export default defineConfig({
   site: profile.site.url,
   output: "static",
   outDir: `./dist/${profileName}`,
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({ filter: (page) => !new URL(page).pathname.startsWith("/admin") }),
+  ],
   vite: {
+    plugins: [tailwindcss()],
     define: {
       "import.meta.env.SITE_PROFILE": JSON.stringify(profileName),
     },
     server: {
       proxy: {
-        "/api": { target: "http://localhost:8080", changeOrigin: true },
+        "/api": {
+          target: process.env.API_PROXY_TARGET ?? "http://localhost:8080",
+          changeOrigin: true,
+        },
       },
       fs: {
         allow: [".."],

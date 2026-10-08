@@ -1,0 +1,11 @@
+---
+import { getPersonalProfile } from "@/lib/profile";
+import type { PersonalProfile } from "@/types/profile";
+import SidebarProfile from "@/components/islands/SidebarProfile";
+interface Props {
+  profile?: PersonalProfile;
+}
+const profile = Astro.props.profile ?? (await getPersonalProfile());
+---
+
+<SidebarProfile profile={profile} />

@@ -2,8 +2,8 @@ export const profiles = {
   main: {
     id: "main",
     site: {
-      title: "AIMCC Blog",
-      description: "AI / Engineering / Collaboration",
+      title: "AIMCC",
+      description: "AI、工程与协作的实验研究日志",
       url: "https://aimcc.example.com",
       lang: "zh-CN",
     },

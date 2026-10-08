@@ -1,12 +1,10 @@
 ---
 import { CategoryList } from "@aimcc/react-component";
 import type { CategoryItem } from "@aimcc/react-component";
-
 interface Props {
   categories: CategoryItem[];
 }
-
 const { categories } = Astro.props;
 ---
 
-{categories.length > 0 && <CategoryList categories={categories} />}
+<CategoryList categories={categories} />

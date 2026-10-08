@@ -1,0 +1,67 @@
+---
+import type { PostSummary } from "@/types/post";
+import ProfileCard from "./sidebar/ProfileCard.astro";
+import { CategoryIndex } from "@aimcc/react-component";
+
+interface Props {
+  posts: PostSummary[];
+  activeSlug?: string;
+  drawer?: boolean;
+}
+
+const { posts, activeSlug, drawer = false } = Astro.props;
+const categories = [
+  ...posts.reduce((map, post) => {
+    const name = post.category || "未分类";
+    map.set(name, (map.get(name) ?? 0) + 1);
+    return map;
+  }, new Map<string, number>()),
+].map(([name, count]) => ({
+  name,
+  count,
+  href: `/?category=${encodeURIComponent(name)}#posts`,
+  active: posts.some(
+    (post) => post.slug === activeSlug && (post.category || "未分类") === name,
+  ),
+}));
+---
+
+<aside
+  class:list={["article-index", { "article-index--drawer": drawer }]}
+  aria-label="分类文章索引"
+>
+  {
+    drawer && (
+      <div class="sidebar-drawer__header">
+        <>
+          <strong id="sidebar-drawer-title">导航与个人信息</strong>
+          <button type="button" data-close-sidebar aria-label="关闭侧栏">
+            ×
+          </button>
+        </>
+      </div>
+    )
+  }
+  {
+    drawer && (
+      <nav class="sidebar-drawer__nav" aria-label="主导航">
+        <>
+          <a href="/">首页</a>
+          <a href="/archive/">归档</a>
+          <a href="/about/">关于</a>
+        </>
+      </nav>
+    )
+  }
+  <div class="article-index__taxonomy">
+    <CategoryIndex categories={categories} title="分类" />
+  </div>
+
+  <div class="article-index__bottom">
+    <ProfileCard />
+    <footer class="article-index__footer">
+      <a href="/#posts">全部文章</a>
+      <a href="/archive/">归档 <span aria-hidden="true">→</span></a>
+    </footer>
+  </div>
+</aside>
