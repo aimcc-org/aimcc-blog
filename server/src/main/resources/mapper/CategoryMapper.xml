@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aimcc.blog.mapper.CategoryMapper">
+
+    <!-- 分类列表：每个分类 + 实时文章数（空分类也显示，计 0 篇） -->
+    <select id="listCategories" resultType="com.aimcc.blog.dto.CategoryVO">
+        SELECT c.id, c.name, COUNT(a.id) AS article_count
+        FROM category c
+                 LEFT JOIN article a ON a.category_id = c.id AND a.status = 1
+        GROUP BY c.id, c.sort
+        ORDER BY c.sort
+    </select>
+
+</mapper>
