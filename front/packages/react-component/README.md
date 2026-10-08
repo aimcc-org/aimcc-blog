@@ -2,7 +2,7 @@
 
 博客通用 React 组件，独立于 Astro、站点配置和服务端 API。目前包含：
 
-- `Header`：品牌、导航链接、当前页标识和 `actions` 插槽；外层固定定位和滚动隐藏由应用负责。
+- `Header`：品牌、导航链接、当前页标识和 `actions` 插槽；自带固定定位、滚动后收窄浮动并保持可见和移动端菜单。
 - `PostCard`：文章摘要、封面、分类、标签及阅读统计；通过 `href` 传入文章链接。
 - `ArticleTimeline`：文章按天聚合、倒序展示、加载/错误/空状态和分页入口。
 - `CategoryList`：分类列表、可选文章数量、链接、当前分类与空状态。
@@ -49,7 +49,13 @@ import "@aimcc/react-component/styles.css";
 
 样式使用共享 CSS 变量；`html.dark` 启用深色主题，宿主可覆盖变量。React/ReactDOM 为 peer dependencies，避免重复运行时。
 
-`blog-web` 的 Astro 包装组件负责将 站点配置数据适配为 props。Header 的 `actions` 接收具名 Astro slot，原有 `HomeControls` 保持 `client:load`；文章和个人信息卡片静态服务端渲染，不增加客户端 hydration。
+`blog-web` 的 Astro 包装组件负责将站点配置数据适配为 props。`BlogHeader` 使用 `client:load`，将搜索与主题切换作为 React `actions` 传入 Header；文章和个人信息卡片静态服务端渲染。
+
+## Header
+
+`links` 配置导航，`actions` 接收操作按钮。默认包含布局占位；首页横幅上使用 `overlay` 与 `tone="inverse"`。滚动超过 40px 进入浮动状态，继续向下或向上滚动均保持可见，回到顶部恢复宽布局。支持 Escape 和点击外部关闭移动端菜单。
+
+浮动背景使用模糊、半透明表面和边缘高光；Chromium 增强为 SVG 位移折射，其他浏览器保留 CSS 玻璃效果。位移图按尺寸生成并对 resize 做防抖。`scrolled` 可固定展示状态，用于 Storybook 预览。`ScrollDemo` 可验证完整滚动交互。
 
 ## UserProfile
 

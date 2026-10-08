@@ -1,106 +1,7 @@
+@import "./header.css";
 @import "./article-timeline.css";
 @import "./category-list.css";
 @import "./user-profile.css";
-
-.home-nav {
-  position: relative;
-  height: var(--navbar-height);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0 0.75rem 0 0.85rem;
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-primary) 13%, transparent),
-      transparent 26%
-    ),
-    color-mix(in srgb, var(--color-surface) 91%, transparent);
-  border: 1px solid var(--color-border);
-  border-top: 0;
-  border-radius: 0 0 var(--radius-large) var(--radius-large);
-  box-shadow: var(--shadow-floating);
-  backdrop-filter: blur(20px) saturate(140%);
-  pointer-events: auto;
-}
-
-.home-nav::before {
-  content: "";
-  position: absolute;
-  inset: auto max(0.75rem, calc((100vw - var(--page-width)) / 2)) 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-accent),
-    transparent
-  );
-}
-
-.home-nav__brand,
-.home-nav__links {
-  display: flex;
-  align-items: center;
-}
-
-.home-nav__brand {
-  gap: 0.65rem;
-  min-width: max-content;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-}
-
-.home-nav__mark {
-  width: 2rem;
-  height: 2rem;
-  display: grid;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 62%, transparent);
-  border-radius: 6px;
-  color: white;
-  background:
-    linear-gradient(135deg, rgb(19 243 209 / 42%), transparent 52%),
-    linear-gradient(135deg, var(--color-primary), #182bff);
-  box-shadow: 0 0 0 3px
-    color-mix(in srgb, var(--color-primary) 12%, transparent);
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-}
-
-.home-nav__links {
-  gap: 0.3rem;
-  padding: 0.32rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--color-surface-solid) 38%, transparent);
-}
-
-.home-nav__links a {
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.home-nav__links a {
-  padding: 0.5rem 0.88rem;
-  border-radius: 5px;
-  color: var(--color-muted);
-  font-size: 0.92rem;
-  text-decoration: none;
-}
-
-.home-nav__links a:hover,
-.home-nav__links a.is-active {
-  color: var(--color-text);
-  background: var(--color-control-hover);
-}
-
-.home-nav__links a:active {
-  transform: scale(0.96);
-}
 
 .post-card__link {
   border: 1px solid var(--color-border);
@@ -304,23 +205,6 @@
 }
 
 @media (max-width: 767px) {
-  .home-nav {
-    width: min(calc(100% - 20px), var(--page-width));
-    height: 64px;
-    padding-inline: 0.75rem;
-  }
-
-  .home-nav__brand span:last-child {
-    max-width: 42vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .home-nav__links {
-    display: none;
-  }
-
   .post-card h2 {
     font-size: 1.5rem;
   }
@@ -344,19 +228,13 @@
   }
 }
 
-.post-card,
-.home-nav {
+.post-card {
   color: var(--color-text);
   font-family: var(--font-body);
 }
 
-.post-card *,
-.home-nav * {
+.post-card * {
   box-sizing: border-box;
-}
-
-.home-nav__brand {
-  color: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {

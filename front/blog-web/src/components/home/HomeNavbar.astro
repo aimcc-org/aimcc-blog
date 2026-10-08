@@ -1,89 +1,11 @@
 ---
 import { currentProfile } from "@/config/build-profile";
-import { Header } from "@aimcc/react-component";
-import HomeControls from "@/components/islands/HomeControls";
+import BlogHeader from "@/components/islands/BlogHeader";
 ---
 
-<header class="home-nav-wrap" transition:persist="home-navbar">
-  <Header
-    title={currentProfile.site.title}
-    className="shell"
-    links={[
-      { href: "/", label: "首页", active: Astro.url.pathname === "/" },
-      {
-        href: "/archive/",
-        label: "归档",
-        active: Astro.url.pathname === "/archive/",
-      },
-      {
-        href: "/about/",
-        label: "关于",
-        active: Astro.url.pathname === "/about/",
-      },
-    ]}
-  >
-    <HomeControls slot="actions" client:load />
-  </Header>
-</header>
-
-<script>
-  const scrollStateKey = "__aimccHeaderScrollBound";
-
-  if (!(scrollStateKey in window)) {
-    Object.defineProperty(window, scrollStateKey, { value: true });
-
-    let lastY = window.scrollY;
-    let direction: "up" | "down" | null = null;
-    let directionStartY = lastY;
-    let frameRequested = false;
-
-    const showHeader = () => {
-      document.querySelector(".home-nav-wrap")?.classList.remove("is-hidden");
-    };
-
-    const updateHeader = () => {
-      frameRequested = false;
-      const currentY = Math.max(window.scrollY, 0);
-      const nextDirection = currentY > lastY ? "down" : "up";
-
-      if (currentY <= 24) {
-        showHeader();
-        direction = null;
-        directionStartY = currentY;
-      } else if (nextDirection !== direction) {
-        direction = nextDirection;
-        directionStartY = currentY;
-      } else {
-        const distance = Math.abs(currentY - directionStartY);
-        const header = document.querySelector(".home-nav-wrap");
-
-        if (direction === "down" && currentY > 96 && distance >= 12) {
-          header?.classList.add("is-hidden");
-        } else if (direction === "up" && distance >= 8) {
-          header?.classList.remove("is-hidden");
-        }
-      }
-
-      lastY = currentY;
-    };
-
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (!frameRequested) {
-          frameRequested = true;
-          window.requestAnimationFrame(updateHeader);
-        }
-      },
-      { passive: true },
-    );
-
-    document.addEventListener("astro:before-swap", showHeader);
-    document.addEventListener("astro:after-swap", () => {
-      lastY = window.scrollY;
-      direction = null;
-      directionStartY = lastY;
-      showHeader();
-    });
-  }
-</script>
+<BlogHeader
+  title={currentProfile.site.title}
+  pathname={Astro.url.pathname}
+  overlay
+  client:load
+/>
