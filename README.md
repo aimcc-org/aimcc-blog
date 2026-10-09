@@ -60,7 +60,9 @@ pnpm --dir front/blog-web build:main
 
 ## Server（后端）
 
-技术栈：Spring Boot 4 + MyBatis-Plus + MySQL 8+ + Flyway（数据库迁移）。
+技术栈：Spring Boot 4.1.1（JDK 25）+ MyBatis-Plus 3.5.17 + MySQL 8+ + Flyway + Sa-Token + Redis。
+
+> AI 协作注意：本项目基于 **Spring Boot 4.1.1**（不是 3.x/2.x），配置项和异常类按此版本给，不要给旧版写法。例如找不到路径时抛的是 `NoResourceFoundException`（不是 `NoHandlerFoundException`），404 配置用 `spring.web.resources.add-mappings=false`。
 
 ### 本地启动
 

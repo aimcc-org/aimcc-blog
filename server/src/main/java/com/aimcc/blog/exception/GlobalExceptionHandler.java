@@ -7,6 +7,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理器：全项目 Controller 抛出的异常，都在这里统一翻译成 ApiResult
@@ -48,5 +49,11 @@ public class GlobalExceptionHandler {
     public ApiResult<Void> handleMethod(HttpRequestMethodNotSupportedException e) {
         log.warn("请求方式不支持: {}", e.getMessage());
         return ApiResult.fail(405, "请求方式不对，请检查 GET/POST");
+    }
+    /** 路径未找到：404 */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ApiResult<Void> handleNoHandlerFound(NoResourceFoundException e) {
+        log.warn("路径未找到: {}", e.getMessage());
+        return ApiResult.fail(404, "路径未找到");
     }
 }

@@ -17,7 +17,7 @@ public interface ArticleService {
      * @param sort  排序：new 最新 / hot 热门 / recommend 推荐
      * @param tagId 标签过滤（可选，null = 不过滤）
      */
-    Page<ArticleListVO> listArticles(int page, int size, String sort, Long tagId);
+    Page<ArticleListVO> listArticles(int page, int size, String sort, Long categoryId, Long tagId);
 
     /** 按 id 查询文章详情 */
     ArticleDetailVO getArticleById(Long id);

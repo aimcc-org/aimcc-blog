@@ -28,7 +28,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final TagMapper tagMapper;
 
     @Override
-    public Page<ArticleListVO> listArticles(int page, int size, String sort, Long tagId) {
+    public Page<ArticleListVO> listArticles(int page, int size, String sort, Long categoryId, Long tagId) {
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1);                     // 只看已发布
         if ("recommend".equals(sort)) {
@@ -37,6 +37,9 @@ public class ArticleServiceImpl implements ArticleService {
         if (tagId != null) {
             // 标签过滤：id 在（挂了该标签的文章 id）里——中间表两跳接力的子查询写法
             wrapper.inSql(Article::getId, "select article_id from article_tag where tag_id = " + tagId);
+        }
+        if (categoryId != null) {
+            wrapper.eq(Article::getCategoryId, categoryId);
         }
         // 排序现状说明：new（最新）和 hot（热门）暂同，均按发布时间倒序——
         // 热门排序等 view_count 有真实数据积累后再改造
@@ -113,6 +116,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setReadingMinutes(article.getReadingMinutes());
         vo.setIsTop(article.getIsTop());
         vo.setPublishedAt(article.getPublishedAt());
+        vo.setCategoryId(article.getCategoryId());
         return vo;
     }
 
@@ -128,6 +132,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setIsTop(article.getIsTop());
         vo.setViewCount(article.getViewCount());
         vo.setPublishedAt(article.getPublishedAt());
+        vo.setCategoryId(article.getCategoryId());
         return vo;
     }
 }

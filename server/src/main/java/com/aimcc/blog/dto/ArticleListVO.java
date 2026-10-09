@@ -29,6 +29,9 @@ public class ArticleListVO {
     /** 是否精选：0否 1是 */
     private Integer isTop;
 
+    /** 分类ID */
+    private Long categoryId;
+
     /** 发布时间 */
     private LocalDateTime publishedAt;
 

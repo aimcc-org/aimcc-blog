@@ -31,6 +31,9 @@ public class ArticleDetailVO {
     /** 是否精选：0否 1是 */
     private Integer isTop;
 
+    /** 分类ID */
+    private Long categoryId;
+
     /** 浏览量 */
     private Integer viewCount;
 
