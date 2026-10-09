@@ -50,12 +50,6 @@ export async function fetchArticleList(
   ) {
     throw new Error("文章接口返回无效数据");
   }
-  if (
-    categoryId !== undefined &&
-    result.data.records.some((article) => article.categoryId !== categoryId)
-  ) {
-    throw new Error("分类筛选暂不可用，请稍后重试。");
-  }
   return result.data;
 }
 
