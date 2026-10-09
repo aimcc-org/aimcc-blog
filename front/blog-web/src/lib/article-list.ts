@@ -1,6 +1,7 @@
 export interface ApiArticle {
   id: number;
   title: string;
+  categoryId?: number | null;
   summary: string | null;
   coverImage?: string | null;
   publishedAt: string | null;
@@ -21,6 +22,7 @@ export async function fetchArticleList(
   page = 1,
   signal?: AbortSignal,
   tagId?: number,
+  categoryId?: number,
 ): Promise<ApiArticlePage> {
   const query = new URLSearchParams({
     page: String(page),
@@ -28,6 +30,7 @@ export async function fetchArticleList(
     sort: "new",
   });
   if (tagId !== undefined) query.set("tagId", String(tagId));
+  if (categoryId !== undefined) query.set("categoryId", String(categoryId));
   const response = await fetch(`${base}/articles?${query}`, { signal });
   if (!response.ok) throw new Error(`文章接口返回 ${response.status}`);
   const result = (await response.json()) as {
@@ -47,6 +50,12 @@ export async function fetchArticleList(
   ) {
     throw new Error("文章接口返回无效数据");
   }
+  if (
+    categoryId !== undefined &&
+    result.data.records.some((article) => article.categoryId !== categoryId)
+  ) {
+    throw new Error("分类筛选暂不可用，请稍后重试。");
+  }
   return result.data;
 }
 
@@ -56,10 +65,13 @@ export async function fetchArticleListBatch(
   page = 1,
   signal?: AbortSignal,
   tagIds: number[] = [],
+  categoryId?: number,
 ): Promise<{ records: ApiArticle[]; hasMore: boolean }> {
   const filters = tagIds.length ? [...new Set(tagIds)] : [undefined];
   const pages = await Promise.all(
-    filters.map((tagId) => fetchArticleList(base, page, signal, tagId)),
+    filters.map((tagId) =>
+      fetchArticleList(base, page, signal, tagId, categoryId),
+    ),
   );
   return {
     records: [

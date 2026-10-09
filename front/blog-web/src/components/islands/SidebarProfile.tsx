@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ApiTag } from "@/lib/api";
-import { readTagIds, toggleTagHref } from "@/lib/tag-filter";
+import { readTagIds, readCategoryId, toggleTagHref } from "@/lib/tag-filter";
 import { getTagCloud } from "@/lib/api";
 import { SidebarUserProfile } from "@aimcc/react-component";
 import type { PersonalProfile } from "@/types/profile";
@@ -10,9 +10,13 @@ export default function SidebarProfile({
   profile: PersonalProfile;
 }) {
   const [tags, setTags] = useState<ApiTag[]>([]);
+  const [categoryId, setCategoryId] = useState<number>();
   const [activeTagIds, setActiveTagIds] = useState<number[]>([]);
   useEffect(() => {
-    const syncTag = () => setActiveTagIds(readTagIds(window.location.search));
+    const syncTag = () => {
+      setActiveTagIds(readTagIds(window.location.search));
+      setCategoryId(readCategoryId(window.location.search));
+    };
     syncTag();
     document.addEventListener("astro:page-load", syncTag);
     window.addEventListener("popstate", syncTag);
@@ -47,7 +51,7 @@ export default function SidebarProfile({
       tags={tags.map((tag) => ({
         id: tag.id,
         name: tag.name,
-        href: toggleTagHref(activeTagIds, tag.id),
+        href: toggleTagHref(activeTagIds, tag.id, categoryId),
         active: activeTagIds.includes(tag.id),
       }))}
       onTagClick={(tag, event) => {

@@ -143,6 +143,34 @@ test("no selected tags requests the unfiltered list", async (t) => {
   });
 });
 
+test("category filter accompanies the tag on every page", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const params = new URL(url, "https://example.test").searchParams;
+    assert.equal(params.get("categoryId"), "3");
+    assert.equal(params.get("tagId"), "2");
+    return Response.json({
+      code: 200,
+      data: {
+        ...data,
+        current: Number(params.get("page")),
+        records: [{ ...data.records[0], categoryId: 3 }],
+      },
+    });
+  });
+  await fetchArticleListBatch("/api", 1, undefined, [2], 3);
+  await fetchArticleListBatch("/api", 2, undefined, [2], 3);
+});
+
+test("reject a server that silently ignores category filtering", async (t) => {
+  t.mock.method(globalThis, "fetch", async () =>
+    Response.json({ code: 200, data: { ...data, current: 1 } }),
+  );
+  await assert.rejects(
+    fetchArticleListBatch("/api", 1, undefined, [], 3),
+    /分类筛选暂不可用/,
+  );
+});
+
 test("a failed selected-tag request fails the whole batch", async (t) => {
   t.mock.method(
     globalThis,

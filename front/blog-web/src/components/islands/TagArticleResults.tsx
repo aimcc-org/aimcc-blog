@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
-import { readTagIds } from "@/lib/tag-filter";
+import { readTagIds, readCategoryId } from "@/lib/tag-filter";
 import ArticleTimelineFeed from "./ArticleTimelineFeed";
 
 export default function TagArticleResults() {
   const [tagIds, setTagIds] = useState<number[]>([]);
-  const [localCategory, setLocalCategory] = useState(false);
+  const [categoryId, setCategoryId] = useState<number>();
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const syncTag = () => {
       const next = readTagIds(window.location.search);
       setReady(true);
-      setLocalCategory(
-        next.length === 0 &&
-          !!new URLSearchParams(window.location.search).get("category"),
-      );
+      setCategoryId(readCategoryId(window.location.search));
       setTagIds((previous) =>
         previous.join(",") === next.join(",") ? previous : next,
       );
@@ -28,11 +25,12 @@ export default function TagArticleResults() {
       window.removeEventListener("aimcc:tag-filter-change", syncTag);
     };
   }, []);
-  return !ready || localCategory ? null : (
+  return !ready ? null : (
     <div>
       <ArticleTimelineFeed
-        key={tagIds.join(",")}
+        key={`${categoryId ?? ""}:${tagIds.join(",")}`}
         tagIds={tagIds}
+        categoryId={categoryId}
         variant="cards"
       />
     </div>

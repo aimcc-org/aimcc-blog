@@ -1,3 +1,5 @@
+import { fetchCategories } from "./categories";
+export type { ApiCategory } from "./categories";
 import { fetchTagCloud } from "./tag-cloud";
 export type { ApiTag } from "./tag-cloud";
 
@@ -32,6 +34,10 @@ async function getApiData<T>(path: string): Promise<T | null> {
   }
 }
 
+export function getCategories(signal?: AbortSignal) {
+  return fetchCategories(apiBaseUrl, signal);
+}
+
 export function getSiteStats() {
   return getApiData<ApiStats>("/stats");
 }
@@ -50,9 +56,10 @@ export function getArticleListBatch(
   page = 1,
   signal?: AbortSignal,
   tagIds: number[] = [],
+  categoryId?: number,
 ) {
   const base =
     import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
-  return fetchArticleListBatch(base, page, signal, tagIds);
+  return fetchArticleListBatch(base, page, signal, tagIds, categoryId);
 }
 export type { ApiArticle, ApiArticlePage } from "./article-list";

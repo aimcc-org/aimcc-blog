@@ -10,8 +10,10 @@ const NO_TAGS: number[] = [];
 export default function ArticleTimelineFeed({
   tagIds = NO_TAGS,
   variant = "timeline",
+  categoryId,
 }: {
   tagIds?: number[];
+  categoryId?: number;
   variant?: "timeline" | "cards";
 }) {
   const [articles, setArticles] = useState<ApiArticle[]>([]);
@@ -32,6 +34,7 @@ export default function ArticleTimelineFeed({
         nextPage.current,
         controller.signal,
         tagIds,
+        categoryId,
       );
       if (controller.signal.aborted) return;
       const records = page.records;
@@ -46,16 +49,20 @@ export default function ArticleTimelineFeed({
       );
       nextPage.current += 1;
       setHasMore(page.hasMore);
-    } catch {
+    } catch (cause) {
       if (!controller.signal.aborted)
-        setError("文章加载失败，请检查网络或稍后重试。");
+        setError(
+          cause instanceof Error && cause.message.startsWith("分类筛选")
+            ? cause.message
+            : "文章加载失败，请检查网络或稍后重试。",
+        );
     } finally {
       if (request.current === controller) {
         request.current = null;
         if (!controller.signal.aborted) setLoading(false);
       }
     }
-  }, [tagIds]);
+  }, [tagIds, categoryId]);
 
   useEffect(() => {
     nextPage.current = 1;
@@ -78,19 +85,54 @@ export default function ArticleTimelineFeed({
           </p>
         )}
         {error && (
-          <div role="alert">
-            <p>{error}</p>
+          <div className="article-feedback" role="alert">
+            <span className="article-feedback__icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v6" strokeLinecap="round" />
+                <circle
+                  cx="12"
+                  cy="17"
+                  r=".8"
+                  fill="currentColor"
+                  stroke="none"
+                />
+              </svg>
+            </span>
+            <div className="article-feedback__body">
+              <h2>文章暂时无法加载</h2>
+              <p>{error}</p>
+            </div>
             <button
+              className="article-feedback__retry"
               type="button"
               onClick={() => void loadNextPage()}
               disabled={loading}
             >
-              重试
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                <path
+                  d="M20 7v5h-5M4 17v-5h5M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              重新加载
             </button>
           </div>
         )}
         {!loading && !error && articles.length === 0 && (
-          <p className="home-posts__empty">当前标签下暂无文章。</p>
+          <p className="home-posts__empty">当前筛选条件下暂无文章。</p>
         )}
         {!error && hasMore && (
           <button

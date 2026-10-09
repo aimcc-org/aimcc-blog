@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { useId } from "react";
 import type { CategoryItem } from "./CategoryList.js";
 
@@ -8,12 +9,17 @@ export interface CategoryIndexProps {
   categories: CategoryIndexItem[];
   title?: string;
   className?: string;
+  onCategoryClick?: (
+    item: CategoryIndexItem,
+    event: MouseEvent<HTMLAnchorElement>,
+  ) => void;
 }
 /** One category level and its count; no nested articles or expansion. */
 export function CategoryIndex({
   categories,
   title = "分类",
   className = "",
+  onCategoryClick,
 }: CategoryIndexProps) {
   const id = useId();
   return (
@@ -46,6 +52,7 @@ export function CategoryIndex({
                 {item.href ? (
                   <a
                     href={item.href}
+                    onClick={(event) => onCategoryClick?.(item, event)}
                     aria-current={item.active ? "page" : undefined}
                   >
                     {contents}
