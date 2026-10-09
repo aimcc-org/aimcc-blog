@@ -1,0 +1,372 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AIMCC Blog API",
+    "version": "1.0.0",
+    "description": "博客后端接口文档"
+  },
+  "servers": [
+    {
+      "url": "http://47.96.92.202/api",
+      "description": "线上服务器"
+    },
+    {
+      "url": "http://localhost:8080/api",
+      "description": "本地开发"
+    }
+  ],
+  "paths": {
+    "/about": {
+      "get": {
+        "summary": "个人资料",
+        "tags": ["公开接口"],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultProfile" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/articles": {
+      "get": {
+        "summary": "文章分页列表",
+        "tags": ["公开接口"],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["new", "hot", "recommend"], "default": "new" } },
+          { "name": "tagId", "in": "query", "schema": { "type": "integer" }, "description": "按标签筛选" },
+          { "name": "categoryId", "in": "query", "schema": { "type": "integer" }, "description": "按分类筛选" }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultPageArticleListVO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/articles/{id}": {
+      "get": {
+        "summary": "文章详情",
+        "tags": ["公开接口"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultArticleDetailVO" }
+              }
+            }
+          },
+          "404": { "description": "文章不存在" }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "标签云",
+        "tags": ["公开接口"],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultListTagVO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categorys": {
+      "get": {
+        "summary": "分类列表",
+        "tags": ["公开接口"],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultListCategoryVO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/login": {
+      "post": {
+        "summary": "管理员登录",
+        "tags": ["管理端"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminLoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功，返回 token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultString" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/session": {
+      "get": {
+        "summary": "校验登录状态",
+        "tags": ["管理端"],
+        "security": [{ "satoken": [] }],
+        "responses": {
+          "200": { "description": "已登录" },
+          "401": { "description": "未登录" }
+        }
+      }
+    },
+    "/admin/logout": {
+      "post": {
+        "summary": "退出登录",
+        "tags": ["管理端"],
+        "security": [{ "satoken": [] }],
+        "responses": {
+          "200": { "description": "成功" }
+        }
+      }
+    },
+    "/admin/register": {
+      "post": {
+        "summary": "创建管理员",
+        "tags": ["管理端"],
+        "security": [{ "satoken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminRegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "成功" }
+        }
+      }
+    },
+    "/admin/articles": {
+      "post": {
+        "summary": "创建文章",
+        "tags": ["管理端"],
+        "security": [{ "satoken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminArticleRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功，返回新文章 id",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResultLong" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "satoken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "satoken"
+      }
+    },
+    "schemas": {
+      "ApiResultProfile": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "example": 200 },
+          "message": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/Profile" }
+        }
+      },
+      "ApiResultString": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" },
+          "data": { "type": "string", "description": "token" }
+        }
+      },
+      "ApiResultLong": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" },
+          "data": { "type": "integer", "description": "新文章 id" }
+        }
+      },
+      "ApiResultListTagVO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" },
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/TagVO" } }
+        }
+      },
+      "ApiResultListCategoryVO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" },
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/CategoryVO" } }
+        }
+      },
+      "ApiResultPageArticleListVO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "records": { "type": "array", "items": { "$ref": "#/components/schemas/ArticleListVO" } },
+              "total": { "type": "integer" },
+              "current": { "type": "integer" },
+              "size": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "ApiResultArticleDetailVO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" },
+          "data": { "$ref": "#/components/schemas/ArticleDetailVO" }
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "nickname": { "type": "string" },
+          "avatar": { "type": "string" },
+          "bio": { "type": "string" },
+          "quote": { "type": "string" },
+          "yearsOfDev": { "type": "integer" },
+          "githubUrl": { "type": "string" },
+          "xUrl": { "type": "string" },
+          "bilibiliUrl": { "type": "string" },
+          "email": { "type": "string" }
+        }
+      },
+      "ArticleListVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "coverImage": { "type": "string" },
+          "readingMinutes": { "type": "integer" },
+          "isTop": { "type": "integer" },
+          "publishedAt": { "type": "string", "format": "date-time" },
+          "categoryId": { "type": "integer" },
+          "tags": { "type": "array", "items": { "$ref": "#/components/schemas/TagItemVO" } }
+        }
+      },
+      "ArticleDetailVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "coverImage": { "type": "string" },
+          "content": { "type": "string" },
+          "readingMinutes": { "type": "integer" },
+          "isTop": { "type": "integer" },
+          "viewCount": { "type": "integer" },
+          "publishedAt": { "type": "string", "format": "date-time" },
+          "categoryId": { "type": "integer" }
+        }
+      },
+      "TagVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "articleCount": { "type": "integer" }
+        }
+      },
+      "CategoryVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "articleCount": { "type": "integer" }
+        }
+      },
+      "TagItemVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "AdminLoginRequest": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" }
+        }
+      },
+      "AdminRegisterRequest": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" },
+          "nickname": { "type": "string" }
+        }
+      },
+      "AdminArticleRequest": {
+        "type": "object",
+        "required": ["title", "content"],
+        "properties": {
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "content": { "type": "string" },
+          "coverImage": { "type": "string" },
+          "readingMinutes": { "type": "integer" },
+          "isTop": { "type": "integer" },
+          "categoryId": { "type": "integer" },
+          "tagIds": { "type": "array", "items": { "type": "integer" } }
+        }
+      }
+    }
+  }
+}
