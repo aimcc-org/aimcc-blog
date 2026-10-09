@@ -4,7 +4,7 @@ export const profiles = {
     site: {
       title: "AIMCC",
       description: "AI、工程与协作的实验研究日志",
-      url: "https://aimcc.example.com",
+      url: "http://47.96.92.202",
       lang: "zh-CN",
     },
     features: {
