@@ -77,8 +77,7 @@ pnpm --dir front/blog-web build:main
 | GET | `/api/articles` | 文章分页列表（`?page=&size=&sort=new\|hot\|recommend`） |
 | GET | `/api/articles/{id}` | 文章详情（浏览量 +1） |
 | GET | `/api/tags` | 标签云（标签名 + 实时文章数） |
-| GET | `/api/category` | 分类列表（侧边栏用，分类名 + 实时文章数，空分类计 0） |
-| GET | `/api/stats` | 站点统计（已发布文章数 + 博主年限） |
+| GET | `/api/categorys` | 分类列表（侧边栏用，分类名 + 实时文章数，空分类计 0） |
 | POST | `/api/admin/login` | 管理员登录，返回 Sa-Token |
 | GET | `/api/admin/session` | 校验管理员登录状态（需 `satoken` 请求头） |
 | POST | `/api/admin/logout` | 退出登录并撤销 token |
