@@ -23,4 +23,12 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @param articleIds 文章 id 列表；@Param 给参数起名，XML 的 foreach 靠名字取它
      */
     List<ArticleTagRow> selectTagsByArticleIds(@Param("articleIds") List<Long> articleIds);
+
+    /**
+     * 批量插入文章标签连线（批量插入，SQL 在 TagMapper.xml）
+     *
+     * @param articleId 文章 id
+     * @param tagIds    标签 id 列表
+     */
+    void insertArticleTags(@Param("articleId") Long articleId, @Param("tagIds") List<Long> tagIds);
 }

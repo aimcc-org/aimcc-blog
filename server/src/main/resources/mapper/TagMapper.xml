@@ -27,4 +27,13 @@
         order by at.article_id
     </select>
 
+    <!-- 批量插入文章标签连线 -->
+    <insert id="insertArticleTags">
+        insert into article_tag (article_id, tag_id)
+        values
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{articleId}, #{tagId})
+        </foreach>
+    </insert>
+
 </mapper>
