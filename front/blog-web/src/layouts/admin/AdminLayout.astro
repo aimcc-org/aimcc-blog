@@ -1,6 +1,9 @@
 ---
 import "@/styles/global.css";
+import "@aimcc/react-component/markdown.css";
+import "@aimcc/react-component/markdown-editor.css";
 import "@/styles/tailwind.css";
+import "../../styles/admin.css";
 interface Props {
   title: string;
 }
@@ -16,7 +19,7 @@ const { title } = Astro.props;
     <title>{title} · AIMCC 博客管理</title>
   </head>
   <body
-    class="bg-admin-bg! bg-none! [&_button]:[font-family:inherit] [&_input]:[font-family:inherit] [&_select]:[font-family:inherit] [&_button]:[-webkit-tap-highlight-color:transparent] [&_a]:[-webkit-tap-highlight-color:transparent] [&_button]:cursor-pointer [&_button:disabled]:cursor-not-allowed [&_button:disabled]:opacity-55 [&_:focus-visible]:outline-[3px] [&_:focus-visible]:outline-admin-accent [&_:focus-visible]:outline-offset-[3px]"
+    class="admin-body bg-admin-bg! bg-none! [&_button]:[font-family:inherit] [&_input]:[font-family:inherit] [&_select]:[font-family:inherit] [&_button]:[-webkit-tap-highlight-color:transparent] [&_a]:[-webkit-tap-highlight-color:transparent] [&_button]:cursor-pointer [&_button:disabled]:cursor-not-allowed [&_button:disabled]:opacity-55 [&_:focus-visible]:outline-[3px] [&_:focus-visible]:outline-admin-accent [&_:focus-visible]:outline-offset-[3px]"
     data-pagefind-ignore><slot /></body
   >
 </html>

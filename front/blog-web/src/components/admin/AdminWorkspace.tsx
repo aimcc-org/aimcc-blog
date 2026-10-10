@@ -1,6 +1,7 @@
 import { useEffect, useState, type ComponentProps } from "react";
 import { adminRequest, adminToken, AdminApiError } from "@/lib/admin-api";
 import MarkdownEditor from "./MarkdownEditor";
+import AdminIcon from "./AdminIcon";
 
 export default function AdminWorkspace({ page }: { page: "home" | "publish" }) {
   const [status, setStatus] = useState<"loading" | "login" | "ready">(
@@ -158,29 +159,35 @@ export default function AdminWorkspace({ page }: { page: "home" | "publish" }) {
     );
 
   return (
-    <div className="grid grid-cols-[220px_minmax(0,1fr)] min-h-screen max-[1100px]:grid-cols-[180px_minmax(0,1fr)] max-[760px]:block">
-      <aside className="sticky top-0 h-screen pt-8 px-5 pb-6 bg-admin-surface border-r border-admin-border flex flex-col max-[760px]:static max-[760px]:w-full max-[760px]:h-auto max-[760px]:p-5 max-[760px]:border-r-0 max-[760px]:border-b">
-        <a
-          className="flex flex-col gap-1.5 px-3 no-underline text-[23px] font-extrabold tracking-[0.08em] [&_span]:text-[11px] [&_span]:font-normal [&_span]:text-admin-subtle [&_span]:tracking-[0.12em] max-[760px]:p-0 max-[760px]:flex-row max-[760px]:items-baseline"
-          href="/admin/"
-        >
-          AIMCC<span>博客管理</span>
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <a className="admin-brand" href="/admin/">
+          <span className="admin-brand-mark" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+          <strong>AIMCC</strong>
         </a>
-        <div className="mt-12 mx-3 mb-3 text-[11px] text-admin-subtle max-[760px]:hidden">
-          工作空间
-        </div>
-        <nav
-          className="grid gap-1.5 max-[760px]:mt-5 max-[760px]:flex [&_a]:flex [&_a]:gap-3 [&_a]:items-center [&_a]:py-[13px] [&_a]:px-4 [&_a]:rounded-[7px] [&_a]:no-underline [&_a]:text-sm [&_a]:text-admin-muted [&_a:hover]:bg-admin-hover [&_a[aria-current=page]]:bg-admin-hover [&_a[aria-current=page]]:text-admin-primary [&_a[aria-current=page]]:font-semibold"
-          aria-label="后台菜单"
-        >
+        <p className="admin-brand-caption">博客管理</p>
+        <div className="admin-nav-label">工作空间</div>
+        <nav className="admin-navigation" aria-label="后台菜单">
           <a href="/admin/" aria-current={page === "home" ? "page" : undefined}>
-            ⌂ <span>工作台</span>
+            <AdminIcon name="grid" />
+            <span>文章管理</span>
           </a>
           <a
             href="/admin/publish/"
             aria-current={page === "publish" ? "page" : undefined}
           >
-            ＋ <span>发布文章</span>
+            <AdminIcon name="plus" />
+            <span>发布文章</span>
+          </a>
+          <a href="/admin/?view=trash">
+            <AdminIcon name="trash" />
+            <span>回收站</span>
           </a>
         </nav>
         <div className="mt-auto grid gap-[18px] pt-6 px-3 border-t border-admin-border text-xs [&_a]:no-underline [&_a]:text-admin-muted [&_button]:border-0 [&_button]:bg-transparent [&_button]:p-0 [&_button]:text-left [&_button]:text-admin-muted max-[760px]:mt-5 max-[760px]:pt-4 max-[760px]:px-0 max-[760px]:flex max-[760px]:justify-between">
@@ -191,7 +198,7 @@ export default function AdminWorkspace({ page }: { page: "home" | "publish" }) {
           </button>
         </div>
       </aside>
-      <main className="min-w-0 w-full max-w-[1680px] mx-auto p-10 max-[1100px]:py-7 max-[1100px]:px-6 max-[760px]:px-4">
+      <main className="admin-main">
         {error && (
           <p
             className="text-[#b42318] bg-[#fff0ed] border border-[#ffcfc6] rounded-md p-3 text-[13px] leading-[1.6]"
@@ -200,36 +207,11 @@ export default function AdminWorkspace({ page }: { page: "home" | "publish" }) {
             {error}
           </p>
         )}
-        {page === "publish" ? (
-          <MarkdownEditor key={accountId} accountId={accountId} />
-        ) : (
-          <>
-            <header className="[&_h1]:my-[9px] [&_h1]:text-[28px] [&_h1]:tracking-[-0.04em] [&_p]:m-0 [&_p]:text-sm">
-              <span className="text-admin-primary text-[11px] font-bold tracking-[0.18em]">
-                WORKSPACE
-              </span>
-              <h1>工作台</h1>
-              <p className="text-admin-muted leading-[1.7]">
-                把新的思考，写成下一篇文章。
-              </p>
-            </header>
-            <a
-              className="mt-9 block w-full max-w-[480px] p-8 border border-admin-border rounded-xl bg-admin-surface no-underline shadow-admin-card transition-transform duration-200 hover:-translate-y-[3px] motion-reduce:transition-none [&_h2]:text-xl [&_p]:text-sm"
-              href="/admin/publish/"
-            >
-              <span className="grid place-items-center size-11 bg-admin-hover text-admin-primary rounded-[10px] text-[28px]">
-                ＋
-              </span>
-              <h2>发布文章</h2>
-              <p className="text-admin-muted leading-[1.7]">
-                用 Markdown 写作，边编辑边预览。
-              </p>
-              <span className="block mt-7 text-admin-primary text-[13px] font-semibold">
-                开始写作 →
-              </span>
-            </a>
-          </>
-        )}
+        <MarkdownEditor
+          key={accountId}
+          accountId={accountId}
+          mode={page === "publish" ? "edit" : "manage"}
+        />
       </main>
     </div>
   );

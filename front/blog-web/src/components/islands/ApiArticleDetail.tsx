@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { MarkdownReader } from "@aimcc/react-component/markdown";
 import { getArticleDetail } from "@/lib/api";
 import type { ApiArticleDetail as ArticleDetail } from "@/lib/article-detail";
 
@@ -96,9 +95,7 @@ export default function ApiArticleDetail() {
       <div className="post-article__lower">
         <div className="post-article__body">
           <div className="prose">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {article.content}
-            </ReactMarkdown>
+            <MarkdownReader source={article.content} />
           </div>
         </div>
         <aside className="post-article__meta" aria-label="文章信息">

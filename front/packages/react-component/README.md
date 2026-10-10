@@ -103,3 +103,7 @@ pnpm --dir packages/react-component test
 `SidebarUserProfile` 复用 `UserProfileProps`，新增 `defaultExpanded` 控制简介与技能的初始展开状态。两种个人信息卡片独立渲染和调试，共享图标。为兼容博客已有代码，原 `UserProfile` 导出保持不变，紧凑版使用 `SidebarUserProfile` 导出。
 
 `CategoryIndex.categories` 为 `{ name, count, href?, active? }[]`，数量为 0 也会显示，没有链接则展示普通行。数据聚合和实际链接由宿主提供。右侧卡片均通过 props 提供内容，不绑定站点配置和个人资料接口。静态图片放在包的 `public/images`，仅供 Storybook 示例使用。
+
+## Markdown
+
+`MarkdownReader` 和受控的 `MarkdownEditor` 支持 GFM，编辑预览与文章正文复用相同样式。阅读可从 `@aimcc/react-component/markdown` 导入，编辑从 `@aimcc/react-component/markdown-editor` 按需导入。详见 [选型与组件 API](../../../docs/markdown-components.md)。

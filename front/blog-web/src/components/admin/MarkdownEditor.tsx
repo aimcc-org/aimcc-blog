@@ -1,6 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { MarkdownEditor as SharedMarkdownEditor } from "@aimcc/react-component/markdown-editor";
+import DraftManager from "./DraftManager";
+import { adminRequest, AdminApiError } from "@/lib/admin-api";
+import {
+  fetchTaxonomyOptions,
+  draftTaxonomy,
+  articlePayload,
+  publishArticle,
+  type ArticleTaxonomy,
+} from "@/lib/admin-publishing";
+import { articleDetailHref } from "@/lib/article-detail";
+import CoverSettings from "./CoverSettings";
+import AdminIcon from "./AdminIcon";
+import {
+  readEditingCache,
+  writeEditingCache,
+  recoverEditingCache,
+  readEditingCacheStore,
+  mergeEditingCache,
+} from "@/lib/admin-edit-cache";
 
 import {
   createDraft,
@@ -15,56 +33,218 @@ import {
 
 const sample = `## 从一个想法开始\n\n在左侧写下你的文字，右侧会实时呈现。\n\n### Markdown 写作\n\n- 用 **粗体** 强调重点\n- 用 *斜体* 表达语气\n- 添加 [链接](https://example.com)\n\n> 把值得记录的事情，慢慢写下来。\n\n\`\`\`javascript\nconst idea = "Hello, world!";\nconsole.log(idea);\n\`\`\`\n`;
 
-export default function MarkdownEditor({ accountId }: { accountId: string }) {
+export default function MarkdownEditor({
+  accountId,
+  mode = "edit",
+}: {
+  accountId: string;
+  mode?: "edit" | "manage";
+}) {
   const draftKey = `aimcc.admin.drafts.${accountId}`;
+  const cacheKey = `aimcc.admin.edit-cache.${accountId}`;
+  const [taxonomy, setTaxonomy] = useState<ArticleTaxonomy>({
+    categories: [],
+    tags: [],
+  });
+  const [taxonomyStatus, setTaxonomyStatus] = useState<
+    "loading" | "ready" | "error"
+  >("loading");
+  const [taxonomyAttempt, setTaxonomyAttempt] = useState(0);
+  const [publishing, setPublishing] = useState(false);
+  const publishingLock = useRef(false);
+  const [publishError, setPublishError] = useState("");
+  const [recovery, setRecovery] = useState<Draft | null>(null);
+  const [cacheError, setCacheError] = useState(false);
+  const lastCached = useRef<string | null>(null);
   const [store, setStore] = useState<DraftStore>(() =>
     readDraftStore(null, null),
   );
-  const draft = store.drafts.find((item) => item.id === store.activeId)!;
+  const [editorDraft, setEditorDraft] = useState<Draft>(() => createDraft());
+  const [editingStarted, setEditingStarted] = useState(false);
+  const draft =
+    mode === "edit"
+      ? editorDraft
+      : store.drafts.find((item) => item.id === store.activeId)!;
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState("正在读取草稿…");
   const [message, setMessage] = useState("");
   const [storageError, setStorageError] = useState(false);
   const [importing, setImporting] = useState(false);
   const [validation, setValidation] = useState<string[] | null>(null);
+  const [previewOnly, setPreviewOnly] = useState(false);
   const [coverFailed, setCoverFailed] = useState(false);
-  const editor = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const lastSaved = useRef<string | null>(null);
   const visibleDrafts = store.drafts.filter((item) => !item.deletedAt);
-  const deletedDrafts = store.drafts.filter((item) => item.deletedAt);
+
+  const selection = draftTaxonomy(draft, taxonomy);
+
+  useEffect(() => {
+    if (mode !== "edit") return;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let active = true;
+    setTaxonomyStatus("loading");
+    const base =
+      import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
+    void Promise.all([
+      fetchTaxonomyOptions(base, "/categorys", controller.signal),
+      fetchTaxonomyOptions(base, "/tags", controller.signal),
+    ])
+      .then(([categories, tags]) => {
+        if (active) {
+          setTaxonomy({ categories, tags });
+          setTaxonomyStatus("ready");
+        }
+      })
+      .catch(() => {
+        if (active) setTaxonomyStatus("error");
+      })
+      .finally(() => clearTimeout(timeout));
+    return () => {
+      active = false;
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [mode, taxonomyAttempt]);
+
+  async function publish() {
+    if (
+      publishingLock.current ||
+      !loaded ||
+      taxonomyStatus !== "ready" ||
+      draft.publishedArticleId
+    )
+      return;
+    setPublishError("");
+    setMessage("");
+    try {
+      articlePayload(draft, taxonomy);
+    } catch (cause) {
+      setPublishError(
+        cause instanceof Error ? cause.message : "请检查文章信息",
+      );
+      return;
+    }
+    publishingLock.current = true;
+    setPublishing(true);
+    try {
+      const id = await publishArticle(draft, taxonomy, adminRequest<number>);
+      setDraft({ ...draft, publishedArticleId: id });
+      setMessage(`文章发布成功（ID：${id}），本地草稿已保留。`);
+    } catch (cause) {
+      setPublishError(
+        cause instanceof AdminApiError && cause.code === 401
+          ? "登录已过期，请重新登录后发布；本地草稿已保留。"
+          : cause instanceof AdminApiError
+            ? cause.message
+            : "未能确认发布结果，请先查看博客确认是否已发布，再决定是否重试；本地草稿已保留。",
+      );
+    } finally {
+      publishingLock.current = false;
+      setPublishing(false);
+    }
+  }
+
+  function cacheDraft(updated: Draft) {
+    // Cache in the same input event: closing the page before effects run
+    // must not lose the latest keystroke or article metadata.
+    try {
+      if (localStorage.getItem(cacheKey) !== lastCached.current) {
+        throw new Error("另一标签页已更新编辑缓存");
+      }
+      writeEditingCache(localStorage, cacheKey, updated);
+      lastCached.current = localStorage.getItem(cacheKey);
+      setCacheError(false);
+    } catch {
+      setCacheError(true);
+    }
+    setRecovery(null);
+  }
 
   function setDraft(value: Draft) {
+    const updated = { ...value, updatedAt: new Date().toISOString() };
+    cacheDraft(updated);
+    setEditorDraft(updated);
+    setEditingStarted(true);
     setStore((current) => ({
       ...current,
-      drafts: current.drafts.map((item) =>
-        item.id === value.id
-          ? { ...value, updatedAt: new Date().toISOString() }
-          : item,
-      ),
+      activeId: updated.id,
+      drafts: current.drafts.some((item) => item.id === updated.id)
+        ? current.drafts.map((item) =>
+            item.id === updated.id ? updated : item,
+          )
+        : [updated, ...current.drafts],
     }));
     setValidation(null);
   }
 
   useEffect(() => {
+    let savedStore: DraftStore | undefined;
+    let persistedStore: DraftStore | undefined;
+    setEditingStarted(false);
+    setEditorDraft(createDraft());
     try {
       const saved = localStorage.getItem(draftKey);
       lastSaved.current = saved;
-      setStore(
-        readDraftStore(
-          saved,
-          saved ? null : localStorage.getItem(`aimcc.admin.draft.${accountId}`),
-        ),
-      );
+      const legacy = saved
+        ? null
+        : localStorage.getItem(`aimcc.admin.draft.${accountId}`);
+      savedStore = readDraftStore(saved, legacy);
+      if (saved || legacy) persistedStore = savedStore;
+      else setEditorDraft(savedStore.drafts[0]);
+      setStore(savedStore);
     } catch {
       setStorageError(true);
       setSaveStatus("无法读取草稿，原数据已保留；请导出当前内容备份");
     }
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      lastCached.current = raw;
+      const cache = readEditingCacheStore(raw, persistedStore);
+      let merged = savedStore
+        ? mergeEditingCache(savedStore, cache)
+        : undefined;
+      if (merged && !persistedStore && Object.keys(cache.entries).length) {
+        const drafts = merged.drafts.filter((item) =>
+          Object.hasOwn(cache.entries, item.id),
+        );
+        merged = {
+          ...merged,
+          drafts,
+          activeId: cache.latestKey ?? drafts[0].id,
+        };
+      }
+      if (merged) setStore(merged);
+      if (mode === "edit") {
+        const selectedId = new URLSearchParams(window.location.search).get(
+          "draft",
+        );
+        const selected = selectedId
+          ? merged?.drafts.find(
+              (item) => item.id === selectedId && !item.deletedAt,
+            )
+          : undefined;
+        // "Continue editing" in article management is an explicit selection.
+        if (selected) {
+          setEditorDraft(selected);
+          setEditingStarted(true);
+          setRecovery(null);
+          if (merged) setStore({ ...merged, activeId: selected.id });
+        } else setRecovery(readEditingCache(raw, persistedStore));
+      }
+      if (localStorage.getItem(cacheKey) !== raw) throw new Error("缓存已更新");
+      const upgraded = JSON.stringify(cache);
+      localStorage.setItem(cacheKey, upgraded);
+      lastCached.current = upgraded;
+    } catch {
+      setCacheError(true);
+    }
     setLoaded(true);
-  }, [draftKey, accountId]);
+  }, [draftKey, accountId, cacheKey, mode]);
 
   useEffect(() => {
-    if (!loaded || storageError) return;
+    if (!loaded || storageError || (mode === "edit" && !editingStarted)) return;
     try {
       if (localStorage.getItem(draftKey) !== lastSaved.current) {
         setStorageError(true);
@@ -79,47 +259,34 @@ export default function MarkdownEditor({ accountId }: { accountId: string }) {
       setStorageError(true);
       setSaveStatus("保存失败，请导出 Markdown 备份");
     }
-  }, [store, draftKey, loaded, storageError]);
+  }, [store, draftKey, cacheKey, loaded, storageError, mode, editingStarted]);
 
   useEffect(() => {
-    if (!storageError) return;
+    if (!storageError && !cacheError) return;
     const warn = (event: BeforeUnloadEvent) => {
       event.preventDefault();
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [storageError]);
+  }, [storageError, cacheError]);
 
   useEffect(() => {
     setCoverFailed(false);
   }, [draft.cover]);
 
   function addDraft(value = createDraft()) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("draft");
+    window.history.replaceState(null, "", url);
+    setEditorDraft(value);
+    setEditingStarted(true);
+    cacheDraft(value);
     setStore((current) => ({
       ...current,
       activeId: value.id,
       drafts: [value, ...current.drafts],
     }));
     setValidation(null);
-  }
-
-  function removeDraft() {
-    const remaining = visibleDrafts.filter((item) => item.id !== draft.id);
-    const next = remaining[0] ?? createDraft();
-    setStore((current) => ({
-      ...current,
-      activeId: next.id,
-      drafts: [
-        ...(remaining.length ? [] : [next]),
-        ...current.drafts.map((item) =>
-          item.id === draft.id
-            ? { ...item, deletedAt: new Date().toISOString() }
-            : item,
-        ),
-      ],
-    }));
-    setValidation(null);
-    setMessage("草稿已移入回收站，可随时恢复。");
   }
 
   async function loadFile(file: File) {
@@ -143,30 +310,6 @@ export default function MarkdownEditor({ accountId }: { accountId: string }) {
     }
   }
 
-  function insert(before: string, after = "", placeholder = "文字") {
-    const input = editor.current;
-    if (!input) return;
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
-    const selected = draft.content.slice(start, end) || placeholder;
-    setDraft({
-      ...draft,
-      content:
-        draft.content.slice(0, start) +
-        before +
-        selected +
-        after +
-        draft.content.slice(end),
-    });
-    requestAnimationFrame(() => {
-      input.focus();
-      input.setSelectionRange(
-        start + before.length,
-        start + before.length + selected.length,
-      );
-    });
-  }
-
   function download() {
     const content = exportMarkdown(draft);
     const url = URL.createObjectURL(
@@ -180,19 +323,112 @@ export default function MarkdownEditor({ accountId }: { accountId: string }) {
     setMessage("Markdown 文件已导出。");
   }
 
+  function openEditor(id?: string) {
+    if (!loaded || storageError || importing) return;
+    const next = id
+      ? { ...store, activeId: id }
+      : (() => {
+          const value = createDraft();
+          return {
+            ...store,
+            activeId: value.id,
+            drafts: [value, ...store.drafts],
+          };
+        })();
+    try {
+      if (localStorage.getItem(draftKey) !== lastSaved.current)
+        throw new Error("conflict");
+      const saved = JSON.stringify(next);
+      localStorage.setItem(draftKey, saved);
+      lastSaved.current = saved;
+      cacheDraft(next.drafts.find((item) => item.id === next.activeId)!);
+      window.location.assign(
+        id
+          ? `/admin/publish/?draft=${encodeURIComponent(id)}`
+          : "/admin/publish/",
+      );
+    } catch {
+      setStorageError(true);
+      setSaveStatus("无法安全保存草稿，请刷新后重试；当前内容已保留。");
+    }
+  }
+
+  if (mode === "manage")
+    return (
+      <DraftManager
+        store={store}
+        disabled={!loaded || storageError || importing || publishing}
+        saveStatus={saveStatus}
+        message={storageError ? "" : message}
+        onNew={() => openEditor()}
+        onEdit={openEditor}
+        onTrash={(id) => {
+          const remaining = visibleDrafts.filter((item) => item.id !== id);
+          const next = remaining[0] ?? createDraft();
+          setStore({
+            ...store,
+            activeId: store.activeId === id ? next.id : store.activeId,
+            drafts: [
+              ...(remaining.length ? [] : [next]),
+              ...store.drafts.map((item) =>
+                item.id === id
+                  ? { ...item, deletedAt: new Date().toISOString() }
+                  : item,
+              ),
+            ],
+          });
+          setMessage("草稿已移入回收站，可随时恢复。");
+        }}
+        onRestore={(id) => {
+          setStore({
+            ...store,
+            drafts: store.drafts.map((item) =>
+              item.id === id ? { ...item, deletedAt: undefined } : item,
+            ),
+          });
+          setMessage("草稿已恢复，可在草稿列表继续编辑。");
+        }}
+      />
+    );
+
+  const headings = draft.content
+    .split("\n")
+    .filter((line) => /^#{1,3}\s/.test(line))
+    .map((line) => ({
+      level: line.match(/^#+/)![0].length,
+      text: line.replace(/^#+\s+/, ""),
+    }));
+  const wordCount = draft.content.replace(/\s/g, "").length;
+
   return (
     <>
-      <header className="flex items-center justify-between gap-5 [&_h1]:my-[9px] [&_h1]:text-[28px] [&_h1]:tracking-[-0.04em] [&_p]:m-0 [&_p]:text-sm max-[1100px]:items-start max-[1100px]:flex-col">
+      {cacheError && (
+        <p role="alert" className="admin-cache-warning">
+          编辑缓存不可用或已被其他标签页更新。请导出 Markdown
+          备份当前内容；原有缓存已保留。
+        </p>
+      )}
+      <header className="admin-page-header flex items-center justify-between gap-5 [&_h1]:my-[9px] [&_h1]:text-[28px] [&_h1]:tracking-[-0.04em] [&_p]:m-0 [&_p]:text-sm max-[1100px]:items-start max-[1100px]:flex-col">
         <div>
           <span className="text-admin-primary text-[11px] font-bold tracking-[0.18em]">
-            NEW STORY
+            发布文章 / 新建文章
           </span>
           <h1>发布文章</h1>
           <p className="text-admin-muted leading-[1.7]">
-            专注写作，让想法有迹可循。
+            用文字记录思考，让想法更有迹可循。
           </p>
         </div>
-        <div className="flex flex-wrap gap-2.5">
+        <div className="admin-header-actions flex flex-wrap gap-2.5">
+          <span className="admin-save-indicator" title={saveStatus}>
+            <i className={storageError ? "is-error" : ""} />
+            {storageError
+              ? "保存异常"
+              : loaded
+                ? editingStarted
+                  ? "草稿已自动保存"
+                  : "新文章"
+                : "正在读取…"}
+          </span>
           <input
             ref={fileInput}
             type="file"
@@ -207,13 +443,13 @@ export default function MarkdownEditor({ accountId }: { accountId: string }) {
           <button
             className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
             onClick={() => fileInput.current?.click()}
-            disabled={!loaded || storageError || importing}
+            disabled={!loaded || storageError || importing || publishing}
           >
             {importing ? "正在导入…" : "导入 Markdown"}
           </button>
           <button
             className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
-            disabled={!loaded}
+            disabled={!loaded || publishing}
             onClick={() => setValidation(validateDraft(draft))}
           >
             检查文章
@@ -221,22 +457,53 @@ export default function MarkdownEditor({ accountId }: { accountId: string }) {
           <button
             className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
             onClick={download}
-            disabled={!loaded}
+            disabled={!loaded || publishing}
           >
             导出 Markdown
           </button>
           <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5 bg-admin-primary! border-admin-primary! text-white! enabled:hover:bg-admin-primary-hover!"
-            disabled
-            title="文章发布接口尚未接入"
+            className="admin-button"
+            disabled={publishing}
+            onClick={() => setPreviewOnly(!previewOnly)}
+            aria-pressed={previewOnly}
           >
-            发布文章
+            {previewOnly ? "返回编辑" : "预览"}
+          </button>
+          <button
+            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5 bg-admin-primary! border-admin-primary! text-white! enabled:hover:bg-admin-primary-hover!"
+            disabled={
+              !loaded ||
+              importing ||
+              publishing ||
+              taxonomyStatus !== "ready" ||
+              !!draft.publishedArticleId
+            }
+            onClick={() => void publish()}
+          >
+            {publishing
+              ? "正在发布…"
+              : draft.publishedArticleId
+                ? "已发布"
+                : "发布文章"}
           </button>
         </div>
       </header>
       <p className="mt-6 mb-5 text-xs text-admin-muted">
-        发布功能即将开放，当前可编辑、预览并保存本地草稿。
+        写作内容会自动保存为本地草稿，点击发布后文章将公开展示。
       </p>
+      {publishError && (
+        <p className="text-[13px] text-[#b42318]" role="alert">
+          {publishError}
+        </p>
+      )}
+      {draft.publishedArticleId && (
+        <p className="text-[13px] text-admin-primary">
+          <a href={articleDetailHref(draft.publishedArticleId)}>
+            查看已发布文章 ↗
+          </a>{" "}
+          · 再次发布请新建草稿。
+        </p>
+      )}
       {message && (
         <p className="text-[13px] text-[#23875d]" role="status">
           {message}
@@ -258,307 +525,438 @@ export default function MarkdownEditor({ accountId }: { accountId: string }) {
               ))}
             </ul>
           ) : (
-            "文章信息检查通过，接入发布功能后即可提交。"
+            "文章信息检查通过。"
           )}
         </div>
       )}
-      <section
-        className="mb-6 p-5 border border-admin-border rounded-[10px] bg-admin-surface"
-        aria-label="本地草稿管理"
-      >
-        <div className="flex justify-between items-center gap-4 mb-4 [&_h2]:text-[15px] [&_h2]:m-0 [&_h2_span]:text-admin-subtle [&_h2_span]:font-normal [&_h2_span]:ml-2">
-          <h2>
-            本地草稿 <span>{visibleDrafts.length}</span>
-          </h2>
+      <div className="admin-editor-draft-bar">
+        <span>
+          {editingStarted
+            ? `当前文章：${draft.title.trim() || "未命名文章"}`
+            : "新文章 · 开始写作后自动保存"}
+        </span>
+        <div>
+          <a href="/admin/">管理草稿</a>
           <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
+            type="button"
+            disabled={!loaded || storageError || importing || publishing}
             onClick={() => {
               addDraft();
-              setMessage("已新建草稿。");
-            }}
-            disabled={!loaded || storageError || importing}
-          >
-            ＋ 新建草稿
-          </button>
-        </div>
-        <div className="flex items-center gap-3 max-[760px]:flex-wrap [&_label]:shrink-0 [&_label]:text-xs [&_label]:text-admin-muted [&_select]:flex-1 [&_select]:min-w-0 [&_select]:border [&_select]:border-admin-border [&_select]:rounded-md [&_select]:bg-admin-surface [&_select]:text-admin-text [&_select]:p-[11px] [&_select]:text-[13px] max-[760px]:[&_select]:basis-full max-[760px]:[&_select]:order-3">
-          <label htmlFor="draft-select">当前草稿</label>
-          <select
-            id="draft-select"
-            value={store.activeId}
-            disabled={!loaded || storageError || importing}
-            onChange={(event) => {
-              setStore({ ...store, activeId: event.target.value });
-              setValidation(null);
               setMessage("");
+              setPublishError("");
             }}
           >
-            {visibleDrafts.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title.trim() || "未命名文章"} ·{" "}
-                {new Date(item.updatedAt).toLocaleString("zh-CN")}
-              </option>
-            ))}
-          </select>
-          <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
-            onClick={removeDraft}
-            disabled={!loaded || storageError || importing}
-          >
-            移入回收站
+            新建文章
           </button>
         </div>
-        {deletedDrafts.length > 0 && (
-          <details className="mt-4 text-admin-muted text-[13px] [&_summary]:cursor-pointer [&_ul]:p-0 [&_ul]:list-none [&_li]:flex [&_li]:justify-between [&_li]:items-center [&_li]:gap-4 [&_li]:py-2.5 [&_li]:border-t [&_li]:border-admin-border [&_li_span]:[overflow-wrap:anywhere]">
-            <summary>回收站（{deletedDrafts.length}）</summary>
-            <ul>
-              {deletedDrafts.map((item) => (
-                <li key={item.id}>
-                  <span>{item.title.trim() || "未命名文章"}</span>
-                  <button
-                    className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
-                    disabled={storageError || importing}
-                    onClick={() => {
-                      setStore({
-                        ...store,
-                        activeId: item.id,
-                        drafts: store.drafts.map((entry) =>
-                          entry.id === item.id
-                            ? { ...entry, deletedAt: undefined }
-                            : entry,
-                        ),
-                      });
-                      setValidation(null);
-                      setMessage("草稿已恢复。");
-                    }}
-                  >
-                    恢复草稿
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
-      </section>
-      <section className="grid gap-2.5 mb-6" aria-label="文章信息">
-        <label className="text-xs text-admin-muted" htmlFor="article-title">
-          文章标题
-        </label>
-        <input
-          id="article-title"
-          className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px] text-[23px] font-semibold p-[17px]!"
-          value={draft.title}
-          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          placeholder="给这篇文章起个标题…"
-          maxLength={200}
-          disabled={!loaded}
-        />
-        <label
-          className="text-xs text-admin-muted"
-          htmlFor="article-description"
+      </div>
+      {recovery && (
+        <aside
+          className="admin-draft-recovery"
+          role="status"
+          aria-label="恢复草稿提示"
         >
-          文章摘要
-        </label>
-        <input
-          className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
-          id="article-description"
-          value={draft.description}
-          onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-          placeholder="用一句话介绍这篇文章（选填）"
-          maxLength={500}
-          disabled={!loaded}
-        />
-        <div className="grid grid-cols-2 gap-4 mt-2.5 max-[760px]:grid-cols-1 [&_label]:grid [&_label]:gap-2 [&_label]:text-admin-muted [&_label]:text-xs">
-          <label>
-            分类
-            <input
-              className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
-              value={draft.category}
-              onChange={(event) =>
-                setDraft({ ...draft, category: event.target.value })
-              }
-              placeholder="例如：技术笔记"
-              maxLength={100}
-              disabled={!loaded}
-            />
-          </label>
-          <label>
-            标签
-            <input
-              className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
-              value={draft.tags}
-              onChange={(event) =>
-                setDraft({ ...draft, tags: event.target.value })
-              }
-              placeholder="用逗号分隔，例如 React, 前端"
-              maxLength={500}
-              disabled={!loaded}
-            />
-          </label>
-          <label>
-            文章链接
-            <input
-              className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
-              value={draft.slug}
-              onChange={(event) =>
-                setDraft({ ...draft, slug: event.target.value })
-              }
-              placeholder="例如 first-post（选填）"
-              maxLength={100}
-              disabled={!loaded}
-            />
-          </label>
-          <label>
-            封面图片地址
-            <input
-              className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
-              type="url"
-              value={draft.cover}
-              onChange={(event) =>
-                setDraft({ ...draft, cover: event.target.value })
-              }
-              placeholder="https://…（选填）"
-              disabled={!loaded}
-            />
-          </label>
-        </div>
-      </section>
-      <section
-        className="grid grid-cols-2 bg-admin-surface border border-admin-border rounded-[10px] overflow-hidden max-[760px]:grid-cols-1"
-        aria-label="Markdown 编辑与预览"
-      >
-        <div className="min-w-0 flex flex-col border-r border-admin-border max-[760px]:border-r-0 max-[760px]:border-b">
-          <div className="flex justify-between items-center py-4 px-5 border-b border-admin-border text-[13px] font-semibold [&>span:last-child]:text-[11px] [&>span:last-child]:text-admin-subtle [&>span:last-child]:font-normal">
-            <label htmlFor="markdown-content">Markdown 编辑</label>
-            <span>MD</span>
+          <div>
+            <strong>有一篇未完成的草稿</strong>
+            <p>
+              {recovery.title.trim() || "未命名文章"}
+              <span>
+                {" "}
+                ·{" "}
+                {new Date(recovery.updatedAt).toLocaleString("zh-CN", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </p>
           </div>
-          <div
-            className="flex items-center flex-wrap gap-1 py-[9px] px-[14px] border-b border-admin-border [&_button]:text-admin-muted [&_button]:py-[5px] [&_button]:px-2.5 [&_button]:border-0 [&_button]:rounded-sm [&_button]:bg-transparent [&_button]:text-xs [&_button:hover]:bg-admin-hover"
-            role="toolbar"
-            aria-label="插入 Markdown 格式"
+          <div className="admin-draft-recovery__actions">
+            <button
+              type="button"
+              className="admin-button"
+              onClick={() => setRecovery(null)}
+            >
+              暂不恢复
+            </button>
+            <button
+              type="button"
+              className="admin-button admin-button-primary"
+              onClick={() => {
+                const restored = recoverEditingCache(store, recovery);
+                const recovered = restored.drafts.find(
+                  (item) => item.id === restored.activeId,
+                )!;
+                cacheDraft(recovered);
+                setEditorDraft(recovered);
+                setEditingStarted(true);
+                setStore(restored);
+                setRecovery(null);
+                setValidation(null);
+                setMessage("已恢复草稿，可继续写作。");
+              }}
+            >
+              恢复草稿
+            </button>
+          </div>
+        </aside>
+      )}
+      <div className="admin-publish-grid">
+        <div className="admin-editor-main">
+          <section
+            className="admin-card admin-basic-info grid gap-2.5 mb-6"
+            aria-label="文章信息"
           >
-            <button
-              type="button"
-              onClick={() => insert("## ")}
-              aria-label="插入标题"
+            <h2>基本信息</h2>
+            <label className="text-xs text-admin-muted" htmlFor="article-title">
+              文章标题 <span className="admin-required">*</span>
+              <span className="admin-field-count">
+                {draft.title.length} / 200
+              </span>
+            </label>
+            <input
+              id="article-title"
+              className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px] text-sm font-medium"
+              value={draft.title}
+              onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+              placeholder="给这篇文章起个标题…"
+              maxLength={200}
+              disabled={!loaded || publishing}
+            />
+            <label
+              className="text-xs text-admin-muted"
+              htmlFor="article-description"
             >
-              H2
-            </button>
-            <button
-              type="button"
-              onClick={() => insert("**", "**")}
-              aria-label="插入粗体"
-            >
-              <b>B</b>
-            </button>
-            <button
-              type="button"
-              onClick={() => insert("*", "*")}
-              aria-label="插入斜体"
-            >
-              <i>I</i>
-            </button>
-            <button
-              type="button"
-              onClick={() => insert("[", "](https://example.com)", "链接文字")}
-              aria-label="插入链接"
-            >
-              链接
-            </button>
-            <button
-              type="button"
-              onClick={() => insert("\n> ", "\n", "引用内容")}
-              aria-label="插入引用"
-            >
-              引用
-            </button>
-            <button
-              type="button"
-              onClick={() => insert("\n```javascript\n", "\n```\n", "// 代码")}
-              aria-label="插入代码块"
-            >
-              代码
-            </button>
+              文章摘要{" "}
+              <span className="admin-field-count">
+                {draft.description.length} / 500
+              </span>
+            </label>
+            <textarea
+              rows={3}
+              className="admin-description w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
+              id="article-description"
+              value={draft.description}
+              onChange={(e) =>
+                setDraft({ ...draft, description: e.target.value })
+              }
+              placeholder="用一句话介绍这篇文章（选填）"
+              maxLength={500}
+              disabled={!loaded || publishing}
+            />
+            <div className="grid grid-cols-2 gap-4 mt-2.5 max-[760px]:grid-cols-1 [&_label]:grid [&_label]:gap-2 [&_label]:text-admin-muted [&_label]:text-xs">
+              <label className="content-start">
+                分类
+                <select
+                  aria-label="文章分类"
+                  className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
+                  value={
+                    selection.categoryId ??
+                    (draft.category ? "unavailable" : "")
+                  }
+                  disabled={!loaded || publishing || taxonomyStatus !== "ready"}
+                  onChange={(event) => {
+                    const categoryId = event.target.value
+                      ? Number(event.target.value)
+                      : null;
+                    setDraft({
+                      ...draft,
+                      categoryId,
+                      category:
+                        taxonomy.categories.find(
+                          (item) => item.id === categoryId,
+                        )?.name ?? "",
+                    });
+                  }}
+                >
+                  <option value="">未分类</option>
+                  {draft.category && selection.categoryId === null && (
+                    <option value="unavailable" disabled>
+                      {draft.category}（请重新选择）
+                    </option>
+                  )}
+                  {selection.categoryId !== null &&
+                    !taxonomy.categories.some(
+                      (item) => item.id === selection.categoryId,
+                    ) && (
+                      <option value={selection.categoryId} disabled>
+                        {draft.category || "原分类"}（已不可用）
+                      </option>
+                    )}
+                  {taxonomy.categories.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <fieldset
+                className="m-0 min-w-0 border-0 p-0"
+                disabled={!loaded || publishing || taxonomyStatus !== "ready"}
+              >
+                <legend className="mb-2 text-xs text-admin-muted">
+                  标签（可多选）
+                </legend>
+                <div className="flex flex-wrap gap-2 rounded-[7px] border border-admin-border p-3">
+                  {taxonomy.tags.map((item) => (
+                    <label
+                      key={item.id}
+                      className="flex! items-center gap-1.5!"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selection.tagIds.includes(item.id)}
+                        onChange={(event) => {
+                          const tagIds = event.target.checked
+                            ? [...selection.tagIds, item.id]
+                            : selection.tagIds.filter((id) => id !== item.id);
+                          setDraft({
+                            ...draft,
+                            tagIds,
+                            tags: taxonomy.tags
+                              .filter((tag) => tagIds.includes(tag.id))
+                              .map((tag) => tag.name)
+                              .join(", "),
+                          });
+                        }}
+                      />
+                      {item.name}
+                    </label>
+                  ))}
+                  {taxonomyStatus === "ready" && taxonomy.tags.length === 0 && (
+                    <span className="text-xs text-admin-muted">
+                      暂无可选标签
+                    </span>
+                  )}
+                </div>
+                {draft.tags &&
+                  (draft.tagIds === undefined ||
+                    selection.tagIds.some(
+                      (id) => !taxonomy.tags.some((tag) => tag.id === id),
+                    )) && (
+                    <p className="text-xs text-admin-muted">
+                      原草稿标签：{draft.tags}。请核对后选择。
+                    </p>
+                  )}
+                <button
+                  type="button"
+                  className="admin-button mt-2"
+                  onClick={() => setDraft({ ...draft, tags: "", tagIds: [] })}
+                >
+                  清空标签
+                </button>
+              </fieldset>
+              {taxonomyStatus === "loading" && (
+                <p role="status" className="text-xs text-admin-muted">
+                  正在加载分类和标签…
+                </p>
+              )}
+              {taxonomyStatus === "error" && (
+                <div role="alert" className="text-xs text-[#b42318]">
+                  分类或标签加载失败。
+                  <button
+                    type="button"
+                    className="admin-button"
+                    onClick={() => setTaxonomyAttempt((value) => value + 1)}
+                  >
+                    重新加载
+                  </button>
+                </div>
+              )}
+              <label>
+                文章链接
+                <input
+                  className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
+                  value={draft.slug}
+                  onChange={(event) =>
+                    setDraft({ ...draft, slug: event.target.value })
+                  }
+                  placeholder="例如 first-post（选填）"
+                  maxLength={100}
+                  disabled={!loaded || publishing}
+                />
+              </label>
+            </div>
+            <CoverSettings
+              value={draft.cover}
+              disabled={!loaded || publishing}
+              failed={coverFailed}
+              onChange={(cover) => setDraft({ ...draft, cover })}
+              onError={() => setCoverFailed(true)}
+            />
+          </section>
+          <h2 className="admin-editor-heading">
+            文章内容
             {!draft.content && (
               <button
                 type="button"
+                className="admin-button"
+                disabled={!loaded || publishing}
                 onClick={() => setDraft({ ...draft, content: sample })}
               >
-                示例
+                插入示例
               </button>
             )}
-          </div>
-          <textarea
-            className="resize-y w-full flex-1 min-h-[480px] border-0 rounded-none p-6 bg-transparent text-admin-text font-admin-mono text-sm leading-[1.85] [tab-size:2] focus-visible:outline-offset-[-3px] placeholder:text-admin-subtle max-[760px]:min-h-[360px]"
-            ref={editor}
-            id="markdown-content"
-            spellCheck={false}
+          </h2>
+          <SharedMarkdownEditor
             value={draft.content}
-            onChange={(e) => setDraft({ ...draft, content: e.target.value })}
+            onChange={(content) => setDraft({ ...draft, content })}
+            disabled={!loaded || publishing}
+            previewOnly={previewOnly}
             placeholder={sample}
-            disabled={!loaded}
+            previewHeader={
+              <>
+                {draft.cover && isSafeCover(draft.cover) && !coverFailed && (
+                  <img
+                    className="w-full max-h-[260px] object-cover mb-5"
+                    src={draft.cover}
+                    alt="文章封面"
+                    onError={() => setCoverFailed(true)}
+                  />
+                )}
+                {draft.cover && (!isSafeCover(draft.cover) || coverFailed) && (
+                  <p className="text-[#b42318] bg-[#fff0ed] border border-[#ffcfc6] rounded-md p-3 text-[13px] leading-[1.6]">
+                    封面无法加载，请检查图片地址。
+                  </p>
+                )}
+                {(draft.category || draft.tags) && (
+                  <div className="flex gap-2 flex-wrap mb-4 [&_span]:text-[11px] [&_span]:text-admin-primary [&_span]:bg-admin-hover [&_span]:rounded-sm [&_span]:py-[3px] [&_span]:px-[9px]">
+                    {draft.category && <span>{draft.category}</span>}
+                    {draft.tags
+                      .split(/[,，]/)
+                      .map((tag) => tag.trim())
+                      .filter(Boolean)
+                      .map((tag, index) => (
+                        <span key={`${tag}-${index}`}>#{tag}</span>
+                      ))}
+                  </div>
+                )}
+                {draft.title && <h1>{draft.title}</h1>}
+                {draft.description && (
+                  <p className="text-admin-muted pb-5 border-b border-admin-border">
+                    {draft.description}
+                  </p>
+                )}
+              </>
+            }
           />
-          <div className="flex justify-between gap-3 py-3 px-5 border-t border-admin-border text-admin-subtle text-[11px]">
-            <span>{draft.content.length} 字符</span>
-            <span>支持 Markdown / GFM</span>
-          </div>
         </div>
-        <div className="min-w-0 flex flex-col">
-          <div className="flex justify-between items-center py-4 px-5 border-b border-admin-border text-[13px] font-semibold [&>span:last-child]:text-[11px] [&>span:last-child]:text-admin-subtle [&>span:last-child]:font-normal">
-            <span>文章预览</span>
-            <span className="text-[#23875d]!">● 实时</span>
-          </div>
-          <article className="py-6 px-8 max-h-[760px] min-h-[530px] overflow-auto [overflow-wrap:anywhere] leading-[1.9] text-[15px] max-[1100px]:p-5 max-[760px]:min-h-[320px] [&>:first-child]:mt-0 [&_h1]:text-[30px] [&_h1]:leading-[1.35] [&_h2]:text-[23px] [&_h2]:leading-[1.5] [&_h2]:mt-[1.7em] [&_h3]:text-[19px] [&_a]:text-admin-primary [&_blockquote]:ml-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-admin-accent [&_blockquote]:py-1 [&_blockquote]:px-[18px] [&_blockquote]:bg-admin-hover [&_blockquote]:text-admin-muted [&_pre]:overflow-auto [&_pre]:p-[18px] [&_pre]:bg-[#101c33] [&_pre]:text-[#dce8ff] [&_pre]:rounded-[7px] [&_pre]:text-xs [&_code]:font-admin-mono [&_:not(pre)>code]:bg-admin-hover [&_:not(pre)>code]:py-0.5 [&_:not(pre)>code]:px-[5px] [&_:not(pre)>code]:rounded-[3px] [&_table]:block [&_table]:overflow-auto [&_table]:border-collapse [&_th]:border [&_th]:border-admin-border [&_th]:py-2 [&_th]:px-3 [&_td]:border [&_td]:border-admin-border [&_td]:py-2 [&_td]:px-3 [&_img]:h-auto [&_img]:rounded-md">
-            {draft.cover && isSafeCover(draft.cover) && !coverFailed && (
-              <img
-                className="w-full max-h-[260px] object-cover mb-5"
-                src={draft.cover}
-                alt="文章封面"
-                onError={() => setCoverFailed(true)}
-              />
-            )}
-            {draft.cover && (!isSafeCover(draft.cover) || coverFailed) && (
-              <p className="text-[#b42318] bg-[#fff0ed] border border-[#ffcfc6] rounded-md p-3 text-[13px] leading-[1.6]">
-                封面无法加载，请检查图片地址。
-              </p>
-            )}
-            {(draft.category || draft.tags) && (
-              <div className="flex gap-2 flex-wrap mb-4 [&_span]:text-[11px] [&_span]:text-admin-primary [&_span]:bg-admin-hover [&_span]:rounded-sm [&_span]:py-[3px] [&_span]:px-[9px]">
-                {draft.category && <span>{draft.category}</span>}
-                {draft.tags
-                  .split(/[,，]/)
-                  .map((tag) => tag.trim())
-                  .filter(Boolean)
-                  .map((tag, index) => (
-                    <span key={`${tag}-${index}`}>#{tag}</span>
-                  ))}
+        <aside className="admin-inspector" aria-label="文章辅助信息">
+          <section className="admin-card">
+            <h2>发布设置</h2>
+            <div className="admin-public-option">
+              <span className="admin-radio" />
+              <div>
+                <strong>
+                  {draft.publishedArticleId ? "已发布" : "公开发布"}
+                </strong>
+                <p>发布后所有访客均可阅读</p>
               </div>
-            )}
-            {draft.title && <h1>{draft.title}</h1>}
-            {draft.description && (
-              <p className="text-admin-muted pb-5 border-b border-admin-border">
-                {draft.description}
-              </p>
-            )}
-            {draft.content ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {draft.content}
-              </ReactMarkdown>
-            ) : (
-              <div className="grid content-center justify-items-center min-h-[400px] text-center text-admin-subtle max-[760px]:min-h-[260px] [&>span]:text-[40px] [&>span]:text-admin-accent [&_h2]:font-admin-display [&_h2]:font-normal [&_h2]:text-[23px] [&_h2]:mb-0 [&_p]:text-[13px]">
-                <span>✎</span>
-                <h2>文字，从这里生长。</h2>
-                <p>在左侧开始写作，预览会实时更新。</p>
+            </div>
+            <p className="admin-inspector-note">
+              发布成功后保留本地草稿。文章链接字段仅用于 Markdown
+              导出，线上文章链接由服务器 ID 生成。
+            </p>
+            <button
+              className="admin-button admin-export"
+              disabled={!loaded || publishing}
+              onClick={download}
+            >
+              导出 Markdown ↗
+            </button>
+          </section>
+          <section className="admin-card">
+            <h2>
+              目录结构 <span className="admin-auto-label">自动生成</span>
+            </h2>
+            <div className="admin-outline">
+              {headings.length ? (
+                headings.map((heading, index) => (
+                  <div
+                    key={index}
+                    style={{ paddingLeft: (heading.level - 1) * 12 }}
+                  >
+                    <span>H{heading.level}</span>
+                    {heading.text}
+                  </div>
+                ))
+              ) : (
+                <p>添加 Markdown 标题后，目录会在这里自动显示。</p>
+              )}
+            </div>
+          </section>
+          <section className="admin-card">
+            <h2>文章信息</h2>
+            <dl className="admin-article-info">
+              <div>
+                <dt>
+                  <AdminIcon name="clock" />
+                  预计阅读时间
+                </dt>
+                <dd>
+                  {wordCount ? Math.max(1, Math.ceil(wordCount / 400)) : 0} 分钟
+                </dd>
               </div>
-            )}
-          </article>
-        </div>
-      </section>
+              <div>
+                <dt>
+                  <AdminIcon name="file" />
+                  正文字数
+                </dt>
+                <dd>{wordCount.toLocaleString()} 字</dd>
+              </div>
+              <div>
+                <dt>
+                  <AdminIcon name="clock" />
+                  最后编辑
+                </dt>
+                <dd>
+                  {loaded
+                    ? new Date(draft.updatedAt).toLocaleString("zh-CN", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "—"}
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <AdminIcon name="file" />
+                  编辑状态
+                </dt>
+                <dd className="admin-draft-status">
+                  {draft.publishedArticleId ? "已发布 ●" : "草稿 ●"}
+                </dd>
+              </div>
+            </dl>
+          </section>
+          <section className="admin-card admin-writing-tips">
+            <h2>✦ 操作提示</h2>
+            <ul>
+              {[
+                "添加清晰的标题与摘要",
+                "设置合适的分类和标签",
+                "检查文章链接是否正确",
+                "导出前建议先预览效果",
+              ].map((tip) => (
+                <li key={tip}>
+                  <AdminIcon name="check" />
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </section>
+        </aside>
+      </div>
       <footer
         className="text-admin-subtle text-[11px] text-right py-[14px] px-0.5"
         role="status"
       >
-        {saveStatus}
+        {editingStarted
+          ? saveStatus
+          : "开始输入后自动保存，原有草稿会保留在文章管理中。"}
       </footer>
     </>
   );

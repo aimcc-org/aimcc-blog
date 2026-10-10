@@ -5,6 +5,9 @@ export interface Draft {
   content: string;
   category: string;
   tags: string;
+  categoryId?: number | null;
+  tagIds?: number[];
+  publishedArticleId?: number;
   slug: string;
   cover: string;
   updatedAt: string;
@@ -17,6 +20,19 @@ export interface DraftStore {
   drafts: Draft[];
 }
 
+function createDraftId(): string {
+  // randomUUID is limited to secure contexts; HTTP LAN development still
+  // exposes getRandomValues. Keep draft creation working there too.
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 export function createDraft(fields: Partial<Draft> = {}): Draft {
   return {
     title: "",
@@ -27,7 +43,7 @@ export function createDraft(fields: Partial<Draft> = {}): Draft {
     slug: "",
     cover: "",
     ...fields,
-    id: crypto.randomUUID(),
+    id: createDraftId(),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -61,6 +77,17 @@ export function readDraftStore(
         ].every((key) => typeof draft[key] === "string") ||
         (draft.deletedAt !== undefined &&
           typeof draft.deletedAt !== "string") ||
+        (draft.categoryId !== undefined &&
+          draft.categoryId !== null &&
+          (!Number.isSafeInteger(draft.categoryId) || draft.categoryId <= 0)) ||
+        (draft.tagIds !== undefined &&
+          (!Array.isArray(draft.tagIds) ||
+            !draft.tagIds.every(
+              (id: number) => Number.isSafeInteger(id) && id > 0,
+            ))) ||
+        (draft.publishedArticleId !== undefined &&
+          (!Number.isSafeInteger(draft.publishedArticleId) ||
+            draft.publishedArticleId <= 0)) ||
         ids.has(draft.id)
       )
         throw new Error("草稿格式不正确");

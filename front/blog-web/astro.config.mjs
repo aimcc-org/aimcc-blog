@@ -23,6 +23,17 @@ export default defineConfig({
     sitemap({ filter: (page) => !new URL(page).pathname.startsWith("/admin") }),
   ],
   vite: {
+    ssr: { noExternal: ["@aimcc/react-component"] },
+    resolve: { dedupe: ["react", "react-dom"] },
+    optimizeDeps: {
+      include: [
+        "@aimcc/react-component > react-markdown",
+        "@aimcc/react-component > remark-gfm",
+        "@aimcc/react-component > rehype-slug",
+        "@aimcc/react-component > @uiw/react-md-editor/nohighlight",
+        "@aimcc/react-component > @uiw/react-md-editor/commands-cn",
+      ],
+    },
     plugins: [tailwindcss()],
     define: {
       "import.meta.env.SITE_PROFILE": JSON.stringify(profileName),
