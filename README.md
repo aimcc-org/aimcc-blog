@@ -71,22 +71,4 @@ pnpm --dir front/blog-web build:main
 3. 启动：运行 `ServerApplication`（或在 `server/` 目录下执行 `./mvnw spring-boot:run`）
 4. 验证：访问 <http://localhost:8080/api/about>，返回 JSON 即成功
 
-### 已有接口
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/api/about` | 个人资料（关于我卡片） |
-| GET | `/api/articles` | 文章分页列表（`?page=&size=&sort=new\|hot\|recommend`） |
-| GET | `/api/articles/{id}` | 文章详情（浏览量 +1） |
-| GET | `/api/tags` | 标签云（标签名 + 实时文章数） |
-| GET | `/api/categorys` | 分类列表（侧边栏用，分类名 + 实时文章数，空分类计 0） |
-| POST | `/api/admin/login` | 管理员登录，返回 Sa-Token |
-| GET | `/api/admin/session` | 校验管理员登录状态（需 `satoken` 请求头） |
-| POST | `/api/admin/logout` | 退出登录并撤销 token |
-| POST | `/api/admin/register` | 创建管理员账号（需登录） |
-
-### 数据库变更规范
-
-改表一律新增迁移文件：`server/src/main/resources/db/migration/V<下一个版本号>__<描述>.sql`（注意版本号后是**双下划线**）。**已执行过的迁移文件永不修改**；应用每次启动，Flyway 会在每个环境自动补齐未执行的迁移。
-
-更多架构和贡献规则见 `ARCHITECTURE.md` 与 `.agent/skills/`。
+更多贡献规则见 `.agent/skills/`。

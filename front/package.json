@@ -11,6 +11,7 @@
     "rush:update": "rush update",
     "build": "rush build",
     "rebuild": "rush rebuild",
+    "purge": "rush purge",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
