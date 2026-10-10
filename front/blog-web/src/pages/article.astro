@@ -1,0 +1,16 @@
+---
+import BlogHomeLayout from "@/layouts/home/BlogHomeLayout.astro";
+import ApiArticleDetail from "@/components/islands/ApiArticleDetail";
+---
+
+<BlogHomeLayout title="文章详情" posts={[]}>
+  <section
+    id="article"
+    class="home-article"
+    aria-label="文章正文"
+    transition:name="home-content"
+    transition:animate="fade"
+  >
+    <ApiArticleDetail client:load />
+  </section>
+</BlogHomeLayout>

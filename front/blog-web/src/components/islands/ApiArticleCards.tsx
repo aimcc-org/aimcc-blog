@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import type { CSSProperties } from "react";
 import type { ApiArticle } from "@/lib/api";
+import { articleDetailHref } from "@/lib/article-detail";
 
 export default function ApiArticleCards({
   articles,
@@ -21,8 +22,9 @@ export default function ApiArticleCards({
               className="post-card"
               style={{ "--stagger-index": index } as CSSProperties}
             >
-              <div
+              <a
                 className={`post-card__link${index === 0 ? " is-featured" : ""}`}
+                href={articleDetailHref(article.id)}
               >
                 <div className="post-card__cover">
                   <img
@@ -58,7 +60,7 @@ export default function ApiArticleCards({
                     </span>
                   </div>
                 </div>
-              </div>
+              </a>
             </article>
           </Fragment>
         );

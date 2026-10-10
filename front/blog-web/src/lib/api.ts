@@ -47,6 +47,12 @@ export function getTagCloud(signal?: AbortSignal) {
 }
 
 import { fetchArticleList, fetchArticleListBatch } from "./article-list";
+import { fetchArticleDetail } from "./article-detail";
+export function getArticleDetail(id: string, signal?: AbortSignal) {
+  const base =
+    import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
+  return fetchArticleDetail(base, id, signal);
+}
 export function getArticleList(page = 1, signal?: AbortSignal, tagId?: number) {
   const base =
     import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";

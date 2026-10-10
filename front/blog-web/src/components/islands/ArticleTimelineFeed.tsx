@@ -4,6 +4,7 @@ import type { TimelineArticle } from "@aimcc/react-component";
 import ApiArticleCards from "./ApiArticleCards";
 import type { ApiArticle } from "@/lib/api";
 import { getArticleListBatch } from "@/lib/api";
+import { articleDetailHref } from "@/lib/article-detail";
 
 const NO_TAGS: number[] = [];
 
@@ -152,6 +153,7 @@ export default function ArticleTimelineFeed({
       ? [
           {
             id: article.id,
+            href: articleDetailHref(article.id),
             title: article.title,
             publishedAt: /(?:Z|[+-]\d{2}:?\d{2})$/.test(article.publishedAt)
               ? article.publishedAt
