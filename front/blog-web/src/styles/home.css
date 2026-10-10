@@ -563,6 +563,8 @@ body:has(.home-page) {
 
 .post-card__meta {
   display: flex;
+  align-items: center;
+  line-height: 1.5;
   flex-wrap: wrap;
   gap: 0.4rem 0.7rem;
   color: var(--color-subtle);

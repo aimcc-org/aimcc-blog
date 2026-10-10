@@ -45,3 +45,12 @@ export const LongContent: Story = {
     tags: ["React", "TypeScript", "一个很长的标签用于验证换行"],
   },
 };
+
+export const TagsOnly: Story = {
+  args: {
+    showBio: false,
+    showResume: false,
+    showGithub: false,
+    showContact: false,
+  },
+};

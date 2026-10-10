@@ -38,6 +38,10 @@ export default function SidebarProfile({
 
   return (
     <SidebarUserProfile
+      showBio={false}
+      showResume={false}
+      showGithub={false}
+      showContact={false}
       name={profile.nickname}
       role={profile.role}
       location={profile.location}

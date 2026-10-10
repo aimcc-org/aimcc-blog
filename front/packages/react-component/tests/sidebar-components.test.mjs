@@ -95,3 +95,51 @@ test("quick links preserve internal navigation and protect new-window links", ()
   assert.match(html, /<a href="\/about\/">/);
   assert.match(html, /target="_blank" rel="noopener noreferrer"/);
 });
+
+test("profile can hide introduction and every personal link while preserving tags", () => {
+  const html = render(SidebarUserProfile, {
+    name: "AIMCC",
+    bio: "隐藏简介",
+    tags: [{ id: 1, name: "React", href: "/?tagId=1", active: true }],
+    resumeHref: "/resume",
+    githubHref: "https://github.com/aimcc",
+    contactHref: "mailto:hello@example.com",
+    showBio: false,
+    showResume: false,
+    showGithub: false,
+    showContact: false,
+  });
+  assert.doesNotMatch(
+    html,
+    /隐藏简介|简介与标签|个人链接|电子简历|GitHub|联系我/,
+  );
+  assert.match(html, /<summary>标签/);
+  assert.doesNotMatch(html, /<h3>标签<\/h3>/);
+  assert.match(html, /href="\/\?tagId=1" data-tag-id="1" aria-current="true"/);
+});
+
+test("profile link switches are independent and visible by default", () => {
+  const props = {
+    name: "AIMCC",
+    resumeHref: "/resume",
+    githubHref: "https://github.com/aimcc",
+    contactHref: "mailto:hello@example.com",
+  };
+  const html = render(SidebarUserProfile, props);
+  assert.match(html, /电子简历/);
+  assert.match(html, /GitHub/);
+  assert.match(html, /联系我/);
+  for (const [option, label] of [
+    ["showResume", "电子简历"],
+    ["showGithub", "GitHub"],
+    ["showContact", "联系我"],
+  ]) {
+    const hidden = render(SidebarUserProfile, { ...props, [option]: false });
+    assert.ok(!hidden.includes(label));
+    for (const other of ["电子简历", "GitHub", "联系我"].filter(
+      (value) => value !== label,
+    )) {
+      assert.ok(hidden.includes(other));
+    }
+  }
+});

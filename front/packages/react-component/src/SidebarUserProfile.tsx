@@ -17,6 +17,11 @@ export interface SidebarUserProfileProps extends Omit<
   /** Tags supplied by the caller, independently of personal profile data. */
   tags?: (string | SidebarProfileTag)[];
   maxVisibleTags?: number;
+  /** Display the introduction independently of tags. */
+  showBio?: boolean;
+  showResume?: boolean;
+  showGithub?: boolean;
+  showContact?: boolean;
   onTagClick?: (
     tag: SidebarProfileTag,
     event: MouseEvent<HTMLAnchorElement>,
@@ -35,6 +40,10 @@ export function SidebarUserProfile({
   online,
   tags = [],
   maxVisibleTags = 9,
+  showBio = true,
+  showResume = true,
+  showGithub = true,
+  showContact = true,
   onTagClick,
   resumeHref,
   githubHref,
@@ -85,18 +94,23 @@ export function SidebarUserProfile({
           )}
         </div>
       </div>
-      {(bio || tags.length > 0) && (
+      {((showBio && bio) || tags.length > 0) && (
         <details
           className="sidebar-user-profile__summary"
           open={defaultExpanded}
         >
           <summary>
-            简介与标签 <span aria-hidden="true">＋</span>
+            {showBio && bio
+              ? tags.length > 0
+                ? "简介与标签"
+                : "简介"
+              : "标签"}
+            <span aria-hidden="true">＋</span>
           </summary>
-          {bio && <p className="sidebar-user-profile__bio">{bio}</p>}
+          {showBio && bio && <p className="sidebar-user-profile__bio">{bio}</p>}
           {tags.length > 0 && (
             <div className="sidebar-user-profile__tags">
-              <h3>标签</h3>
+              {showBio && bio && <h3>标签</h3>}
               <ul aria-label="标签">
                 {tags.slice(0, limit).map((tag, index) => (
                   <li key={typeof tag === "string" ? index : tag.id}>
@@ -127,20 +141,22 @@ export function SidebarUserProfile({
           )}
         </details>
       )}
-      {(resumeHref || githubHref || contactHref) && (
+      {((showResume && resumeHref) ||
+        (showGithub && githubHref) ||
+        (showContact && contactHref)) && (
         <nav className="sidebar-user-profile__links" aria-label="个人链接">
-          {resumeHref && (
+          {showResume && resumeHref && (
             <a className="is-primary" href={resumeHref}>
               电子简历 <ProfileIcon kind="arrow" />
             </a>
           )}
-          {githubHref && (
+          {showGithub && githubHref && (
             <a href={githubHref} target="_blank" rel="noopener noreferrer">
               <ProfileIcon kind="github" />
               GitHub
             </a>
           )}
-          {contactHref && (
+          {showContact && contactHref && (
             <a href={contactHref}>
               <ProfileIcon kind="mail" />
               联系我
