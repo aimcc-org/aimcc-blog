@@ -8,3 +8,5 @@ node_modules/
 
 # Local frontend snapshots
 /front-backup-*/
+.rush/
+dist/

@@ -82,4 +82,4 @@ feat(front) add page
 
 ## Hooks
 
-仓库根目录的 Husky hooks 会强制提交消息格式和暂存文件检查。它们刻意保留在仓库根目录，因为它们同时治理 `front/` 和未来的 `server/` 应用。
+仓库根目录的 Husky hooks 会强制提交消息格式和暂存文件检查。它们刻意保留在仓库根目录，因为它们同时治理 `front/` 和 `server/` 应用。
