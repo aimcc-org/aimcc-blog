@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { ApiArticle } from "@/lib/api";
 import { articleDetailHref } from "@/lib/article-detail";
+import ArticleStats from "./ArticleStats";
 
 export default function ApiArticleCard({
   article,
@@ -43,12 +44,7 @@ export default function ApiArticleCard({
           </div>
           {article.summary && <p>{article.summary}</p>}
           <div className="post-card__footer">
-            <span>
-              {article.readingMinutes !== null &&
-              article.readingMinutes !== undefined
-                ? `阅读约 ${article.readingMinutes} 分钟`
-                : ""}
-            </span>
+            <ArticleStats article={article} />
           </div>
         </div>
       </a>

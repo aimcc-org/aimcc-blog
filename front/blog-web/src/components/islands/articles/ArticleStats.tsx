@@ -1,4 +1,5 @@
 import type { ApiArticle } from "@/lib/api";
+import "./article-stats.css";
 
 const formatCount = (count: number) =>
   count >= 1000

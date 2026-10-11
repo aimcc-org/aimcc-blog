@@ -148,28 +148,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.article-stats {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
-  align-self: flex-end;
-  flex-shrink: 0;
-  color: var(--color-muted);
-  font-size: 13px;
-}
-.article-stats > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.article-stats svg {
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-}
 .featured-card--lead {
   border: 1px solid var(--color-border);
   border-radius: 8px;
