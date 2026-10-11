@@ -22,9 +22,9 @@ export function useFeaturedArticles() {
         controller.signal,
         undefined,
         undefined,
-        1,
+        undefined,
         5,
-        "recommend",
+        "RECOMMEND",
       );
       if (!controller.signal.aborted) setPage(result);
     } catch {

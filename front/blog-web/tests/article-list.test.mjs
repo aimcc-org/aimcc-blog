@@ -27,7 +27,7 @@ test("request the latest article page and forward abort signal", async (t) => {
     assert.equal(parsed.pathname, "/api/articles");
     assert.equal(parsed.searchParams.get("page"), "2");
     assert.equal(parsed.searchParams.get("size"), "20");
-    assert.equal(parsed.searchParams.get("sort"), "new");
+    assert.equal(parsed.searchParams.get("sort"), "NEW");
     assert.equal(parsed.searchParams.has("tagId"), false);
     assert.equal(options.signal, controller.signal);
     return Response.json({ code: 200, data });
@@ -190,7 +190,7 @@ test("featured requests preserve recommend, isTop and size when advancing pages"
   t.mock.method(globalThis, "fetch", async (url) => {
     const params = new URL(url, "https://example.test").searchParams;
     assert.equal(params.get("isTop"), "1");
-    assert.equal(params.get("sort"), "recommend");
+    assert.equal(params.get("sort"), "RECOMMEND");
     assert.equal(params.get("size"), "5");
     const current = Number(params.get("page"));
     calls.push(current);
@@ -204,7 +204,7 @@ test("featured requests preserve recommend, isTop and size when advancing pages"
     undefined,
     1,
     5,
-    "recommend",
+    "RECOMMEND",
   );
   await fetchArticleList(
     "/api",
@@ -214,7 +214,7 @@ test("featured requests preserve recommend, isTop and size when advancing pages"
     undefined,
     1,
     5,
-    "recommend",
+    "RECOMMEND",
   );
   assert.deepEqual(calls, [1, 2]);
 });
@@ -227,7 +227,7 @@ test("recent pagination preserves filters and page size without isTop", async (t
     assert.equal(params.get("tagId"), "2");
     assert.equal(params.get("categoryId"), "3");
     assert.equal(params.has("isTop"), false);
-    assert.equal(params.get("sort"), "new");
+    assert.equal(params.get("sort"), "NEW");
     const current = Number(params.get("page"));
     calls.push(current);
     return Response.json({ code: 200, data: { ...data, current, size: 8 } });
