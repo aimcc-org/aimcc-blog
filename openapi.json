@@ -39,7 +39,7 @@
         "parameters": [
           { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
           { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
-          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["new", "hot", "recommend"], "default": "new" } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["NEW", "RECOMMEND"], "default": "NEW" }, "description": "排序方式：NEW 最新 / RECOMMEND 推荐（只取精选）" },
           { "name": "tagId", "in": "query", "schema": { "type": "integer" }, "description": "按标签筛选" },
           { "name": "categoryId", "in": "query", "schema": { "type": "integer" }, "description": "按分类筛选" }
         ],
