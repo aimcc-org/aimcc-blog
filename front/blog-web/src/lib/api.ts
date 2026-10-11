@@ -53,10 +53,27 @@ export function getArticleDetail(id: string, signal?: AbortSignal) {
     import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
   return fetchArticleDetail(base, id, signal);
 }
-export function getArticleList(page = 1, signal?: AbortSignal, tagId?: number) {
+export function getArticleList(
+  page = 1,
+  signal?: AbortSignal,
+  tagId?: number,
+  categoryId?: number,
+  isTop?: number,
+  size = 20,
+  sort: "new" | "hot" | "recommend" = "new",
+) {
   const base =
     import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
-  return fetchArticleList(base, page, signal, tagId);
+  return fetchArticleList(
+    base,
+    page,
+    signal,
+    tagId,
+    categoryId,
+    isTop,
+    size,
+    sort,
+  );
 }
 export function getArticleListBatch(
   page = 1,

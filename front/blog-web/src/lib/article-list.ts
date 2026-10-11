@@ -2,6 +2,9 @@ export interface ApiArticle {
   id: number;
   title: string;
   categoryId?: number | null;
+  isTop?: number;
+  viewCount?: number | null;
+  commentCount?: number | null;
   summary: string | null;
   coverImage?: string | null;
   publishedAt: string | null;
@@ -23,14 +26,18 @@ export async function fetchArticleList(
   signal?: AbortSignal,
   tagId?: number,
   categoryId?: number,
+  isTop?: number,
+  size = 20,
+  sort: "new" | "hot" | "recommend" = "new",
 ): Promise<ApiArticlePage> {
   const query = new URLSearchParams({
     page: String(page),
-    size: "20",
-    sort: "new",
+    size: String(size),
+    sort,
   });
   if (tagId !== undefined) query.set("tagId", String(tagId));
   if (categoryId !== undefined) query.set("categoryId", String(categoryId));
+  if (isTop !== undefined) query.set("isTop", String(isTop));
   const response = await fetch(`${base}/articles?${query}`, { signal });
   if (!response.ok) throw new Error(`文章接口返回 ${response.status}`);
   const result = (await response.json()) as {

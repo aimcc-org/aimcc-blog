@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArticleTimeline } from "@aimcc/react-component";
 import type { TimelineArticle } from "@aimcc/react-component";
-import ApiArticleCards from "./ApiArticleCards";
 import type { ApiArticle } from "@/lib/api";
 import { getArticleListBatch } from "@/lib/api";
 import { articleDetailHref } from "@/lib/article-detail";
@@ -10,12 +9,10 @@ const NO_TAGS: number[] = [];
 
 export default function ArticleTimelineFeed({
   tagIds = NO_TAGS,
-  variant = "timeline",
   categoryId,
 }: {
   tagIds?: number[];
   categoryId?: number;
-  variant?: "timeline" | "cards";
 }) {
   const [articles, setArticles] = useState<ApiArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,78 +73,6 @@ export default function ArticleTimelineFeed({
     };
   }, [loadNextPage]);
 
-  if (variant === "cards") {
-    return (
-      <section aria-label="文章卡片列表" aria-busy={loading}>
-        <ApiArticleCards articles={articles} />
-        {loading && (
-          <p className="home-posts__empty" role="status">
-            正在加载文章…
-          </p>
-        )}
-        {error && (
-          <div className="article-feedback" role="alert">
-            <span className="article-feedback__icon" aria-hidden="true">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v6" strokeLinecap="round" />
-                <circle
-                  cx="12"
-                  cy="17"
-                  r=".8"
-                  fill="currentColor"
-                  stroke="none"
-                />
-              </svg>
-            </span>
-            <div className="article-feedback__body">
-              <h2>文章暂时无法加载</h2>
-              <p>{error}</p>
-            </div>
-            <button
-              className="article-feedback__retry"
-              type="button"
-              onClick={() => void loadNextPage()}
-              disabled={loading}
-            >
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <path
-                  d="M20 7v5h-5M4 17v-5h5M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              重新加载
-            </button>
-          </div>
-        )}
-        {!loading && !error && articles.length === 0 && (
-          <p className="home-posts__empty">当前筛选条件下暂无文章。</p>
-        )}
-        {!error && hasMore && (
-          <button
-            type="button"
-            className="article-timeline__more"
-            onClick={() => void loadNextPage()}
-            disabled={loading}
-          >
-            {loading ? "加载中…" : "加载更多"}
-          </button>
-        )}
-      </section>
-    );
-  }
   const timelineArticles = articles.flatMap((article): TimelineArticle[] =>
     article.publishedAt
       ? [

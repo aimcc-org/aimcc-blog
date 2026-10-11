@@ -184,3 +184,56 @@ test("a failed selected-tag request fails the whole batch", async (t) => {
     /503/,
   );
 });
+
+test("featured requests preserve recommend, isTop and size when advancing pages", async (t) => {
+  const calls = [];
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const params = new URL(url, "https://example.test").searchParams;
+    assert.equal(params.get("isTop"), "1");
+    assert.equal(params.get("sort"), "recommend");
+    assert.equal(params.get("size"), "5");
+    const current = Number(params.get("page"));
+    calls.push(current);
+    return Response.json({ code: 200, data: { ...data, current, size: 5 } });
+  });
+  await fetchArticleList(
+    "/api",
+    1,
+    undefined,
+    undefined,
+    undefined,
+    1,
+    5,
+    "recommend",
+  );
+  await fetchArticleList(
+    "/api",
+    2,
+    undefined,
+    undefined,
+    undefined,
+    1,
+    5,
+    "recommend",
+  );
+  assert.deepEqual(calls, [1, 2]);
+});
+
+test("recent pagination preserves filters and page size without isTop", async (t) => {
+  const calls = [];
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const params = new URL(url, "https://example.test").searchParams;
+    assert.equal(params.get("size"), "8");
+    assert.equal(params.get("tagId"), "2");
+    assert.equal(params.get("categoryId"), "3");
+    assert.equal(params.has("isTop"), false);
+    assert.equal(params.get("sort"), "new");
+    const current = Number(params.get("page"));
+    calls.push(current);
+    return Response.json({ code: 200, data: { ...data, current, size: 8 } });
+  });
+  for (const page of [1, 2, 1]) {
+    await fetchArticleList("/api", page, undefined, 2, 3, undefined, 8);
+  }
+  assert.deepEqual(calls, [1, 2, 1]);
+});

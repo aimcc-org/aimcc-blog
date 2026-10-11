@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { readTagIds, readCategoryId } from "@/lib/tag-filter";
-import ArticleTimelineFeed from "./ArticleTimelineFeed";
+import RecentArticles from "./recent-articles/RecentArticles";
 
 export default function TagArticleResults() {
   const [tagIds, setTagIds] = useState<number[]>([]);
@@ -27,11 +27,10 @@ export default function TagArticleResults() {
   }, []);
   return !ready ? null : (
     <div>
-      <ArticleTimelineFeed
+      <RecentArticles
         key={`${categoryId ?? ""}:${tagIds.join(",")}`}
-        tagIds={tagIds}
+        tagId={tagIds[0]}
         categoryId={categoryId}
-        variant="cards"
       />
     </div>
   );
