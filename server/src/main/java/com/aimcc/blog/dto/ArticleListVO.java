@@ -26,6 +26,9 @@ public class ArticleListVO {
     /** 阅读时长（分钟） */
     private Integer readingMinutes;
 
+    /** 浏览量 */
+    private Integer viewCount;
+
     /** 是否精选：0否 1是 */
     private Integer isTop;
 

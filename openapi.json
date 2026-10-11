@@ -292,6 +292,7 @@
           "summary": { "type": "string" },
           "coverImage": { "type": "string" },
           "readingMinutes": { "type": "integer" },
+          "viewCount": { "type": "integer" },
           "isTop": { "type": "integer" },
           "publishedAt": { "type": "string", "format": "date-time" },
           "categoryId": { "type": "integer" },
