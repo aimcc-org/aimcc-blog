@@ -4,12 +4,16 @@
 
 ```text
 repo/
-├── front/       # 当前 Fuwari 风格前端 Rush 工作区
-├── front-bak/   # 布局回退前的前端源码备份
-├── server/      # 后端应用
-├── .agent/      # 仓库级 AI 工程规则
-├── .husky/      # 仓库级 Git hooks
-└── ...          # 仓库级治理配置
+├── front/            # 前端 Rush 工作区
+├── server/           # 后端应用
+├── .agent/           # AI 工程规则
+├── .husky/           # Git hooks
+├── .nvmrc            # Node 版本
+├── commitlint.config.cjs  # 提交信息规范
+├── package.json      # 仓库级 Git 工具
+├── pnpm-lock.yaml    # 仓库级依赖锁
+├── openapi.json      # 接口文档（导入 Apifox）
+└── README.md
 ```
 
 ## 边界规则
@@ -54,9 +58,7 @@ pnpm build:all
 pnpm --dir front/blog-web build:main
 ```
 
-`front/` 使用 Rush 管理多包结构：`front/blog-web` 是博客前端页面，`front/packages/mdx-component` 是公共 MDX 组件包。
-
-当前 `front/` 恢复到 `1eaab39` 的 Fuwari 风格最后一版。`front-bak/` 保留回退前的阅读布局、个人资料页和 Tailwind 管理后台；两套工作区独立安装依赖，启动备份版本时可将上述命令中的 `front/` 替换为 `front-bak/`。
+`front/` 使用 Rush 管理多包结构：`front/blog-web` 是博客前端页面，`front/packages/` 下是公共组件包。
 
 ## Server（后端）
 
