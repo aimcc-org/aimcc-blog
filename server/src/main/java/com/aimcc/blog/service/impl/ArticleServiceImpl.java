@@ -114,6 +114,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setSummary(article.getSummary());
         vo.setCoverImage(article.getCoverImage());
         vo.setReadingMinutes(article.getReadingMinutes());
+        vo.setViewCount(article.getViewCount());
         vo.setIsTop(article.getIsTop());
         vo.setPublishedAt(article.getPublishedAt());
         vo.setCategoryId(article.getCategoryId());
