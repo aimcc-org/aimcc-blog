@@ -19,9 +19,6 @@ export default function FeaturedArticleCard({
             alt=""
             loading={lead ? "eager" : "lazy"}
           />
-          {lead && article.isTop === 1 && (
-            <span className="featured-card__badge">置顶</span>
-          )}
         </div>
         <div className="featured-card__body">
           <h3>{article.title}</h3>
