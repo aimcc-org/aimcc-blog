@@ -5,6 +5,7 @@ import com.aimcc.blog.dto.ArticleListVO;
 import com.aimcc.blog.dto.ArticleTagRow;
 import com.aimcc.blog.dto.TagItemVO;
 import com.aimcc.blog.entity.Article;
+import com.aimcc.blog.enums.ArticleSort;
 import com.aimcc.blog.exception.BizException;
 import com.aimcc.blog.mapper.ArticleMapper;
 import com.aimcc.blog.mapper.TagMapper;
@@ -28,11 +29,13 @@ public class ArticleServiceImpl implements ArticleService {
     private final TagMapper tagMapper;
 
     @Override
-    public Page<ArticleListVO> listArticles(int page, int size, String sort, Long categoryId, Long tagId) {
+    public Page<ArticleListVO> listArticles(int page, int size, ArticleSort sort, Long categoryId, Long tagId) {
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1);                     // 只看已发布
-        if ("recommend".equals(sort)) {
-            wrapper.eq(Article::getIsTop, 1);                  // 推荐 = 只取精选文章
+        // 排序方式只影响过滤条件，两种方式最终都按发布时间倒序
+        switch (sort) {
+            case RECOMMEND -> wrapper.eq(Article::getIsTop, 1); // 推荐 = 只取精选文章
+            case NEW -> { }                                    // 最新不加过滤，故意留空
         }
         if (tagId != null) {
             // 标签过滤：id 在（挂了该标签的文章 id）里——中间表两跳接力的子查询写法
@@ -41,8 +44,6 @@ public class ArticleServiceImpl implements ArticleService {
         if (categoryId != null) {
             wrapper.eq(Article::getCategoryId, categoryId);
         }
-        // 排序现状说明：new（最新）和 hot（热门）暂同，均按发布时间倒序——
-        // 热门排序等 view_count 有真实数据积累后再改造
         wrapper.orderByDesc(Article::getPublishedAt);
 
         Page<Article> articlePage = articleMapper.selectPage(new Page<>(page, size), wrapper);

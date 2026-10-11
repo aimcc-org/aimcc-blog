@@ -3,6 +3,7 @@ package com.aimcc.blog.controller;
 import com.aimcc.blog.common.ApiResult;
 import com.aimcc.blog.dto.ArticleDetailVO;
 import com.aimcc.blog.dto.ArticleListVO;
+import com.aimcc.blog.enums.ArticleSort;
 import com.aimcc.blog.service.ArticleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class ArticleController {
     public ApiResult<Page<ArticleListVO>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "new") String sort,
+            @RequestParam(defaultValue = "NEW") ArticleSort sort,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long tagId) {
         return ApiResult.ok(articleService.listArticles(page, size, sort, categoryId, tagId));
