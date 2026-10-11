@@ -3,7 +3,7 @@ import { CategoryIndex } from "./CategoryIndex.js";
 import {
   sidebarProfile,
   categoryIndex,
-} from "../.storybook/sidebar-fixtures.js";
+} from "../../../.storybook/sidebar-fixtures.js";
 const meta = {
   title: "Blog/Category/CategoryIndex",
   component: CategoryIndex,

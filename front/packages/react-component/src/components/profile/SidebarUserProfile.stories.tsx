@@ -3,7 +3,7 @@ import { SidebarUserProfile } from "./SidebarUserProfile.js";
 import {
   sidebarProfile,
   categoryIndex,
-} from "../.storybook/sidebar-fixtures.js";
+} from "../../../.storybook/sidebar-fixtures.js";
 const meta = {
   title: "Blog/Profile/UserProfile",
   component: SidebarUserProfile,

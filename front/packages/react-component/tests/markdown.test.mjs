@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { MarkdownReader } from "../dist/MarkdownReader.js";
-import { MarkdownEditor } from "../dist/MarkdownEditor.js";
+import { MarkdownReader } from "../dist/index.js";
+import { MarkdownEditor } from "../dist/index.js";
 
 const render = (source) =>
   renderToStaticMarkup(createElement(MarkdownReader, { source }));

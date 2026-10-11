@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { groupArticlesByDay } from "../dist/ArticleTimeline.js";
+import { groupArticlesByDay } from "../dist/index.js";
 
 const article = (id, publishedAt) => ({ id, title: `文章 ${id}`, publishedAt });
 test("group unsorted articles by Beijing day and order latest first", () => {

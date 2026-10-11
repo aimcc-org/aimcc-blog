@@ -10,6 +10,24 @@
 
 这是 Rush 内部源码包，入口直接导出 TypeScript，交给 Astro/Vite 编译，修改组件后应用和 Storybook 都能热更新。`build` 生成 JS 和类型声明供检查；当前包不用于发布 npm。
 
+## 目录结构
+
+```text
+src/
+├── index.ts                 # 公开组件及类型导出
+├── styles.css               # 全量样式入口，保持加载顺序
+├── styles/                  # 全局 tokens、跨组件侧栏样式
+└── components/
+    ├── articles/            # PostCard、ArticleTimeline
+    ├── categories/          # CategoryList、CategoryIndex
+    ├── navigation/          # Header、玻璃效果辅助函数
+    ├── profile/             # UserProfile、SidebarUserProfile、共享图标
+    ├── markdown/            # MarkdownReader、MarkdownEditor
+    └── sidebar/             # NowCard、QuickLinks、AmbientCard
+```
+
+组件实现、专属样式与 Stories 按职责就近放置；跨组件样式放在 `styles/`。新增组件同步维护 `src/index.ts`，宿主通过包名或现有子路径使用，避免直接引用内部文件路径。`styles.css`、`tokens.css`、`markdown`、`markdown-editor` 等公开路径保持不变。
+
 ## 开发与调试
 
 在 `front/` 目录使用 Node 26：

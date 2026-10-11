@@ -9,11 +9,11 @@
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css",
-    "./tokens.css": "./src/tokens.css",
-    "./markdown": "./src/MarkdownReader.tsx",
-    "./markdown-editor": "./src/MarkdownEditor.tsx",
-    "./markdown.css": "./src/markdown.css",
-    "./markdown-editor.css": "./src/markdown-editor.css"
+    "./tokens.css": "./src/styles/tokens.css",
+    "./markdown": "./src/components/markdown/MarkdownReader.tsx",
+    "./markdown-editor": "./src/components/markdown/MarkdownEditor.tsx",
+    "./markdown.css": "./src/components/markdown/markdown.css",
+    "./markdown-editor.css": "./src/components/markdown/markdown-editor.css"
   },
   "sideEffects": [
     "**/*.css"

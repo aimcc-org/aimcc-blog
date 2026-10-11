@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react-vite";
 import { INITIAL_VIEWPORTS } from "storybook/viewport";
-import "../src/tokens.css";
+import "../src/styles/tokens.css";
 import "../src/styles.css";
 import "./preview.css";
 
