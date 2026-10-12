@@ -1,0 +1,24 @@
+.profile-avatar {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  &__fallback {
+    display: grid;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+}
+:where(.profile-link-action) {
+  height: auto;
+  padding: 0;
+  border-radius: 0;
+}
+.profile-tag {
+  border: 0;
+  font-weight: 400;
+  white-space: normal;
+}

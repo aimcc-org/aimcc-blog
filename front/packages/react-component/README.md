@@ -15,18 +15,26 @@
 ```text
 src/
 ├── index.ts                 # 公开组件及类型导出
-├── styles.css               # 全量样式入口，保持加载顺序
-├── styles/                  # 全局 tokens、跨组件侧栏样式
+├── styles.css               # 全量样式入口
+├── styles/                  # 主题 tokens、共用 Less mixin 及公开样式入口
+├── utils/cn.ts              # 条件语义类名合并
 └── components/
-    ├── articles/            # PostCard、ArticleTimeline
-    ├── categories/          # CategoryList、CategoryIndex
-    ├── navigation/          # Header、玻璃效果辅助函数
-    ├── profile/             # UserProfile、SidebarUserProfile、共享图标
-    ├── markdown/            # MarkdownReader、MarkdownEditor
-    └── sidebar/             # NowCard、QuickLinks、AmbientCard
+    ├── ui/                  # 从 shadcn/ui 官方源码引入的基础控件
+    │   ├── button/{components,modules,stories}/
+    │   └── textarea/{components,stories}/
+    └── <组件域>/            # articles、categories、navigation、profile、markdown、sidebar
+        ├── components/      # 对外组件
+        ├── modules/         # 内部子模块（按需）
+        ├── utils/           # 无 UI 的工具函数（按需）
+        ├── stories/         # Storybook 示例
+        └── styles/          # 复杂交互、响应式、排版 Less
 ```
 
-组件实现、专属样式与 Stories 按职责就近放置；跨组件样式放在 `styles/`。新增组件同步维护 `src/index.ts`，宿主通过包名或现有子路径使用，避免直接引用内部文件路径。`styles.css`、`tokens.css`、`markdown`、`markdown-editor` 等公开路径保持不变。
+React UI 复用 shadcn/ui 的本地组件源码与 Radix 交互能力，全部样式采用结构化 Less。JSX 只保留语义化类名；普通声明、BEM 子元素、状态和响应式规则放在组件的 `styles/`，不使用 Tailwind 或其他工具类引擎。
+
+基础控件从 [shadcn/ui 官方注册表](https://ui.shadcn.com/) 引入，颜色、字体和圆角直接引用现有 `--color-*` / `--font-*` / `--radius-*`，支持原有深色主题。基础控件使用 CSS `shadcn` 层，宿主组件样式可覆盖其外观；不引入全局 reset。生成 CLI 依赖 Tailwind 配置，因此本仓库维护本地源码，不保留 `components.json`。
+
+新增组件同步维护 `src/index.ts`。`styles.css`、`tokens.css`、`markdown`、`markdown-editor` 等公开路径保持不变。`check` 覆盖目录职责、Stories 位置、组件包与博客的基础控件复用，以及禁止 Tailwind 依赖和工具类。
 
 ## 开发与调试
 
@@ -125,3 +133,5 @@ pnpm --dir packages/react-component test
 ## Markdown
 
 `MarkdownReader` 和受控的 `MarkdownEditor` 支持 GFM，编辑预览与文章正文复用相同样式。阅读可从 `@aimcc/react-component/markdown` 导入，编辑从 `@aimcc/react-component/markdown-editor` 按需导入。详见 [选型与组件 API](../../../docs/markdown-components.md)。
+
+`PostCard` 提供 `metadata` / `footer` 插槽及 `showCoverArrow`，宿主可复用布局，同时保留自定义标签与统计。

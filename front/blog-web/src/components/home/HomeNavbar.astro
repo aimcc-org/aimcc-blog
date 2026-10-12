@@ -1,6 +1,7 @@
 ---
 import { currentProfile } from "@/config/build-profile";
 import HomeControls from "@/components/islands/HomeControls";
+const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
 ---
 
 <header class="home-nav-wrap" transition:persist="home-navbar">
@@ -25,8 +26,16 @@ import HomeControls from "@/components/islands/HomeControls";
       <span class="home-nav__descriptor">AI 研究札记 / 实验研究日志</span>
     </a>
     <nav class="home-nav__links" aria-label="主导航">
-      <a class="is-active" href="/">首页</a>
-      <a href="/archive/">归档</a>
+      <a
+        class:list={{ "is-active": pathname === "/" }}
+        aria-current={pathname === "/" ? "page" : undefined}
+        href="/">首页</a
+      >
+      <a
+        class:list={{ "is-active": pathname === "/archive" }}
+        aria-current={pathname === "/archive" ? "page" : undefined}
+        href="/archive/">归档</a
+      >
     </nav>
     <div class="home-nav__status" aria-label="站点状态">
       <span class="home-nav__online"><i></i>在线</span>
@@ -43,3 +52,20 @@ import HomeControls from "@/components/islands/HomeControls";
     <HomeControls client:load />
   </div>
 </header>
+
+<script>
+  const syncCurrentPage = () => {
+    const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+    document
+      .querySelectorAll<HTMLAnchorElement>(".home-nav__links a")
+      .forEach((link) => {
+        const current =
+          (new URL(link.href).pathname.replace(/\/+$/, "") || "/") === pathname;
+        link.classList.toggle("is-active", current);
+        if (current) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+  };
+  document.addEventListener("astro:page-load", syncCurrentPage);
+  syncCurrentPage();
+</script>

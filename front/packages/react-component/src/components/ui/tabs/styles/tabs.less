@@ -1,0 +1,69 @@
+@layer shadcn {
+  .rc-tabs {
+    display: flex;
+    gap: 8px;
+    &[data-orientation="horizontal"] {
+      flex-direction: column;
+    }
+    &__list {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 3px;
+      border-radius: var(--radius-card, 8px);
+      color: var(--color-muted);
+      &--default {
+        background: var(--color-control-hover);
+      }
+      &--line {
+        gap: 4px;
+        background: transparent;
+        border-radius: 0;
+      }
+    }
+    &__trigger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 6px;
+      padding: 4px 8px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-control, 6px);
+      background: transparent;
+      color: var(--color-muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      &[data-state="active"] {
+        background: var(--color-surface-solid);
+        color: var(--color-text);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+      &:disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+    }
+    &__content {
+      flex: 1;
+      outline: none;
+    }
+    &[data-orientation="vertical"] {
+      .rc-tabs__list {
+        flex-direction: column;
+      }
+      .rc-tabs__trigger {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  }
+}

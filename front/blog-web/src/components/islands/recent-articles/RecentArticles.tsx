@@ -1,7 +1,9 @@
+import "./styles/recent-articles.less";
+import { Button } from "@aimcc/react-component";
 import ApiArticleCards from "../articles/ApiArticleCards";
 import ArticlePagination from "./ArticlePagination";
 import { useRecentArticles } from "./useRecentArticles";
-import "./recent-articles.css";
+import "./recent-articles.less";
 
 export default function RecentArticles({
   tagId,
@@ -37,14 +39,15 @@ export default function RecentArticles({
           <div className="article-feedback__body">
             <p>文章加载失败，请稍后重试。</p>
           </div>
-          <button
+          <Button
+            variant="ghost"
             type="button"
             className="article-feedback__retry"
             disabled={loading}
             onClick={() => void retry()}
           >
             重新加载
-          </button>
+          </Button>
         </div>
       )}
       {!loading && !error && !page?.records.length && (

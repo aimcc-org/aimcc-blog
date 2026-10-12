@@ -1,0 +1,20 @@
+.article-bookmark {
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  color: var(--color-muted);
+  & svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+  }
+  &[aria-pressed="true"] {
+    color: var(--color-primary);
+    & svg {
+      fill: var(--color-control-hover);
+    }
+  }
+}

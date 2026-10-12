@@ -1,0 +1,209 @@
+.sidebar-user-profile {
+  padding: 20px 12px 12px;
+  border-top: 1px dashed var(--color-border);
+  background: var(--color-surface);
+  container: sidebar-profile / inline-size;
+  font-size: 14px;
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 11px;
+    & span:first-child {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+    }
+    & span:last-child {
+      color: var(--color-subtle);
+    }
+  }
+  & svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+  }
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  &__avatar {
+    position: relative;
+    flex: 0 0 64px;
+    height: 64px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-control-hover);
+    & > div {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: inherit;
+      color: var(--color-primary);
+      font-size: 22px;
+      font-weight: 800;
+    }
+    & img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    & i {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid var(--color-surface-solid);
+      border-radius: 50%;
+      background: var(--color-subtle);
+    }
+    & i.is-online {
+      background: #62c335;
+    }
+  }
+  &__details {
+    min-width: 0;
+    & h2 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    & p {
+      margin: 4px 0 0;
+      color: var(--color-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  }
+  &__location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    & svg {
+      width: 13px;
+      height: 13px;
+    }
+  }
+  &__summary {
+    margin-top: 12px;
+    &[data-state="open"] .sidebar-user-profile__trigger span {
+      transform: rotate(45deg);
+    }
+  }
+  &__trigger {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    list-style: none;
+    cursor: pointer;
+    color: var(--color-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  &__bio {
+    margin: 4px 0 16px;
+    white-space: pre-line;
+    color: var(--color-muted);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  &__tags h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+  }
+  &__tags ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  &__tags li {
+    padding: 3px 9px;
+    background: var(--color-control-hover);
+    border-radius: 99px;
+    color: var(--color-muted);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  &__tags li:has(a) {
+    padding: 0;
+  }
+  &__tags a {
+    display: block;
+    padding: 3px 9px;
+    border-radius: inherit;
+    color: inherit;
+    text-decoration: none;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease;
+  }
+  &__tags a:hover,
+  &__tags a:focus-visible,
+  &__tags a[aria-current="true"] {
+    color: #fff;
+    background: var(--color-primary);
+  }
+  &__links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+    & a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 8px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--color-text);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    & a:hover {
+      background: var(--color-control-hover);
+      color: var(--color-primary);
+    }
+    & a.is-primary {
+      grid-column: 1 / -1;
+      color: #fff;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    & a.is-primary:hover {
+      background: var(--color-primary-hover);
+    }
+  }
+  @container sidebar-profile (max-width: 220px) {
+    &__identity {
+      gap: 8px;
+    }
+    &__avatar {
+      flex-basis: 52px;
+      height: 52px;
+    }
+    &__links {
+      grid-template-columns: 1fr;
+    }
+  }
+}

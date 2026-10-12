@@ -1,0 +1,19 @@
+@import "../../../../styles/form-controls.less";
+@layer shadcn {
+  .rc-input {
+    .form-control();
+    min-height: 36px;
+    padding: 8px 12px;
+    &::selection {
+      color: #fff;
+      background: var(--color-primary);
+    }
+    &::file-selector-button {
+      display: inline-flex;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+    }
+  }
+}

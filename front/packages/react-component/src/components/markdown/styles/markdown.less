@@ -1,0 +1,121 @@
+.aimcc-markdown {
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  & > :first-child {
+    margin-top: 0;
+  }
+  & > :last-child {
+    margin-bottom: 0;
+  }
+  & :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--color-text);
+    line-height: 1.45;
+    margin: 1.7em 0 0.7em;
+    scroll-margin-top: 5rem;
+  }
+  & :where(h1, h2, h3, h4, h5, h6) {
+    font-size: 14px;
+    font-weight: 650;
+  }
+  & :where(h1, h2) {
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid var(--color-border);
+  }
+  & :where(h4, h5, h6) {
+    color: var(--color-muted);
+  }
+  & :where(p, ul, ol, pre, table, blockquote) {
+    margin-block: 1em;
+  }
+  & :where(ul, ol) {
+    padding-inline-start: 1.8em;
+  }
+  & ul {
+    list-style: disc;
+  }
+  & ol {
+    list-style: decimal;
+  }
+  & li + li {
+    margin-top: 0.3em;
+  }
+  & a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  & a:hover {
+    color: var(--color-primary-hover);
+  }
+  & blockquote {
+    margin-inline: 0;
+    padding: 0.2em 1.1em;
+    border-inline-start: 3px solid var(--color-accent);
+    color: var(--color-muted);
+    background: var(--color-control-hover);
+  }
+  & code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  & :not(pre) > code {
+    padding: 0.15em 0.35em;
+    border-radius: 4px;
+    background: var(--color-control-hover);
+  }
+  & pre {
+    max-width: 100%;
+    overflow: auto;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control, 6px);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+  & pre code {
+    padding: 0;
+    background: transparent;
+    color: inherit;
+  }
+  & table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  & :where(th, td) {
+    border: 1px solid var(--color-border);
+    padding: 0.5em 0.85em;
+  }
+  & th {
+    text-align: start;
+    font-weight: 600;
+    background: var(--color-control-hover);
+  }
+  & tbody tr:nth-child(even) {
+    background: var(--color-control-hover);
+  }
+  & img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-control, 6px);
+  }
+  & hr {
+    margin-block: 2em;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  & .contains-task-list {
+    list-style: none;
+    padding-inline-start: 0.5em;
+  }
+  & input[type="checkbox"] {
+    accent-color: var(--color-primary);
+    margin-inline-end: 0.5em;
+  }
+}

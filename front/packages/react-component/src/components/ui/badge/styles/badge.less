@@ -1,0 +1,50 @@
+@layer shadcn {
+  .rc-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 4px;
+    width: fit-content;
+    padding: 2px 8px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    white-space: nowrap;
+    &--primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    &--secondary {
+      background: var(--color-control-hover);
+      color: var(--color-text);
+    }
+    &--destructive {
+      background: var(--color-danger, #dc2626);
+      color: #fff;
+    }
+    &--outline {
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+    &--link {
+      color: var(--color-primary);
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    &--ghost {
+      color: inherit;
+      &:hover {
+        color: var(--color-primary);
+        background: var(--color-control-hover);
+      }
+    }
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  }
+}

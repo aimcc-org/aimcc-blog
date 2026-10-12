@@ -1,4 +1,15 @@
+import "./styles/home-controls.less";
 import { useEffect, useState } from "react";
+import {
+  Button,
+  Input,
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@aimcc/react-component";
 
 function applyTheme(theme: "light" | "dark") {
   document.documentElement.classList.toggle("dark", theme === "dark");
@@ -8,36 +19,27 @@ function applyTheme(theme: "light" | "dark") {
 export default function HomeControls() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [searchOpen, setSearchOpen] = useState(false);
-
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
+    setTheme(
+      document.documentElement.classList.contains("dark") ? "dark" : "light",
+    );
   }, []);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setSearchOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
   const nextTheme = theme === "dark" ? "light" : "dark";
-
   return (
-    <>
+    <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
       <div className="home-nav__actions" aria-label="首页操作">
-        <button
-          className="home-nav__icon-button"
-          type="button"
-          aria-label="打开搜索"
-          onClick={() => setSearchOpen(true)}
-        >
-          <span aria-hidden="true">⌕</span>
-        </button>
-        <button
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            className="home-nav__icon-button"
+            type="button"
+            aria-label="打开搜索"
+          >
+            <span aria-hidden="true">⌕</span>
+          </Button>
+        </DialogTrigger>
+        <Button
+          variant="ghost"
           className="home-nav__icon-button"
           type="button"
           aria-label={`切换到${nextTheme === "dark" ? "深色" : "浅色"}模式`}
@@ -47,43 +49,36 @@ export default function HomeControls() {
           }}
         >
           <span aria-hidden="true">{theme === "dark" ? "☾" : "☼"}</span>
-        </button>
+        </Button>
       </div>
-
-      {searchOpen && (
-        <div
-          className="home-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="home-search-title"
-        >
-          <button
-            className="home-dialog__backdrop"
-            type="button"
-            aria-label="关闭搜索"
-            onClick={() => setSearchOpen(false)}
-          />
-          <section className="home-dialog__panel">
-            <div className="home-dialog__header">
-              <h2 id="home-search-title">搜索文章</h2>
-              <button
-                className="home-nav__icon-button"
-                type="button"
-                aria-label="关闭搜索"
-                onClick={() => setSearchOpen(false)}
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <input
-              className="home-dialog__input"
-              placeholder="搜索功能即将上线"
-              disabled
-            />
-            <p>搜索入口已预留，后续可以接入 Pagefind 或服务端搜索 API。</p>
-          </section>
+      <DialogContent
+        className="home-dialog home-dialog__panel"
+        overlayClassName="home-dialog__backdrop"
+        showCloseButton={false}
+      >
+        <div className="home-dialog__header">
+          <DialogTitle>搜索文章</DialogTitle>
+          <DialogClose asChild>
+            <Button
+              variant="ghost"
+              className="home-nav__icon-button"
+              type="button"
+              aria-label="关闭搜索"
+            >
+              <span aria-hidden="true">×</span>
+            </Button>
+          </DialogClose>
         </div>
-      )}
-    </>
+        <Input
+          className="home-dialog__input"
+          aria-label="搜索文章"
+          placeholder="搜索功能即将上线"
+          disabled
+        />
+        <DialogDescription>
+          搜索入口已预留，后续可以接入 Pagefind 或服务端搜索 API。
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
   );
 }

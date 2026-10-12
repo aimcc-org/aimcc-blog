@@ -10,20 +10,22 @@
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css",
     "./tokens.css": "./src/styles/tokens.css",
-    "./markdown": "./src/components/markdown/MarkdownReader.tsx",
-    "./markdown-editor": "./src/components/markdown/MarkdownEditor.tsx",
-    "./markdown.css": "./src/components/markdown/markdown.css",
-    "./markdown-editor.css": "./src/components/markdown/markdown-editor.css"
+    "./markdown": "./src/components/markdown/components/MarkdownReader.tsx",
+    "./markdown-editor": "./src/components/markdown/components/MarkdownEditor.tsx",
+    "./markdown.css": "./src/styles/markdown.css",
+    "./markdown-editor.css": "./src/styles/markdown-editor.css"
   },
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "**/*.less"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "check": "tsc --noEmit",
+    "check": "node scripts/check-architecture.mjs && tsc --noEmit",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
-    "test": "pnpm build && node --test tests/*.test.mjs"
+    "test": "pnpm build && node --test tests/*.test.mjs",
+    "check:architecture": "node scripts/check-architecture.mjs"
   },
   "peerDependencies": {
     "react": "^19.1.1",
@@ -38,12 +40,22 @@
     "@types/react-dom": "^19.1.9",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "less": "^4.2.2"
   },
   "dependencies": {
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "rehype-slug": "^6.0.0",
-    "@uiw/react-md-editor": "^4.0.11"
-  }
+    "@radix-ui/react-slot": "^1.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "@radix-ui/react-checkbox": "^1.1.0",
+    "@radix-ui/react-collapsible": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.0"
+  },
+  "packageManager": "pnpm@9.14.4"
 }

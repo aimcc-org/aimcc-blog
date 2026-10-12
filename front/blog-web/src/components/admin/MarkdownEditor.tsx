@@ -1,3 +1,11 @@
+import { Checkbox } from "@aimcc/react-component";
+import { Input } from "@aimcc/react-component";
+import {
+  Button,
+  NativeSelect,
+  NativeSelectOption,
+  Textarea,
+} from "@aimcc/react-component";
 import { useEffect, useRef, useState } from "react";
 import { MarkdownEditor as SharedMarkdownEditor } from "@aimcc/react-component/markdown-editor";
 import DraftManager from "./DraftManager";
@@ -408,17 +416,13 @@ export default function MarkdownEditor({
           备份当前内容；原有缓存已保留。
         </p>
       )}
-      <header className="admin-page-header flex items-center justify-between gap-5 [&_h1]:my-[9px] [&_h1]:text-[28px] [&_h1]:tracking-[-0.04em] [&_p]:m-0 [&_p]:text-sm max-[1100px]:items-start max-[1100px]:flex-col">
+      <header className="admin-page-header">
         <div>
-          <span className="text-admin-primary text-[11px] font-bold tracking-[0.18em]">
-            发布文章 / 新建文章
-          </span>
+          <span className="admin-eyebrow">发布文章 / 新建文章</span>
           <h1>发布文章</h1>
-          <p className="text-admin-muted leading-[1.7]">
-            用文字记录思考，让想法更有迹可循。
-          </p>
+          <p className="admin-intro">用文字记录思考，让想法更有迹可循。</p>
         </div>
-        <div className="admin-header-actions flex flex-wrap gap-2.5">
+        <div className="admin-header-actions">
           <span className="admin-save-indicator" title={saveStatus}>
             <i className={storageError ? "is-error" : ""} />
             {storageError
@@ -440,37 +444,42 @@ export default function MarkdownEditor({
               if (file) void loadFile(file);
             }}
           />
-          <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
+          <Button
+            variant="ghost"
+            className="admin-action"
             onClick={() => fileInput.current?.click()}
             disabled={!loaded || storageError || importing || publishing}
           >
             {importing ? "正在导入…" : "导入 Markdown"}
-          </button>
-          <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
+          </Button>
+          <Button
+            variant="ghost"
+            className="admin-action"
             disabled={!loaded || publishing}
             onClick={() => setValidation(validateDraft(draft))}
           >
             检查文章
-          </button>
-          <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5"
+          </Button>
+          <Button
+            variant="ghost"
+            className="admin-action"
             onClick={download}
             disabled={!loaded || publishing}
           >
             导出 Markdown
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             className="admin-button"
             disabled={publishing}
             onClick={() => setPreviewOnly(!previewOnly)}
             aria-pressed={previewOnly}
           >
             {previewOnly ? "返回编辑" : "预览"}
-          </button>
-          <button
-            className="border border-admin-border rounded-[7px] px-[18px] py-[11px] bg-admin-surface text-admin-text font-semibold text-[13px] enabled:hover:bg-admin-hover max-[760px]:px-3 max-[760px]:py-2.5 bg-admin-primary! border-admin-primary! text-white! enabled:hover:bg-admin-primary-hover!"
+          </Button>
+          <Button
+            variant="ghost"
+            className="admin-action-primary"
             disabled={
               !loaded ||
               importing ||
@@ -485,19 +494,19 @@ export default function MarkdownEditor({
               : draft.publishedArticleId
                 ? "已发布"
                 : "发布文章"}
-          </button>
+          </Button>
         </div>
       </header>
-      <p className="mt-6 mb-5 text-xs text-admin-muted">
+      <p className="admin-publish-notice">
         写作内容会自动保存为本地草稿，点击发布后文章将公开展示。
       </p>
       {publishError && (
-        <p className="text-[13px] text-[#b42318]" role="alert">
+        <p className="admin-feedback-error" role="alert">
           {publishError}
         </p>
       )}
       {draft.publishedArticleId && (
-        <p className="text-[13px] text-admin-primary">
+        <p className="admin-feedback-pending">
           <a href={articleDetailHref(draft.publishedArticleId)}>
             查看已发布文章 ↗
           </a>{" "}
@@ -505,16 +514,14 @@ export default function MarkdownEditor({
         </p>
       )}
       {message && (
-        <p className="text-[13px] text-[#23875d]" role="status">
+        <p className="admin-feedback-success" role="status">
           {message}
         </p>
       )}
       {validation && (
         <div
           className={
-            validation.length
-              ? "text-[#b42318] bg-[#fff0ed] border border-[#ffcfc6] rounded-md p-3 text-[13px] leading-[1.6]"
-              : "text-[13px] text-[#23875d]"
+            validation.length ? "admin-error-notice" : "admin-feedback-success"
           }
           role="status"
         >
@@ -537,7 +544,9 @@ export default function MarkdownEditor({
         </span>
         <div>
           <a href="/admin/">管理草稿</a>
-          <button
+          <Button
+            variant="ghost"
+            className="admin-inline-action"
             type="button"
             disabled={!loaded || storageError || importing || publishing}
             onClick={() => {
@@ -547,7 +556,7 @@ export default function MarkdownEditor({
             }}
           >
             新建文章
-          </button>
+          </Button>
         </div>
       </div>
       {recovery && (
@@ -573,14 +582,16 @@ export default function MarkdownEditor({
             </p>
           </div>
           <div className="admin-draft-recovery__actions">
-            <button
+            <Button
+              variant="ghost"
               type="button"
               className="admin-button"
               onClick={() => setRecovery(null)}
             >
               暂不恢复
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               type="button"
               className="admin-button admin-button-primary"
               onClick={() => {
@@ -598,26 +609,26 @@ export default function MarkdownEditor({
               }}
             >
               恢复草稿
-            </button>
+            </Button>
           </div>
         </aside>
       )}
       <div className="admin-publish-grid">
         <div className="admin-editor-main">
           <section
-            className="admin-card admin-basic-info grid gap-2.5 mb-6"
+            className="admin-card admin-basic-info"
             aria-label="文章信息"
           >
             <h2>基本信息</h2>
-            <label className="text-xs text-admin-muted" htmlFor="article-title">
+            <label className="admin-field-caption" htmlFor="article-title">
               文章标题 <span className="admin-required">*</span>
               <span className="admin-field-count">
                 {draft.title.length} / 200
               </span>
             </label>
-            <input
+            <Input
               id="article-title"
-              className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px] text-sm font-medium"
+              className="admin-title-input"
               value={draft.title}
               onChange={(e) => setDraft({ ...draft, title: e.target.value })}
               placeholder="给这篇文章起个标题…"
@@ -625,7 +636,7 @@ export default function MarkdownEditor({
               disabled={!loaded || publishing}
             />
             <label
-              className="text-xs text-admin-muted"
+              className="admin-field-caption"
               htmlFor="article-description"
             >
               文章摘要{" "}
@@ -633,9 +644,9 @@ export default function MarkdownEditor({
                 {draft.description.length} / 500
               </span>
             </label>
-            <textarea
+            <Textarea
               rows={3}
-              className="admin-description w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
+              className="admin-description"
               id="article-description"
               value={draft.description}
               onChange={(e) =>
@@ -645,12 +656,12 @@ export default function MarkdownEditor({
               maxLength={500}
               disabled={!loaded || publishing}
             />
-            <div className="grid grid-cols-2 gap-4 mt-2.5 max-[760px]:grid-cols-1 [&_label]:grid [&_label]:gap-2 [&_label]:text-admin-muted [&_label]:text-xs">
-              <label className="content-start">
+            <div className="admin-taxonomy-fields">
+              <label className="admin-taxonomy-fields__category">
                 分类
-                <select
+                <NativeSelect
                   aria-label="文章分类"
-                  className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
+                  className="admin-form-control"
                   value={
                     selection.categoryId ??
                     (draft.category ? "unavailable" : "")
@@ -669,48 +680,49 @@ export default function MarkdownEditor({
                         )?.name ?? "",
                     });
                   }}
+                  wrapperClassName="admin-select-wrapper"
                 >
-                  <option value="">未分类</option>
+                  <NativeSelectOption value="">未分类</NativeSelectOption>
                   {draft.category && selection.categoryId === null && (
-                    <option value="unavailable" disabled>
+                    <NativeSelectOption value="unavailable" disabled>
                       {draft.category}（请重新选择）
-                    </option>
+                    </NativeSelectOption>
                   )}
                   {selection.categoryId !== null &&
                     !taxonomy.categories.some(
                       (item) => item.id === selection.categoryId,
                     ) && (
-                      <option value={selection.categoryId} disabled>
+                      <NativeSelectOption value={selection.categoryId} disabled>
                         {draft.category || "原分类"}（已不可用）
-                      </option>
+                      </NativeSelectOption>
                     )}
                   {taxonomy.categories.map((item) => (
-                    <option key={item.id} value={item.id}>
+                    <NativeSelectOption key={item.id} value={item.id}>
                       {item.name}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </select>
+                </NativeSelect>
               </label>
               <fieldset
-                className="m-0 min-w-0 border-0 p-0"
+                className="admin-tag-fieldset"
                 disabled={!loaded || publishing || taxonomyStatus !== "ready"}
               >
-                <legend className="mb-2 text-xs text-admin-muted">
+                <legend className="admin-tag-fieldset__legend">
                   标签（可多选）
                 </legend>
-                <div className="flex flex-wrap gap-2 rounded-[7px] border border-admin-border p-3">
+                <div className="admin-tag-options">
                   {taxonomy.tags.map((item) => (
-                    <label
-                      key={item.id}
-                      className="flex! items-center gap-1.5!"
-                    >
-                      <input
-                        type="checkbox"
+                    <label key={item.id} className="admin-tag-options__label">
+                      <Checkbox
+                        disabled={
+                          !loaded || publishing || taxonomyStatus !== "ready"
+                        }
                         checked={selection.tagIds.includes(item.id)}
-                        onChange={(event) => {
-                          const tagIds = event.target.checked
-                            ? [...selection.tagIds, item.id]
-                            : selection.tagIds.filter((id) => id !== item.id);
+                        onCheckedChange={(checked) => {
+                          const tagIds =
+                            checked === true
+                              ? [...selection.tagIds, item.id]
+                              : selection.tagIds.filter((id) => id !== item.id);
                           setDraft({
                             ...draft,
                             tagIds,
@@ -725,9 +737,7 @@ export default function MarkdownEditor({
                     </label>
                   ))}
                   {taxonomyStatus === "ready" && taxonomy.tags.length === 0 && (
-                    <span className="text-xs text-admin-muted">
-                      暂无可选标签
-                    </span>
+                    <span className="admin-field-caption">暂无可选标签</span>
                   )}
                 </div>
                 {draft.tags &&
@@ -735,39 +745,41 @@ export default function MarkdownEditor({
                     selection.tagIds.some(
                       (id) => !taxonomy.tags.some((tag) => tag.id === id),
                     )) && (
-                    <p className="text-xs text-admin-muted">
+                    <p className="admin-field-caption">
                       原草稿标签：{draft.tags}。请核对后选择。
                     </p>
                   )}
-                <button
+                <Button
+                  variant="ghost"
                   type="button"
-                  className="admin-button mt-2"
+                  className="admin-button admin-tag-clear"
                   onClick={() => setDraft({ ...draft, tags: "", tagIds: [] })}
                 >
                   清空标签
-                </button>
+                </Button>
               </fieldset>
               {taxonomyStatus === "loading" && (
-                <p role="status" className="text-xs text-admin-muted">
+                <p role="status" className="admin-field-caption">
                   正在加载分类和标签…
                 </p>
               )}
               {taxonomyStatus === "error" && (
-                <div role="alert" className="text-xs text-[#b42318]">
+                <div role="alert" className="admin-taxonomy-error">
                   分类或标签加载失败。
-                  <button
+                  <Button
+                    variant="ghost"
                     type="button"
                     className="admin-button"
                     onClick={() => setTaxonomyAttempt((value) => value + 1)}
                   >
                     重新加载
-                  </button>
+                  </Button>
                 </div>
               )}
               <label>
                 文章链接
-                <input
-                  className="w-full border border-admin-border bg-admin-surface text-admin-text px-[14px] py-[13px] rounded-[7px]"
+                <Input
+                  className="admin-form-control"
                   value={draft.slug}
                   onChange={(event) =>
                     setDraft({ ...draft, slug: event.target.value })
@@ -789,14 +801,15 @@ export default function MarkdownEditor({
           <h2 className="admin-editor-heading">
             文章内容
             {!draft.content && (
-              <button
+              <Button
+                variant="ghost"
                 type="button"
                 className="admin-button"
                 disabled={!loaded || publishing}
                 onClick={() => setDraft({ ...draft, content: sample })}
               >
                 插入示例
-              </button>
+              </Button>
             )}
           </h2>
           <SharedMarkdownEditor
@@ -809,19 +822,19 @@ export default function MarkdownEditor({
               <>
                 {draft.cover && isSafeCover(draft.cover) && !coverFailed && (
                   <img
-                    className="w-full max-h-[260px] object-cover mb-5"
+                    className="admin-preview-cover"
                     src={draft.cover}
                     alt="文章封面"
                     onError={() => setCoverFailed(true)}
                   />
                 )}
                 {draft.cover && (!isSafeCover(draft.cover) || coverFailed) && (
-                  <p className="text-[#b42318] bg-[#fff0ed] border border-[#ffcfc6] rounded-md p-3 text-[13px] leading-[1.6]">
+                  <p className="admin-error-notice">
                     封面无法加载，请检查图片地址。
                   </p>
                 )}
                 {(draft.category || draft.tags) && (
-                  <div className="flex gap-2 flex-wrap mb-4 [&_span]:text-[11px] [&_span]:text-admin-primary [&_span]:bg-admin-hover [&_span]:rounded-sm [&_span]:py-[3px] [&_span]:px-[9px]">
+                  <div className="admin-preview-tags">
                     {draft.category && <span>{draft.category}</span>}
                     {draft.tags
                       .split(/[,，]/)
@@ -834,9 +847,7 @@ export default function MarkdownEditor({
                 )}
                 {draft.title && <h1>{draft.title}</h1>}
                 {draft.description && (
-                  <p className="text-admin-muted pb-5 border-b border-admin-border">
-                    {draft.description}
-                  </p>
+                  <p className="admin-preview-summary">{draft.description}</p>
                 )}
               </>
             }
@@ -858,13 +869,14 @@ export default function MarkdownEditor({
               发布成功后保留本地草稿。文章链接字段仅用于 Markdown
               导出，线上文章链接由服务器 ID 生成。
             </p>
-            <button
+            <Button
+              variant="ghost"
               className="admin-button admin-export"
               disabled={!loaded || publishing}
               onClick={download}
             >
               导出 Markdown ↗
-            </button>
+            </Button>
           </section>
           <section className="admin-card">
             <h2>
@@ -950,10 +962,7 @@ export default function MarkdownEditor({
           </section>
         </aside>
       </div>
-      <footer
-        className="text-admin-subtle text-[11px] text-right py-[14px] px-0.5"
-        role="status"
-      >
+      <footer className="admin-editor-footer" role="status">
         {editingStarted
           ? saveStatus
           : "开始输入后自动保存，原有草稿会保留在文章管理中。"}

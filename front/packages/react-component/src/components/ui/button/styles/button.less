@@ -1,0 +1,122 @@
+@layer shadcn {
+  .rc-button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border: 0 solid transparent;
+    border-radius: var(--radius-control, 6px);
+    background: transparent;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      box-shadow 150ms ease;
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+    &:disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    &[aria-invalid="true"] {
+      border-color: var(--color-danger, #dc2626);
+    }
+    > svg {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+    &--primary {
+      background: var(--color-primary);
+      color: #fff;
+      &:hover {
+        background: var(--color-primary-hover);
+      }
+    }
+    &--destructive {
+      background: var(--color-danger, #dc2626);
+      color: #fff;
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+    &--outline {
+      border-width: 1px;
+      border-color: var(--color-border);
+      background: var(--color-surface-solid);
+      &:hover {
+        background: var(--color-control-hover);
+        color: var(--color-primary);
+      }
+    }
+    &--secondary {
+      background: var(--color-control-hover);
+      &:hover {
+        color: var(--color-primary);
+      }
+    }
+    &--ghost {
+      &:hover {
+        background: var(--color-control-hover);
+        color: var(--color-primary);
+      }
+    }
+    &--link {
+      color: var(--color-primary);
+      text-underline-offset: 4px;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    &--md {
+      height: 36px;
+      padding: 8px 16px;
+    }
+    &--xs {
+      height: 24px;
+      padding: 4px 8px;
+      font-size: 12px;
+      gap: 4px;
+    }
+    &--sm {
+      height: 32px;
+      padding: 6px 12px;
+      gap: 6px;
+    }
+    &--lg {
+      height: 40px;
+      padding: 8px 24px;
+    }
+    &--icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+    }
+    &--icon-xs {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+    }
+    &--icon-sm {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+    }
+    &--icon-lg {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+    }
+  }
+}

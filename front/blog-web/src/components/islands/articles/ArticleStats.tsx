@@ -1,12 +1,18 @@
 import type { ApiArticle } from "@/lib/api";
-import "./article-stats.css";
+import "./article-stats.less";
 
 const formatCount = (count: number) =>
   count >= 1000
     ? `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`
     : String(count);
 
-export default function ArticleStats({ article }: { article: ApiArticle }) {
+export default function ArticleStats({
+  article,
+  showDate = false,
+}: {
+  article: ApiArticle;
+  showDate?: boolean;
+}) {
   return (
     <div className="article-stats">
       <span
@@ -20,6 +26,14 @@ export default function ArticleStats({ article }: { article: ApiArticle }) {
           <circle cx="12" cy="12" r="9" />
           <path d="M12 7v5l3 2" />
         </svg>
+        {showDate && article.publishedAt && (
+          <>
+            <time dateTime={article.publishedAt}>
+              {article.publishedAt.slice(0, 10).replaceAll("-", "/")}
+            </time>
+            <span aria-hidden="true">·</span>
+          </>
+        )}
         {article.readingMinutes == null
           ? "— 分钟"
           : `${article.readingMinutes} 分钟`}

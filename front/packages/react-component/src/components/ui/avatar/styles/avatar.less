@@ -1,0 +1,69 @@
+@layer shadcn {
+  .rc-avatar {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    border-radius: 50%;
+    user-select: none;
+    &[data-size="sm"] {
+      width: 24px;
+      height: 24px;
+    }
+    &[data-size="lg"] {
+      width: 40px;
+      height: 40px;
+    }
+    &__image {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+    &__fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--color-control-hover);
+      color: var(--color-muted);
+      font-size: 14px;
+    }
+    &__badge {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--color-surface-solid);
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+    }
+  }
+  .rc-avatar-group {
+    display: flex;
+    > * + * {
+      margin-left: -8px;
+    }
+    .rc-avatar {
+      outline: 2px solid var(--color-surface-solid);
+    }
+    &__count {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-control-hover);
+      color: var(--color-muted);
+      font-size: 14px;
+    }
+  }
+}

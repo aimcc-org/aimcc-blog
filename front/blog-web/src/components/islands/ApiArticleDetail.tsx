@@ -1,3 +1,5 @@
+import "./styles/api-article-detail.less";
+import { Button } from "@aimcc/react-component";
 import { useEffect, useState } from "react";
 import { MarkdownReader } from "@aimcc/react-component/markdown";
 import { getArticleDetail } from "@/lib/api";
@@ -63,69 +65,55 @@ export default function ApiArticleDetail() {
           <p>{error}</p>
           <a href="/#posts">← 返回文章列表</a>
         </div>
-        <button
+        <Button
+          variant="ghost"
           className="article-feedback__retry"
           type="button"
           onClick={() => setAttempt((value) => value + 1)}
         >
           重新加载
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <article className="post-article">
-      <header className="post-article__hero">
-        <div className="post-article__intro">
-          <span className="eyebrow">研究札记</span>
-          <h1>{article.title}</h1>
-          {article.summary && <p>{article.summary}</p>}
-          <a className="post-article__back" href="/#posts">
-            ← 返回文章列表
+      <header className="article-detail__header">
+        <Button asChild variant="ghost" className="article-detail__back">
+          <a href="/#posts" aria-label="返回文章列表">
+            ← 返回
           </a>
+        </Button>
+        <div className="article-detail__heading">
+          <h1 title={article.title}>{article.title}</h1>
+          <div className="article-detail__metadata" aria-label="文章信息">
+            {article.publishedAt && (
+              <time dateTime={article.publishedAt}>
+                {article.publishedAt.slice(0, 10).replaceAll("-", "/")}
+              </time>
+            )}
+            {article.readingMinutes != null && (
+              <span>阅读约 {article.readingMinutes} 分钟</span>
+            )}
+            {article.viewCount != null && (
+              <span>{article.viewCount.toLocaleString("zh-CN")} 次浏览</span>
+            )}
+          </div>
         </div>
-        <figure className="post-article__visual">
-          <img
-            src={article.coverImage || "/images/ai-workflow-city.png"}
-            alt=""
-          />
-        </figure>
       </header>
       <div className="post-article__lower">
         <div className="post-article__body">
-          <div className="prose">
-            <MarkdownReader source={article.content} />
-          </div>
-        </div>
-        <aside className="post-article__meta" aria-label="文章信息">
-          {article.readingMinutes != null && (
-            <div className="post-article__read-time">
-              阅读约 {article.readingMinutes} 分钟
-            </div>
+          {article.summary && (
+            <p className="article-detail__summary">{article.summary}</p>
           )}
-          <dl>
-            {article.publishedAt && (
-              <div>
-                <dt>日期</dt>
-                <dd>
-                  <time dateTime={article.publishedAt}>
-                    {article.publishedAt.slice(0, 10).replaceAll("-", "/")}
-                  </time>
-                </dd>
-              </div>
-            )}
-            {article.viewCount != null && (
-              <div>
-                <dt>浏览</dt>
-                <dd>{article.viewCount}</dd>
-              </div>
-            )}
-          </dl>
-          <a href="/archive/">
-            继续探索 <span aria-hidden="true">→</span>
-          </a>
-        </aside>
+          <MarkdownReader source={article.content} />
+          <footer className="article-detail__footer">
+            <Button asChild variant="ghost">
+              <a href="/archive/">继续阅读其他文章 →</a>
+            </Button>
+          </footer>
+        </div>
       </div>
     </article>
   );

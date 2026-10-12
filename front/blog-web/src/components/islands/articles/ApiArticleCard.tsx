@@ -1,6 +1,8 @@
-import type { CSSProperties } from "react";
+import { Badge, PostCard } from "@aimcc/react-component";
 import type { ApiArticle } from "@/lib/api";
 import { articleDetailHref } from "@/lib/article-detail";
+import "./styles/article-card-list.less";
+import ArticleBookmark from "./components/ArticleBookmark";
 import ArticleStats from "./ArticleStats";
 
 export default function ApiArticleCard({
@@ -13,41 +15,39 @@ export default function ApiArticleCard({
   const tags = article.tags ?? [];
   const publishedAt = article.publishedAt;
   return (
-    <article
-      className="post-card"
-      style={{ "--stagger-index": index } as CSSProperties}
-    >
-      <a className="post-card__link" href={articleDetailHref(article.id)}>
-        <div className="post-card__cover">
-          <img
-            src={article.coverImage || "/images/ai-workflow-city.png"}
-            alt=""
-            loading="lazy"
-          />
-        </div>
-        <div className="post-card__body">
-          <h2>{article.title}</h2>
-          <div className="post-card__meta">
-            {publishedAt && (
-              <time dateTime={publishedAt}>
-                {publishedAt.slice(0, 10).replaceAll("-", "/")}
-              </time>
-            )}
-            {tags.slice(0, 2).map((tag) => (
-              <span key={tag.id}>#{tag.name}</span>
-            ))}
-            {tags.length > 2 && (
-              <span aria-label={`另有 ${tags.length - 2} 个标签`}>
-                +{tags.length - 2}
-              </span>
-            )}
-          </div>
-          {article.summary && <p>{article.summary}</p>}
-          <div className="post-card__footer">
-            <ArticleStats article={article} />
-          </div>
-        </div>
-      </a>
-    </article>
+    <PostCard
+      href={articleDetailHref(article.id)}
+      index={index}
+      post={{
+        title: article.title,
+        description: article.summary ?? undefined,
+        publishedAt: publishedAt ?? undefined,
+        cover: article.coverImage || "/images/ai-workflow-city.png",
+        tags: tags.map((tag) => tag.name),
+      }}
+      showCoverArrow={false}
+      metadata={
+        <>
+          {tags.slice(0, 2).map((tag) => (
+            <Badge
+              key={tag.id}
+              variant={tags[0]?.id === tag.id ? "default" : "secondary"}
+            >
+              {tag.name}
+            </Badge>
+          ))}
+          {tags.length > 2 && (
+            <Badge
+              variant="ghost"
+              aria-label={`另有 ${tags.length - 2} 个标签`}
+            >
+              +{tags.length - 2}
+            </Badge>
+          )}
+        </>
+      }
+      footer={<ArticleStats article={article} showDate />}
+      action={<ArticleBookmark articleId={article.id} />}
+    />
   );
 }

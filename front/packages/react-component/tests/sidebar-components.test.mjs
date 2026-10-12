@@ -35,9 +35,15 @@ test("compact profile supports collapsed introduction, offline state and tag ove
     tags: ["React", "TypeScript", "Astro"],
     maxVisibleTags: 1,
     online: false,
+    defaultExpanded: true,
+  });
+  assert.match(html, /aria-expanded="true"/);
+  const collapsed = render(SidebarUserProfile, {
+    name: "AIMCC",
+    bio: "介绍",
     defaultExpanded: false,
   });
-  assert.match(html, /<details class="sidebar-user-profile__summary">/);
+  assert.match(collapsed, /aria-expanded="false"/);
   assert.match(html, /aria-label="离线"/);
   assert.match(html, /<h3>标签<\/h3>/);
   assert.doesNotMatch(html, /技能/);
@@ -58,7 +64,7 @@ test("both profile designs can render together with separate accessible headings
   const ids = [...html.matchAll(/<h2 id="([^"]+)"/g)].map((match) => match[1]);
   assert.equal(ids.length, 2);
   assert.equal(new Set(ids).size, 2);
-  assert.match(html, /class="user-profile"/);
+  assert.match(html, /class="user-profile(?: [^"]*)?"/);
   assert.match(html, /class="sidebar-user-profile"/);
 });
 
@@ -113,7 +119,7 @@ test("profile can hide introduction and every personal link while preserving tag
     html,
     /隐藏简介|简介与标签|个人链接|电子简历|GitHub|联系我/,
   );
-  assert.match(html, /<summary>标签/);
+  assert.match(html, /data-slot="collapsible-trigger"[^>]*>标签/);
   assert.doesNotMatch(html, /<h3>标签<\/h3>/);
   assert.match(html, /href="\/\?tagId=1" data-tag-id="1" aria-current="true"/);
 });

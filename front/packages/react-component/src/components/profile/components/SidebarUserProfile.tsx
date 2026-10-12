@@ -1,0 +1,197 @@
+import { ProfileAvatar } from "../modules/ProfileAvatar.js";
+import { Badge } from "../../ui/badge/components/badge.js";
+import { Button } from "../../ui/button/components/button.js";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../../ui/collapsible/components/collapsible.js";
+import { useId } from "react";
+import type { MouseEvent } from "react";
+import { ProfileIcon } from "../modules/profile-icons.js";
+import type { UserProfileProps } from "./UserProfile.js";
+
+export interface SidebarProfileTag {
+  id: number;
+  name: string;
+  href: string;
+  active?: boolean;
+}
+
+export interface SidebarUserProfileProps extends Omit<
+  UserProfileProps,
+  "skills" | "maxVisibleSkills"
+> {
+  /** Tags supplied by the caller, independently of personal profile data. */
+  tags?: (string | SidebarProfileTag)[];
+  maxVisibleTags?: number;
+  /** Display the introduction independently of tags. */
+  showBio?: boolean;
+  showResume?: boolean;
+  showGithub?: boolean;
+  showContact?: boolean;
+  onTagClick?: (
+    tag: SidebarProfileTag,
+    event: MouseEvent<HTMLAnchorElement>,
+  ) => void;
+  /** Initial state of the independent introduction and tags disclosure. */
+  defaultExpanded?: boolean;
+}
+
+/** Compact About Me from the previous blog's left rail. */
+export function SidebarUserProfile({
+  name,
+  role,
+  location,
+  bio,
+  avatar,
+  online,
+  tags = [],
+  maxVisibleTags = 9,
+  showBio = true,
+  showResume = true,
+  showGithub = true,
+  showContact = true,
+  onTagClick,
+  resumeHref,
+  githubHref,
+  contactHref,
+  className = "",
+  defaultExpanded = true,
+}: SidebarUserProfileProps) {
+  const id = useId();
+  const limit = Number.isFinite(maxVisibleTags)
+    ? Math.max(0, Math.floor(maxVisibleTags))
+    : 9;
+  const extra = tags
+    .slice(limit)
+    .map((tag) => (typeof tag === "string" ? tag : tag.name));
+  return (
+    <section
+      className={`sidebar-user-profile ${className}`.trim()}
+      aria-labelledby={id}
+    >
+      <header className="sidebar-user-profile__header">
+        <span>
+          <ProfileIcon kind="badge" />
+          ABOUT ME
+        </span>
+        <span>// 个人信息</span>
+      </header>
+      <div className="sidebar-user-profile__identity">
+        <div className="sidebar-user-profile__avatar">
+          <ProfileAvatar>
+            {avatar ?? name.slice(0, 2).toUpperCase()}
+          </ProfileAvatar>
+          {online !== undefined && (
+            <i
+              className={online ? "is-online" : ""}
+              role="img"
+              aria-label={online ? "在线" : "离线"}
+            />
+          )}
+        </div>
+        <div className="sidebar-user-profile__details">
+          <h2 id={id}>{name}</h2>
+          {role && <p>{role}</p>}
+          {location && (
+            <p className="sidebar-user-profile__location">
+              <ProfileIcon kind="location" />
+              {location}
+            </p>
+          )}
+        </div>
+      </div>
+      {((showBio && bio) || tags.length > 0) && (
+        <Collapsible
+          className="sidebar-user-profile__summary"
+          defaultOpen={defaultExpanded}
+        >
+          <CollapsibleTrigger
+            className="sidebar-user-profile__trigger"
+            type="button"
+          >
+            {showBio && bio
+              ? tags.length > 0
+                ? "简介与标签"
+                : "简介"
+              : "标签"}
+            <span aria-hidden="true">＋</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            {showBio && bio && (
+              <p className="sidebar-user-profile__bio">{bio}</p>
+            )}
+            {tags.length > 0 && (
+              <div className="sidebar-user-profile__tags">
+                {showBio && bio && <h3>标签</h3>}
+                <ul aria-label="标签">
+                  {tags.slice(0, limit).map((tag, index) => (
+                    <Badge
+                      asChild
+                      variant="secondary"
+                      className="profile-tag"
+                      key={typeof tag === "string" ? index : tag.id}
+                    >
+                      <li>
+                        {typeof tag === "string" ? (
+                          tag
+                        ) : (
+                          <a
+                            href={tag.href}
+                            data-tag-id={tag.id}
+                            aria-current={tag.active ? "true" : undefined}
+                            onClick={(event) => onTagClick?.(tag, event)}
+                          >
+                            {tag.name}
+                          </a>
+                        )}
+                      </li>
+                    </Badge>
+                  ))}
+                  {extra.length > 0 && (
+                    <li
+                      title={extra.join("、")}
+                      aria-label={`另外 ${extra.length} 个标签：${extra.join("、")}`}
+                    >
+                      +{extra.length}
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+      {((showResume && resumeHref) ||
+        (showGithub && githubHref) ||
+        (showContact && contactHref)) && (
+        <nav className="sidebar-user-profile__links" aria-label="个人链接">
+          {showResume && resumeHref && (
+            <Button asChild variant="ghost" className="profile-link-action">
+              <a className="is-primary" href={resumeHref}>
+                电子简历 <ProfileIcon kind="arrow" />
+              </a>
+            </Button>
+          )}
+          {showGithub && githubHref && (
+            <Button asChild variant="ghost" className="profile-link-action">
+              <a href={githubHref} target="_blank" rel="noopener noreferrer">
+                <ProfileIcon kind="github" />
+                GitHub
+              </a>
+            </Button>
+          )}
+          {showContact && contactHref && (
+            <Button asChild variant="ghost" className="profile-link-action">
+              <a href={contactHref}>
+                <ProfileIcon kind="mail" />
+                联系我
+              </a>
+            </Button>
+          )}
+        </nav>
+      )}
+    </section>
+  );
+}

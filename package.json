@@ -14,6 +14,6 @@
     "lint-staged": "^16.1.6"
   },
   "lint-staged": {
-    "front/**/*.{astro,ts,tsx,js,mjs,cjs,json,md,css}": "pnpm --dir front exec prettier --check"
+    "front/**/*.{astro,ts,tsx,js,mjs,cjs,json,md,css,less}": "pnpm --dir front exec prettier --check"
   }
 }

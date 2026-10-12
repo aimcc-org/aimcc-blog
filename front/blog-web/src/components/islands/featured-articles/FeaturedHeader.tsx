@@ -1,3 +1,5 @@
+import "./styles/featured-header.less";
+import { Button } from "@aimcc/react-component";
 interface Props {
   loading: boolean;
   hasPrevious: boolean;
@@ -21,13 +23,25 @@ export default function FeaturedHeader({
       </div>
       <nav className="featured-articles__pagination" aria-label="精选文章分页">
         {hasPrevious && (
-          <button type="button" disabled={loading} onClick={onPrevious}>
+          <Button
+            variant="ghost"
+            className="featured-header__previous"
+            type="button"
+            disabled={loading}
+            onClick={onPrevious}
+          >
             <span aria-hidden="true">←</span> 前一页
-          </button>
+          </Button>
         )}
-        <button type="button" disabled={loading || !hasNext} onClick={onNext}>
+        <Button
+          variant="ghost"
+          className="featured-header__next"
+          type="button"
+          disabled={loading || !hasNext}
+          onClick={onNext}
+        >
           下一页 <span aria-hidden="true">→</span>
-        </button>
+        </Button>
       </nav>
     </header>
   );

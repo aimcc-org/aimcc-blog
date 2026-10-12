@@ -1,7 +1,9 @@
+import "./styles/featured-articles.less";
+import { Button } from "@aimcc/react-component";
 import FeaturedArticleCard from "./FeaturedArticleCard";
 import FeaturedHeader from "./FeaturedHeader";
 import { useFeaturedArticles } from "./useFeaturedArticles";
-import "./featured-articles.css";
+import "./featured-articles.less";
 
 export default function FeaturedArticles() {
   const { page, loading, error, hasNext, hasPrevious, loadPage, retry } =
@@ -37,9 +39,15 @@ export default function FeaturedArticles() {
       {error && (
         <div className="featured-articles__feedback" role="alert">
           <span>精选文章加载失败，请稍后重试。</span>
-          <button type="button" disabled={loading} onClick={() => void retry()}>
+          <Button
+            variant="ghost"
+            className="featured-articles__retry"
+            type="button"
+            disabled={loading}
+            onClick={() => void retry()}
+          >
             重新加载
-          </button>
+          </Button>
         </div>
       )}
       <span

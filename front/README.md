@@ -28,7 +28,7 @@ pnpm --dir blog-web build:all
 
 ## 样式
 
-管理后台使用 Tailwind CSS 4，通过 `@tailwindcss/vite` 接入 Astro。样式直接写在组件的工具类中；`src/styles/tailwind.css` 将现有设计 token 映射为 Tailwind 主题。不引入 Preflight，沿用站点已有的全局基础样式。
+管理后台和 React 组件统一使用结构化 Less，通过 Vite 内置 Less 预处理编译。JSX 使用语义化类名，颜色、字体和圆角沿用现有主题 token；表单、按钮和复合交互复用 `@aimcc/react-component` 中的 shadcn/ui 控件，不使用 Tailwind。
 
 ## 管理后台
 

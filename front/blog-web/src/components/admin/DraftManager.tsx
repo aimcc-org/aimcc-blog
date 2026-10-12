@@ -1,3 +1,15 @@
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@aimcc/react-component";
+import { Input } from "@aimcc/react-component";
+import {
+  Button,
+  NativeSelect,
+  NativeSelectOption,
+} from "@aimcc/react-component";
 import { useState } from "react";
 import { isSafeCover, type Draft, type DraftStore } from "@/lib/admin-drafts";
 import AdminIcon from "./AdminIcon";
@@ -65,14 +77,15 @@ export default function DraftManager({
           <h1>文章管理</h1>
           <p>整理每一次思考，让值得记录的想法继续生长。</p>
         </div>
-        <button
+        <Button
+          variant="ghost"
           className="admin-button admin-button-primary"
           onClick={onNew}
           disabled={disabled}
         >
           <AdminIcon name="plus" />
           新建文章
-        </button>
+        </Button>
       </header>
       <div className="admin-stats">
         {[
@@ -108,189 +121,208 @@ export default function DraftManager({
         ))}
       </div>
       <section className="admin-card admin-manager">
-        <div
-          className="admin-manager-tabs"
-          role="tablist"
-          aria-label="文章类型"
+        <Tabs
+          value={view}
+          onValueChange={(next) => {
+            setView(next);
+            setCategory("");
+          }}
+          className="admin-manager-content"
         >
-          <button
-            role="tab"
-            aria-selected={view === "drafts"}
-            onClick={() => {
-              setView("drafts");
-              setCategory("");
-            }}
+          <TabsList
+            variant="line"
+            className="admin-manager-tabs"
+            aria-label="文章类型"
           >
-            草稿 <span>{drafts.length}</span>
-          </button>
-          <button
-            role="tab"
-            aria-selected={view === "trash"}
-            onClick={() => {
-              setView("trash");
-              setCategory("");
-            }}
-          >
-            回收站 <span>{trash.length}</span>
-          </button>
-        </div>
-        <div className="admin-filters">
-          <label className="admin-search">
-            <AdminIcon name="search" />
-            <input
-              aria-label="搜索文章"
-              placeholder="搜索标题、摘要或标签…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-          <select
-            aria-label="筛选文章分类"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">全部分类</option>
-            {[
-              ...new Set(
-                store.drafts
-                  .map((item) => item.category.trim())
-                  .filter(Boolean),
-              ),
-            ].map((name) => (
-              <option key={name}>{name}</option>
-            ))}
-          </select>
-          <select
-            aria-label="文章排序"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-          >
-            <option value="latest">最近更新</option>
-            <option value="title">标题排序</option>
-          </select>
-        </div>
-        <div className="admin-table-scroll">
-          <table className="admin-article-table">
-            <thead>
-              <tr>
-                <th>文章</th>
-                <th>分类 / 标签</th>
-                <th>状态</th>
-                <th>最后更新</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <div className="admin-article-cell">
-                      <span className="admin-article-thumbnail">
-                        <AdminIcon name="file" />
-                        {item.cover && isSafeCover(item.cover) && (
-                          <img
-                            key={item.cover}
-                            src={item.cover}
-                            alt=""
-                            loading="lazy"
-                            onError={(event) => {
-                              event.currentTarget.hidden = true;
-                            }}
-                          />
-                        )}
-                      </span>
-                      <div>
-                        <strong>{item.title.trim() || "未命名文章"}</strong>
-                        <span
-                          className="admin-badge ml-2"
-                          tabIndex={0}
-                          title="清理浏览器缓存后，本地草稿会丢失，请及时发布。"
-                        >
-                          本地缓存
-                        </span>
-                        <p>
-                          {item.description.trim() ||
-                            `${item.content.length} 字符 · 尚未添加摘要`}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="admin-category">
-                      {item.category.trim() || "未分类"}
-                    </span>
-                    <p className="admin-table-tags">
-                      {item.tags || "暂无标签"}
-                    </p>
-                  </td>
-                  <td>
-                    <span
-                      className={`admin-badge ${item.deletedAt ? "is-trash" : ""}`}
+            <TabsTrigger value="drafts" className="admin-manager-tab">
+              草稿 <span>{drafts.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="trash" className="admin-manager-tab">
+              回收站 <span>{trash.length}</span>
+            </TabsTrigger>
+          </TabsList>
+          {["drafts", "trash"].map((tab) => (
+            <TabsContent key={tab} value={tab} className="admin-manager-panel">
+              {tab === view && (
+                <>
+                  <div className="admin-filters">
+                    <label className="admin-search">
+                      <AdminIcon name="search" />
+                      <Input
+                        aria-label="搜索文章"
+                        placeholder="搜索标题、摘要或标签…"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="admin-search__input"
+                      />
+                    </label>
+                    <NativeSelect
+                      aria-label="筛选文章分类"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="admin-category-select"
                     >
-                      {item.deletedAt
-                        ? "已移除"
-                        : item.publishedArticleId
-                          ? "已发布"
-                          : "草稿"}
-                    </span>
-                  </td>
-                  <td className="admin-date">{formatDate(item)}</td>
-                  <td>
-                    <div className="admin-row-actions">
-                      {item.deletedAt ? (
-                        <button
-                          disabled={disabled}
-                          onClick={() => onRestore(item.id)}
-                        >
-                          恢复草稿
-                        </button>
-                      ) : (
-                        <>
-                          <button
-                            disabled={disabled}
-                            onClick={() => onEdit(item.id)}
-                          >
-                            继续编辑
-                          </button>
-                          <button
-                            className="admin-delete"
-                            disabled={disabled}
-                            onClick={() => onTrash(item.id)}
-                            aria-label={`将${item.title || "未命名文章"}移入回收站`}
-                          >
-                            <AdminIcon name="trash" />
-                          </button>
-                        </>
-                      )}
+                      <NativeSelectOption value="">全部分类</NativeSelectOption>
+                      {[
+                        ...new Set(
+                          store.drafts
+                            .map((item) => item.category.trim())
+                            .filter(Boolean),
+                        ),
+                      ].map((name) => (
+                        <NativeSelectOption key={name}>
+                          {name}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
+                    <NativeSelect
+                      aria-label="文章排序"
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value)}
+                      className="admin-sort-select"
+                    >
+                      <NativeSelectOption value="latest">
+                        最近更新
+                      </NativeSelectOption>
+                      <NativeSelectOption value="title">
+                        标题排序
+                      </NativeSelectOption>
+                    </NativeSelect>
+                  </div>
+                  <div className="admin-table-scroll">
+                    <table className="admin-article-table">
+                      <thead>
+                        <tr>
+                          <th>文章</th>
+                          <th>分类 / 标签</th>
+                          <th>状态</th>
+                          <th>最后更新</th>
+                          <th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((item) => (
+                          <tr key={item.id}>
+                            <td>
+                              <div className="admin-article-cell">
+                                <span className="admin-article-thumbnail">
+                                  <AdminIcon name="file" />
+                                  {item.cover && isSafeCover(item.cover) && (
+                                    <img
+                                      key={item.cover}
+                                      src={item.cover}
+                                      alt=""
+                                      loading="lazy"
+                                      onError={(event) => {
+                                        event.currentTarget.hidden = true;
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                                <div>
+                                  <strong>
+                                    {item.title.trim() || "未命名文章"}
+                                  </strong>
+                                  <span
+                                    className="admin-badge admin-cache-badge"
+                                    tabIndex={0}
+                                    title="清理浏览器缓存后，本地草稿会丢失，请及时发布。"
+                                  >
+                                    本地缓存
+                                  </span>
+                                  <p>
+                                    {item.description.trim() ||
+                                      `${item.content.length} 字符 · 尚未添加摘要`}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="admin-category">
+                                {item.category.trim() || "未分类"}
+                              </span>
+                              <p className="admin-table-tags">
+                                {item.tags || "暂无标签"}
+                              </p>
+                            </td>
+                            <td>
+                              <span
+                                className={`admin-badge ${item.deletedAt ? "is-trash" : ""}`}
+                              >
+                                {item.deletedAt
+                                  ? "已移除"
+                                  : item.publishedArticleId
+                                    ? "已发布"
+                                    : "草稿"}
+                              </span>
+                            </td>
+                            <td className="admin-date">{formatDate(item)}</td>
+                            <td>
+                              <div className="admin-row-actions">
+                                {item.deletedAt ? (
+                                  <Button
+                                    variant="ghost"
+                                    className="admin-row-action"
+                                    disabled={disabled}
+                                    onClick={() => onRestore(item.id)}
+                                  >
+                                    恢复草稿
+                                  </Button>
+                                ) : (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      className="admin-row-action"
+                                      disabled={disabled}
+                                      onClick={() => onEdit(item.id)}
+                                    >
+                                      继续编辑
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      className="admin-delete"
+                                      disabled={disabled}
+                                      onClick={() => onTrash(item.id)}
+                                      aria-label={`将${item.title || "未命名文章"}移入回收站`}
+                                    >
+                                      <AdminIcon name="trash" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {!rows.length && (
+                    <div className="admin-empty">
+                      <AdminIcon name={view === "trash" ? "trash" : "search"} />
+                      <h2>
+                        {query || category
+                          ? "没有找到匹配的文章"
+                          : view === "trash"
+                            ? "回收站是空的"
+                            : "从第一篇文章开始"}
+                      </h2>
+                      <p>
+                        {query || category
+                          ? "试试其他关键词，或调整分类筛选。"
+                          : view === "trash"
+                            ? "移入回收站的草稿将在这里显示。"
+                            : "新建一篇草稿，记录此刻的想法。"}
+                      </p>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {!rows.length && (
-          <div className="admin-empty">
-            <AdminIcon name={view === "trash" ? "trash" : "search"} />
-            <h2>
-              {query || category
-                ? "没有找到匹配的文章"
-                : view === "trash"
-                  ? "回收站是空的"
-                  : "从第一篇文章开始"}
-            </h2>
-            <p>
-              {query || category
-                ? "试试其他关键词，或调整分类筛选。"
-                : view === "trash"
-                  ? "移入回收站的草稿将在这里显示。"
-                  : "新建一篇草稿，记录此刻的想法。"}
-            </p>
-          </div>
-        )}
-        <div className="admin-table-footer">
-          共 {rows.length} 篇文章<span>草稿仅保存在当前浏览器</span>
-        </div>
+                  )}
+                  <div className="admin-table-footer">
+                    共 {rows.length} 篇文章<span>草稿仅保存在当前浏览器</span>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
       </section>
       <p className="admin-storage-note" role="status">
         {message || saveStatus}

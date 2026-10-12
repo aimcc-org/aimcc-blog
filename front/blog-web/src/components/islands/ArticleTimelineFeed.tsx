@@ -3,6 +3,7 @@ import { ArticleTimeline } from "@aimcc/react-component";
 import type { TimelineArticle } from "@aimcc/react-component";
 import type { ApiArticle } from "@/lib/api";
 import { getArticleListBatch } from "@/lib/api";
+import ApiArticleCard from "./articles/ApiArticleCard";
 import { articleDetailHref } from "@/lib/article-detail";
 
 const NO_TAGS: number[] = [];
@@ -90,9 +91,17 @@ export default function ArticleTimelineFeed({
         ]
       : [],
   );
+  const articlesById = new Map(
+    articles.map((article) => [article.id, article]),
+  );
   return (
     <ArticleTimeline
       articles={timelineArticles}
+      articleListClassName="article-card-list"
+      renderArticle={(entry) => {
+        const article = articlesById.get(Number(entry.id));
+        return article ? <ApiArticleCard article={article} /> : null;
+      }}
       loading={loading}
       error={error}
       hasMore={hasMore}

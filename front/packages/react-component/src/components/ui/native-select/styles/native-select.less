@@ -1,0 +1,32 @@
+@import "../../../../styles/form-controls.less";
+@layer shadcn {
+  .rc-native-select {
+    position: relative;
+    width: fit-content;
+    &__control {
+      .form-control();
+      min-height: 36px;
+      appearance: none;
+      padding: 8px 36px 8px 12px;
+      &[data-size="sm"] {
+        min-height: 32px;
+        padding-block: 4px;
+      }
+    }
+    &__icon {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--color-muted);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    &__option {
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+}

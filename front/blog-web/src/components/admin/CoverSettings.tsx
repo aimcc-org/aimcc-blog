@@ -1,3 +1,5 @@
+import { Input } from "@aimcc/react-component";
+import { Button } from "@aimcc/react-component";
 import { useEffect, useState } from "react";
 import { isSafeCover } from "@/lib/admin-drafts";
 import AdminIcon from "./AdminIcon";
@@ -51,15 +53,17 @@ export default function CoverSettings({
         <div className="admin-cover-controls">
           <label htmlFor="cover-text">封面文字</label>
           <div className="admin-cover-generator">
-            <input
+            <Input
               id="cover-text"
               value={text}
               onChange={(event) => setText(event.target.value)}
               placeholder="例如：YAML、Spring Boot"
               maxLength={100}
               disabled={disabled}
+              className="admin-cover-generator__input"
             />
-            <button
+            <Button
+              variant="ghost"
               type="button"
               className="admin-button"
               disabled={disabled || !text.trim()}
@@ -70,35 +74,38 @@ export default function CoverSettings({
               }
             >
               生成封面
-            </button>
+            </Button>
           </div>
           <label htmlFor="cover-url">图片地址</label>
-          <input
+          <Input
             id="cover-url"
             type="url"
             value={value}
             onChange={(event) => onChange(event.target.value)}
             placeholder="https://placehold.co/1200x630?text=YAML"
             disabled={disabled}
+            className="admin-cover-controls__input"
           />
           <div className="admin-cover-actions">
-            <button
+            <Button
+              variant="ghost"
               type="button"
               className="admin-button"
               disabled
               title="图片上传暂未开放"
             >
               上传图片（暂未开放）
-            </button>
+            </Button>
             {value && (
-              <button
+              <Button
+                variant="ghost"
                 type="button"
                 className="admin-button"
                 disabled={disabled}
                 onClick={() => onChange("")}
               >
                 移除封面
-              </button>
+              </Button>
             )}
           </div>
           <p>支持 placehold.co 文字图片链接，也可直接粘贴图片地址。</p>

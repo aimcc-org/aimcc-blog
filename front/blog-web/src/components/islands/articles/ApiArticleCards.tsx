@@ -7,7 +7,7 @@ export default function ApiArticleCards({
   articles: ApiArticle[];
 }) {
   return (
-    <div className="home-posts__list">
+    <div className="home-posts__list article-card-list">
       {articles.map((article, index) => (
         <ApiArticleCard key={article.id} article={article} index={index} />
       ))}

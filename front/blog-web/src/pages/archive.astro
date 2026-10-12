@@ -1,10 +1,12 @@
 ---
-import BaseLayout from "@/layouts/base/BaseLayout.astro";
+import BlogHomeLayout from "@/layouts/home/BlogHomeLayout.astro";
+import "@/styles/archive.less";
 import ArticleTimelineFeed from "@/components/islands/ArticleTimelineFeed";
 ---
 
-<BaseLayout title="归档"
-  ><main class="shell" style="padding:40px 0 80px;">
-    <h1>归档</h1><ArticleTimelineFeed client:load />
-  </main></BaseLayout
->
+<BlogHomeLayout title="归档">
+  <section class="archive-page">
+    <h1 class="home-posts__section-title">归档</h1>
+    <ArticleTimelineFeed client:load />
+  </section>
+</BlogHomeLayout>
