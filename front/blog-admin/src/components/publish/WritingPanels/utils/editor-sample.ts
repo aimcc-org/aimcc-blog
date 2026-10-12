@@ -1,0 +1,1 @@
+export const sample = `## 从一个想法开始\n\n在左侧写下你的文字，右侧会实时呈现。\n\n### Markdown 写作\n\n- 用 **粗体** 强调重点\n- 用 *斜体* 表达语气\n- 添加 [链接](https://example.com)\n\n> 把值得记录的事情，慢慢写下来。\n\n\`\`\`javascript\nconst idea = "Hello, world!";\nconsole.log(idea);\n\`\`\`\n`;

@@ -1,0 +1,10 @@
+.markdown-toolbar {
+  width: 100%;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 5px;
+}
+.markdown-source {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.65;
+}

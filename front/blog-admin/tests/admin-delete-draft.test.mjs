@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDraft, readDraftStore } from "../src/lib/admin-drafts.ts";
+import { createDraft, readDraftStore } from "../src/utils/drafts.ts";
 import {
   mergeEditingCache,
   readEditingCacheStore,
   readEditingCache,
   writeEditingCache,
-} from "../src/lib/admin-edit-cache.ts";
-import { deleteLocalDraft } from "../src/lib/admin-delete-draft.ts";
+} from "../src/utils/editing-cache.ts";
+import { deleteLocalDraft } from "../src/utils/delete-draft.ts";
 function setup() {
   const a = createDraft({ content: "删除内容" }),
     b = createDraft({ content: "保留内容" });

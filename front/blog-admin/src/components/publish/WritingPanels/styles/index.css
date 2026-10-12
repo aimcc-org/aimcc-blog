@@ -1,0 +1,83 @@
+.markdown-preview {
+  overflow-wrap: anywhere;
+}
+.markdown-preview img {
+  max-width: 100%;
+}
+.markdown-preview pre {
+  overflow-x: auto;
+}
+.markdown-preview table {
+  display: block;
+  overflow-x: auto;
+}
+.publish-editor-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+}
+@media (max-width: 575px) {
+  .publish-editor-meta {
+    flex-wrap: wrap;
+  }
+}
+.publish-writing-column {
+  display: flex;
+  min-width: 0;
+}
+.publish-writing-card {
+  width: 100%;
+}
+.publish-writing-card > .ant-card-body {
+  padding: 16px;
+}
+.markdown-preview {
+  min-height: 480px;
+  margin: 0 auto;
+  padding: 8px;
+  transition: max-width 0.2s;
+}
+.preview-desktop {
+  max-width: 100%;
+}
+.preview-tablet {
+  max-width: 560px;
+}
+.preview-phone {
+  max-width: 360px;
+}
+.markdown-preview h1 {
+  font-size: 30px;
+}
+.markdown-preview h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+.markdown-preview blockquote {
+  margin: 16px 0;
+  border-left: 3px solid #1677ff;
+  padding: 8px 16px;
+  background: #e6f4ff;
+}
+.markdown-preview blockquote p {
+  margin: 0;
+}
+.markdown-preview pre {
+  padding: 16px;
+  border-radius: 6px;
+  background: #f5f5f5;
+}
+@media (max-width: 575px) {
+  .publish-writing-card .ant-card-head-wrapper {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0;
+  }
+}
+@media (max-width: 575px) {
+  .markdown-preview {
+    min-height: 280px;
+  }
+}

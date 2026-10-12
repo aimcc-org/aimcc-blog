@@ -1,12 +1,11 @@
-import assert from "node:assert/strict";
-import test from "node:test";
-import { createDraft, readDraftStore } from "../src/lib/admin-drafts.ts";
 import {
-  articlePayload,
-  draftTaxonomy,
   fetchTaxonomyOptions,
   publishArticle,
-} from "../src/lib/admin-publishing.ts";
+} from "../src/services/articles.ts";
+import assert from "node:assert/strict";
+import test from "node:test";
+import { createDraft, readDraftStore } from "../src/utils/drafts.ts";
+import { articlePayload, draftTaxonomy } from "../src/utils/publishing.ts";
 
 const taxonomy = {
   categories: [{ id: 3, name: "技术" }],

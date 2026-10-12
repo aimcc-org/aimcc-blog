@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDraft, readDraftStore } from "../src/lib/admin-drafts.ts";
+import { createDraft, readDraftStore } from "../src/utils/drafts.ts";
 import {
   readEditingCache,
   readEditingCacheStore,
   mergeEditingCache,
   writeEditingCache,
-} from "../src/lib/admin-edit-cache.ts";
-import { clearPublishedDraft } from "../src/lib/admin-publish-cleanup.ts";
+} from "../src/utils/editing-cache.ts";
+import { clearPublishedDraft } from "../src/utils/publish-cleanup.ts";
 function fixture() {
   const a = createDraft({ title: "发布目标", content: "正文" });
   const b = createDraft({ title: "其他草稿", content: "保留内容" });

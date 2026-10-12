@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDraft, readDraftStore } from "../src/lib/admin-drafts.ts";
+import { createDraft, readDraftStore } from "../src/utils/drafts.ts";
 
 test("HTTP development can create and restore drafts without crypto.randomUUID", () => {
   const descriptor = Object.getOwnPropertyDescriptor(crypto, "randomUUID");

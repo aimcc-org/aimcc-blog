@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+}
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.workspace-content {
+  padding: 24px;
+  min-width: 0;
+}
+
+@media (max-width: 575px) {
+  .workspace-content {
+    padding: 16px;
+  }
+}
+
+.workspace-header.ant-layout-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  height: auto;
+  min-height: 64px;
+  line-height: normal;
+}
+.workspace-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #1677ff;
+  font-size: 22px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.workspace-menu {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 0;
+}
+.workspace-content {
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 28px;
+}
+@media (max-width: 991px) {
+  .workspace-header.ant-layout-header {
+    gap: 12px;
+    padding: 0 16px;
+    flex-wrap: wrap;
+  }
+  .workspace-account {
+    margin-left: auto;
+    padding: 12px 0;
+  }
+  .workspace-menu {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .workspace-content {
+    padding: 20px;
+  }
+}
+@media (max-width: 575px) {
+  .workspace-content {
+    padding: 16px;
+  }
+  .workspace-brand {
+    font-size: 18px;
+  }
+  .workspace-header.ant-layout-header {
+    gap: 8px;
+  }
+}

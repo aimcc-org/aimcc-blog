@@ -1,0 +1,17 @@
+.publish-form .ant-form-item {
+  margin-bottom: 16px;
+}
+.publish-form .ant-form-item-label {
+  padding-bottom: 4px;
+}
+.publish-information-section + .publish-information-section {
+  border-left: 1px solid #f0f0f0;
+}
+.publish-form .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+@media (max-width: 991px) {
+  .publish-information-section + .publish-information-section {
+    border-left: 0;
+  }
+}

@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDraft, readDraftStore } from "../src/lib/admin-drafts.ts";
+import { createDraft, readDraftStore } from "../src/utils/drafts.ts";
 import {
   readEditingCache,
   writeEditingCache,
   recoverEditingCache,
   readEditingCacheStore,
   mergeEditingCache,
-} from "../src/lib/admin-edit-cache.ts";
+} from "../src/utils/editing-cache.ts";
 
 test("cache the latest text and metadata synchronously before draft save", () => {
   const draft = createDraft({

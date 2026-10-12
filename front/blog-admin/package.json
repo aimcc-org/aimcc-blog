@@ -9,9 +9,10 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
-    "check": "tsc --noEmit",
-    "test": "node --test tests/*.test.mjs"
+    "build": "node scripts/check-architecture.mjs && tsc --noEmit && vite build",
+    "check": "node scripts/check-architecture.mjs && tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "check:architecture": "node scripts/check-architecture.mjs"
   },
   "dependencies": {
     "antd": "^6.6.6",

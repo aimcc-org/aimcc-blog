@@ -1,6 +1,7 @@
 import "./styles/featured-articles.less";
 import { Button } from "@aimcc/react-component";
 import FeaturedArticleCard from "./FeaturedArticleCard";
+import FeaturedEmptyState from "./FeaturedEmptyState";
 import FeaturedHeader from "./FeaturedHeader";
 import { useFeaturedArticles } from "./useFeaturedArticles";
 import "./featured-articles.less";
@@ -36,6 +37,7 @@ export default function FeaturedArticles() {
           )}
         </div>
       )}
+      {!loading && !error && !first && <FeaturedEmptyState />}
       {error && (
         <div className="featured-articles__feedback" role="alert">
           <span>精选文章加载失败，请稍后重试。</span>

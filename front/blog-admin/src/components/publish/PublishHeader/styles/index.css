@@ -1,0 +1,26 @@
+.publish-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.publish-header h4 {
+  margin: 0 0 4px;
+}
+@media (max-width: 575px) {
+  .publish-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+.publish-header {
+  padding-bottom: 4px;
+}
+.publish-header h4 {
+  font-size: 28px;
+}
+@media (max-width: 575px) {
+  .publish-header h4 {
+    font-size: 24px;
+  }
+}
