@@ -2,7 +2,6 @@ import { Badge, PostCard } from "@aimcc/react-component";
 import type { ApiArticle } from "@/lib/api";
 import { articleDetailHref } from "@/lib/article-detail";
 import "./styles/article-card-list.less";
-import ArticleBookmark from "./components/ArticleBookmark";
 import ArticleStats from "./ArticleStats";
 
 export default function ApiArticleCard({
@@ -47,7 +46,6 @@ export default function ApiArticleCard({
         </>
       }
       footer={<ArticleStats article={article} showDate />}
-      action={<ArticleBookmark articleId={article.id} />}
     />
   );
 }
