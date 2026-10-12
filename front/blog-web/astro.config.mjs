@@ -17,10 +17,7 @@ export default defineConfig({
   site: profile.site.url,
   output: "static",
   outDir: `./dist/${profileName}`,
-  integrations: [
-    react(),
-    sitemap({ filter: (page) => !new URL(page).pathname.startsWith("/admin") }),
-  ],
+  integrations: [react(), sitemap()],
   vite: {
     ssr: { noExternal: ["@aimcc/react-component"] },
     resolve: { dedupe: ["react", "react-dom"] },

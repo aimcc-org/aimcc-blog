@@ -1,5 +1,4 @@
-const baseUrl =
-  import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
+const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "/api";
 const TOKEN_KEY = "aimcc.admin.token";
 
 export class AdminApiError extends Error {

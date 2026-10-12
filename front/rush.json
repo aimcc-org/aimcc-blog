@@ -13,6 +13,11 @@
       "reviewCategory": "production"
     },
     {
+      "packageName": "@aimcc/blog-admin",
+      "projectFolder": "blog-admin",
+      "reviewCategory": "production"
+    },
+    {
       "packageName": "@aimcc/react-component",
       "projectFolder": "packages/react-component",
       "reviewCategory": "libraries"

@@ -1,0 +1,228 @@
+body {
+  margin: 0;
+}
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.workspace-content {
+  padding: 24px;
+  min-width: 0;
+}
+.markdown-preview {
+  overflow-wrap: anywhere;
+}
+.markdown-preview img {
+  max-width: 100%;
+}
+.markdown-preview pre {
+  overflow-x: auto;
+}
+.markdown-preview table {
+  display: block;
+  overflow-x: auto;
+}
+@media (max-width: 575px) {
+  .workspace-content {
+    padding: 16px;
+  }
+}
+
+.publish-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.publish-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.publish-header h4 {
+  margin: 0 0 4px;
+}
+.publish-form .ant-form-item {
+  margin-bottom: 16px;
+}
+.publish-form .ant-form-item-label {
+  padding-bottom: 4px;
+}
+.publish-editor-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+}
+@media (max-width: 575px) {
+  .publish-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .publish-editor-meta {
+    flex-wrap: wrap;
+  }
+}
+
+.workspace-header.ant-layout-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  height: auto;
+  min-height: 64px;
+  line-height: normal;
+}
+.workspace-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #1677ff;
+  font-size: 22px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.workspace-menu {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 0;
+}
+.workspace-content {
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 28px;
+}
+.publish-header {
+  padding-bottom: 4px;
+}
+.publish-header h4 {
+  font-size: 28px;
+}
+.publish-information-section + .publish-information-section {
+  border-left: 1px solid #f0f0f0;
+}
+.publish-form .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+.publish-writing-column {
+  display: flex;
+  min-width: 0;
+}
+.publish-writing-card {
+  width: 100%;
+}
+.publish-writing-card > .ant-card-body {
+  padding: 16px;
+}
+.markdown-toolbar {
+  width: 100%;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 5px;
+}
+.markdown-source {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.65;
+}
+.markdown-preview {
+  min-height: 480px;
+  margin: 0 auto;
+  padding: 8px;
+  transition: max-width 0.2s;
+}
+.preview-desktop {
+  max-width: 100%;
+}
+.preview-tablet {
+  max-width: 560px;
+}
+.preview-phone {
+  max-width: 360px;
+}
+.markdown-preview h1 {
+  font-size: 30px;
+}
+.markdown-preview h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+.markdown-preview blockquote {
+  margin: 16px 0;
+  border-left: 3px solid #1677ff;
+  padding: 8px 16px;
+  background: #e6f4ff;
+}
+.markdown-preview blockquote p {
+  margin: 0;
+}
+.markdown-preview pre {
+  padding: 16px;
+  border-radius: 6px;
+  background: #f5f5f5;
+}
+@media (max-width: 991px) {
+  .workspace-header.ant-layout-header {
+    gap: 12px;
+    padding: 0 16px;
+    flex-wrap: wrap;
+  }
+  .workspace-account {
+    margin-left: auto;
+    padding: 12px 0;
+  }
+  .workspace-menu {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .workspace-content {
+    padding: 20px;
+  }
+  .publish-information-section + .publish-information-section {
+    border-left: 0;
+  }
+}
+@media (max-width: 575px) {
+  .workspace-content {
+    padding: 16px;
+  }
+  .workspace-brand {
+    font-size: 18px;
+  }
+  .workspace-header.ant-layout-header {
+    gap: 8px;
+  }
+  .publish-header h4 {
+    font-size: 24px;
+  }
+  .publish-writing-card .ant-card-head-wrapper {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0;
+  }
+  .markdown-preview {
+    min-height: 280px;
+  }
+}
+
+.cover-preview {
+  min-height: 108px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  padding: 12px;
+}
+.cover-preview img {
+  max-height: 108px;
+  max-width: 100%;
+  object-fit: contain;
+}

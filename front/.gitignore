@@ -18,3 +18,6 @@ packages/*/storybook-static/
 # Project dependencies are locked centrally by Rush
 /blog-web/pnpm-lock.yaml
 /packages/*/pnpm-lock.yaml
+
+blog-admin/dist/
+/blog-admin/pnpm-lock.yaml
