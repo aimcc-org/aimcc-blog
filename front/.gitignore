@@ -14,3 +14,7 @@ packages/*/storybook-static/
 **/rush-logs/
 **/.rush/temp/chunked-rush-logs/
 **/.rush/temp/package-deps_*.json
+
+# Project dependencies are locked centrally by Rush
+/blog-web/pnpm-lock.yaml
+/packages/*/pnpm-lock.yaml

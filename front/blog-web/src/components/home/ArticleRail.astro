@@ -1,11 +1,8 @@
 ---
-import type { PostSummary } from "@/types/post";
 import ProfileCard from "./sidebar/ProfileCard.astro";
 import CategoryFilter from "@/components/islands/CategoryFilter";
 
 interface Props {
-  posts: PostSummary[];
-  activeSlug?: string;
   drawer?: boolean;
 }
 

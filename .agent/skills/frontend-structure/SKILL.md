@@ -55,7 +55,7 @@ front/
 │       ├── styles/
 │       └── types/
 └── packages/
-    └── mdx-component/
+    └── react-component/
 ```
 
 ### 内容

@@ -52,7 +52,7 @@ pnpm --dir blog-web build:all
 - `blog-web/profiles.config.mjs`：站点组合/构建 profile
 - `blog-web/src/content/`：内容查询和 profile 过滤
 - `blog-web/src/components/`：页面组件
-- `packages/mdx-component/`：公共 MDX 组件包
+- `packages/react-component/`：共享 React 组件与 Storybook
 
 ## 布局与组件迁移
 
@@ -61,3 +61,10 @@ pnpm --dir blog-web build:all
 左侧 `ArticleRail` 使用 `CategoryIndex` 展示一级分类与数量，`ProfileCard` 使用 `SidebarUserProfile`。右侧 `HomeAside` 分别使用 `NowCard`、`QuickLinks`、`AmbientCard`。共享源码和 Storybook 位于 `packages/react-component`，站点的数据加载与路由仍由 Astro 包装组件提供。
 
 博客导航保留原 `front-bak` 的 Header 样式与交互；共享玻璃 `Header` 仍保留在组件库和 Storybook。归档继续使用文章 list API 的 `ArticleTimeline`。
+
+## 依赖锁与内容来源
+
+- 根目录 `pnpm-lock.yaml`：锁定 Husky、commitlint、lint-staged 等仓库工具。
+- `front/pnpm-lock.yaml`：锁定工作区入口使用的 Rush、Prettier；`install:all` 会先安装这些依赖。
+- `front/common/config/rush/pnpm-lock.yaml`：Rush 管理的应用与公共包依赖锁。不要在 `blog-web/` 或 `packages/*/` 单独执行 `pnpm install` 或提交项目级锁文件。
+- 首页文章、分类、标签和归档使用后端 API；本地 `content/` 仍用于 `/about/` 和 `/posts/*` 静态页面。

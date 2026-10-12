@@ -4,18 +4,15 @@ import HomeNavbar from "@/components/home/HomeNavbar.astro";
 import ArticleRail from "@/components/home/ArticleRail.astro";
 import HomeFooter from "@/components/home/HomeFooter.astro";
 import HomeAside from "@/components/home/HomeAside.astro";
-import type { PostSummary } from "@/types/post";
 import "@/styles/home.css";
 import "@/styles/responsive.css";
 
 interface Props {
   title?: string;
   description?: string;
-  posts: PostSummary[];
-  activeSlug?: string;
 }
 
-const { title, description, posts, activeSlug } = Astro.props;
+const { title, description } = Astro.props;
 ---
 
 <BaseLayout
@@ -27,7 +24,7 @@ const { title, description, posts, activeSlug } = Astro.props;
   <div class="home-page">
     <HomeNavbar />
     <div class="home-workspace">
-      <ArticleRail posts={posts} activeSlug={activeSlug} />
+      <ArticleRail />
       <div class="home-scroll-region">
         <main class="editorial-shell" transition:animate="none">
           <div class="editorial-content"><slot /></div>
@@ -41,7 +38,7 @@ const { title, description, posts, activeSlug } = Astro.props;
       class="sidebar-drawer"
       aria-labelledby="sidebar-drawer-title"
     >
-      <ArticleRail posts={posts} activeSlug={activeSlug} drawer />
+      <ArticleRail drawer />
     </dialog>
   </div>
 </BaseLayout>

@@ -4,8 +4,7 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@content/*": ["content/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": [".astro/types.d.ts", "**/*"],
