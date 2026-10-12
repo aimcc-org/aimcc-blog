@@ -60,7 +60,7 @@ export function getArticleList(
   categoryId?: number,
   isTop?: number,
   size = 20,
-  sort: "new" | "hot" | "recommend" = "new",
+  sort: "NEW" | "RECOMMEND" = "NEW",
 ) {
   const base =
     import.meta.env.PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "/api";

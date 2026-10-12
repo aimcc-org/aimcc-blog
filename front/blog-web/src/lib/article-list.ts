@@ -28,7 +28,7 @@ export async function fetchArticleList(
   categoryId?: number,
   isTop?: number,
   size = 20,
-  sort: "new" | "hot" | "recommend" = "new",
+  sort: "NEW" | "RECOMMEND" = "NEW",
 ): Promise<ApiArticlePage> {
   const query = new URLSearchParams({
     page: String(page),

@@ -7,7 +7,11 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 全局异常处理器：全项目 Controller 抛出的异常，都在这里统一翻译成 ApiResult
@@ -50,6 +54,24 @@ public class GlobalExceptionHandler {
         log.warn("请求方式不支持: {}", e.getMessage());
         return ApiResult.fail(405, "请求方式不对，请检查 GET/POST");
     }
+    /** 参数类型不对（比如 sort 传了枚举里没有的值）：400 */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ApiResult<Void> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        String name = e.getName();                  // 出错的参数名，如 "sort"
+        Class<?> requiredType = e.getRequiredType(); // 目标类型，如 ArticleSort.class
+        // 目标类型是枚举时，把可选值一并告诉前端，省得对方翻文档
+        if (requiredType != null && requiredType.isEnum()) {
+            List<String> names = new ArrayList<>();
+            for (Object value : requiredType.getEnumConstants()) {
+                names.add(((Enum<?>) value).name());
+            }
+            log.warn("参数类型不匹配: {} = {}", name, e.getValue());
+            return ApiResult.fail(400, name + " 取值不合法，可选值：" + String.join("、", names));
+        }
+        log.warn("参数类型不匹配: {}", name);
+        return ApiResult.fail(400, name + " 参数格式不对");
+    }
+
     /** 路径未找到：404 */
     @ExceptionHandler(NoResourceFoundException.class)
     public ApiResult<Void> handleNoHandlerFound(NoResourceFoundException e) {
