@@ -102,6 +102,27 @@ test("quick links preserve internal navigation and protect new-window links", ()
   assert.match(html, /target="_blank" rel="noopener noreferrer"/);
 });
 
+test("all supplied tags remain clickable when the host disables the count limit", () => {
+  const tags = Array.from({ length: 30 }, (_, index) => ({
+    id: index + 1,
+    name: `文章标签 ${index + 1}`,
+    href: `/?tagId=${index + 1}#posts`,
+    active: index === 29,
+  }));
+  const html = render(SidebarUserProfile, {
+    name: "AIMCC",
+    tags,
+    maxVisibleTags: tags.length,
+    showBio: false,
+  });
+  assert.equal((html.match(/data-tag-id=/g) ?? []).length, tags.length);
+  assert.match(
+    html,
+    /href="\/\?tagId=30#posts" data-tag-id="30" aria-current="true"/,
+  );
+  assert.doesNotMatch(html, /另外 \d+ 个标签/);
+});
+
 test("profile can hide introduction and every personal link while preserving tags", () => {
   const html = render(SidebarUserProfile, {
     name: "AIMCC",

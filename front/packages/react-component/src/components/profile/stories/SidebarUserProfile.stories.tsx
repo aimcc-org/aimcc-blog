@@ -54,3 +54,19 @@ export const TagsOnly: Story = {
     showContact: false,
   },
 };
+
+export const ScrollableTags: Story = {
+  args: {
+    showBio: false,
+    showResume: false,
+    showGithub: false,
+    showContact: false,
+    maxVisibleTags: 30,
+    tags: Array.from({ length: 30 }, (_, index) => ({
+      id: index + 1,
+      name: `文章标签 ${index + 1}`,
+      href: `/?tagId=${index + 1}#posts`,
+      active: index === 29,
+    })),
+  },
+};

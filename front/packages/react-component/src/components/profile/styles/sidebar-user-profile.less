@@ -131,10 +131,20 @@
     flex-wrap: wrap;
     gap: 5px;
     margin: 0;
-    padding: 0;
+    padding: 3px;
     list-style: none;
+    max-height: min(12rem, 25svh);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
   }
   &__tags li {
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
     padding: 3px 9px;
     background: var(--color-control-hover);
     border-radius: 99px;
@@ -151,6 +161,7 @@
     border-radius: inherit;
     color: inherit;
     text-decoration: none;
+    min-width: 0;
     transition:
       color 150ms ease,
       background-color 150ms ease;

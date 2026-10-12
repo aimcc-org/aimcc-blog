@@ -52,6 +52,7 @@ export default function SidebarProfile({
         ) : undefined
       }
       online={profile.online}
+      maxVisibleTags={tags.length}
       tags={tags.map((tag) => ({
         id: tag.id,
         name: tag.name,
