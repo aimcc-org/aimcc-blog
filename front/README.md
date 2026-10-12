@@ -47,10 +47,8 @@ pnpm --dir blog-web build:all
 
 ## 架构
 
-- `blog-web/content/<owner>/`：按所有者隔离的内容
 - `blog-web/src/layouts/`：页面宏观结构
 - `blog-web/profiles.config.mjs`：站点组合/构建 profile
-- `blog-web/src/content/`：内容查询和 profile 过滤
 - `blog-web/src/components/`：页面组件
 - `packages/react-component/`：共享 React 组件与 Storybook
 
@@ -67,4 +65,4 @@ pnpm --dir blog-web build:all
 - 根目录 `pnpm-lock.yaml`：锁定 Husky、commitlint、lint-staged 等仓库工具。
 - `front/pnpm-lock.yaml`：锁定工作区入口使用的 Rush、Prettier；`install:all` 会先安装这些依赖。
 - `front/common/config/rush/pnpm-lock.yaml`：Rush 管理的应用与公共包依赖锁。不要在 `blog-web/` 或 `packages/*/` 单独执行 `pnpm install` 或提交项目级锁文件。
-- 首页文章、分类、标签和归档使用后端 API；本地 `content/` 仍用于 `/about/` 和 `/posts/*` 静态页面。
+- 首页文章、分类、标签、归档和文章详情均使用后端 API。

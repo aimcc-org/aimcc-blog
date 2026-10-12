@@ -11,9 +11,6 @@ export const profiles = {
       toc: true,
       search: true,
     },
-    content: {
-      owners: ["main", "shared"],
-    },
   },
 };
 

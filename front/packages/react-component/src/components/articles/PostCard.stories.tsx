@@ -6,7 +6,7 @@ const meta = {
   component: PostCard,
   tags: ["autodocs"],
   args: {
-    href: "/posts/hello-main/",
+    href: "/article/?id=1",
     post: {
       title: "构建一个可复用的博客组件库",
       description: "用 React 与 Storybook 独立开发组件，再接入 Astro 页面。",

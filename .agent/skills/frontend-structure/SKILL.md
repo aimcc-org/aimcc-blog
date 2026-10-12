@@ -41,15 +41,11 @@ front/
 │   └── config/
 │       └── rush/
 ├── blog-web/
-│   ├── content/
-│   │   ├── main/
-│   │   └── shared/
 │   ├── public/
 │   ├── scripts/
 │   └── src/
 │       ├── components/
 │       ├── config/
-│       ├── content/
 │       ├── layouts/
 │       ├── pages/
 │       ├── styles/
@@ -57,16 +53,6 @@ front/
 └── packages/
     └── react-component/
 ```
-
-### 内容
-
-- 个人内容当前放在 `front/blog-web/content/main/**`。
-- 共享内容可以放在 `front/blog-web/content/shared/**`。
-- 由 profile 决定一次构建中哪些内容所有者可见。
-- 所有者目录是构建期作用域，不能自动变成 URL 前缀。
-- 文章资源优先与文章目录放在一起。
-- 新增、删除或重命名内容分类/profile 时，必须阅读 `.agent/skills/content-category/SKILL.md`。
-- 关键扩展约定记录在 `docs/infra/content-profiles.md`，避免后续新增 profile 时遗漏同步点。
 
 ### 主题
 

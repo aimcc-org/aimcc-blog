@@ -60,7 +60,7 @@ import "@aimcc/react-component/tokens.css";
 import "@aimcc/react-component/styles.css";
 
 <PostCard
-  href="/posts/hello/"
+  href="/article/?id=1"
   post={{ title: "Hello", publishedAt: "2026-10-08", tags: ["React"] }}
 />;
 ```

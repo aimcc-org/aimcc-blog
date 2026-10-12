@@ -4,13 +4,9 @@ import { NowCard, QuickLinks, AmbientCard } from "@aimcc/react-component";
 import type { QuickLink } from "@aimcc/react-component";
 const profile = await getPersonalProfile();
 const links: QuickLink[] = [
-  ...(profile.resumeUrl
-    ? [{ label: "电子简历", href: profile.resumeUrl }]
-    : []),
   ...(profile.githubUrl
     ? [{ label: "GitHub", href: profile.githubUrl, external: true }]
     : []),
-  { label: "关于我", href: "/about/" },
   { label: "文章归档", href: "/archive/" },
 ];
 ---

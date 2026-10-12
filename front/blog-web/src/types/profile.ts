@@ -1,5 +1,4 @@
 export type ProfileName = "main";
-export type ContentOwner = "main" | "shared";
 
 export interface PersonalProfile {
   nickname: string;
@@ -29,8 +28,5 @@ export interface SiteProfile {
   features: {
     toc: boolean;
     search: boolean;
-  };
-  content: {
-    owners: ContentOwner[];
   };
 }
