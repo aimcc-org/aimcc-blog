@@ -23,7 +23,7 @@ export function useRecentArticles(tagId?: number, categoryId?: number) {
           tagId,
           categoryId,
           undefined,
-          8,
+          12,
         );
         if (!controller.signal.aborted) setPage(result);
       } catch {
