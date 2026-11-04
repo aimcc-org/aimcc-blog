@@ -31,6 +31,8 @@ public class ArticleController {
             @RequestParam(defaultValue = "NEW") ArticleSort sort,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long tagId) {
+        // 防止恶意传 ?size=10000 一次读穿数据库
+        if (size > 50) size = 50;
         return ApiResult.ok(articleService.listArticles(page, size, sort, categoryId, tagId));
     }
 

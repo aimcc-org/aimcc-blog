@@ -20,13 +20,29 @@ scp target/server-0.0.1-SNAPSHOT.jar root@47.96.92.202:/opt/blog/blog.jar
 ssh root@47.96.92.202 "systemctl restart blog"
 ```
 
+## 服务器部署配置
+
+服务用 systemd 管理，配置文件在 `/etc/systemd/system/blog.service`：
+
+- 以 `blogapp` 低权限用户运行（不用 root）
+- 环境变量 `DB_USERNAME`、`DB_PASSWORD`、`REDIS_PASSWORD` 写在 service 文件里
+- JVM 限制 `-Xmx256m`（1G 小内存服务器）
+- 崩溃自动重启（`Restart=always`，等 5 秒）
+- 开机自启（`WantedBy=multi-user.target`）
+
+## Nginx 反向代理
+
+Nginx 配置在 `/etc/nginx/sites-available/blog`：
+- 静态文件托管：前端构建产物放在 `/var/www/blog/`
+- `/api/` 开头的请求反向代理到 `127.0.0.1:8080`（后端 Spring Boot）
+
 ## 服务器排障
 
 ```bash
+systemctl status blog --no-pager        # 服务状态（看 active/running）
 journalctl -u blog -n 50 --no-pager    # 看最近 50 行日志
 journalctl -u blog -f                  # 实时日志
-systemctl status blog --no-pager       # 服务状态
-curl http://localhost:8080/api/articles  # 本机自测
+curl http://localhost:8080/api/articles  # 本机自测接口
 ```
 
 ## 目录结构

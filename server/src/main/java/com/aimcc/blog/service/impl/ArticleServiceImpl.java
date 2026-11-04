@@ -90,21 +90,18 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDetailVO getArticleById(Long id) {
-        Article article = articleMapper.selectById(id);
-        if (article == null || article.getStatus() != 1) {
-            throw new BizException(404, "文章不存在");
-        }
-        // 浏览量+1：让数据库自己加（原子操作），不读回 Java 再写回
+        // 浏览量+1：让数据库自己加（原子操作），顺便校验文章存在且已发布
         LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Article::getId, id);
+        updateWrapper.eq(Article::getStatus, 1);
         updateWrapper.setSql("view_count = view_count + 1");
-        articleMapper.update(null, updateWrapper);
-        // Return the current database value rather than the snapshot read before the increment.
-        Article updatedArticle = articleMapper.selectById(id);
-        if (updatedArticle == null || updatedArticle.getStatus() != 1) {
+        boolean updated = articleMapper.update(null, updateWrapper) > 0;
+        if (!updated) {
             throw new BizException(404, "文章不存在");
         }
-        return toDetailVO(updatedArticle);
+        // 只查一次，返回最新数据
+        Article article = articleMapper.selectById(id);
+        return toDetailVO(article);
     }
 
     /** entity → 列表 VO，手动逐字段赋值 */

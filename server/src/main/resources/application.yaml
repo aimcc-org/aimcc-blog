@@ -24,10 +24,20 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    # HikariCP 数据库连接池配置
+    hikari:
+      # 池子最多维持多少条连接：2 核机器 10 条足够，多了反而让 MySQL 压力变大
+      maximum-pool-size: 10
+      # 平时最少保持几条空闲连接：5 条够用，比默认 10 条更省 MySQL 内存
+      minimum-idle: 5
+      # 从池子借连接最多等多久（毫秒）：5 秒拿不到连接就快速失败，不让请求堆在内存里
+      connection-timeout: 5000
+      # 一条连接最长存活时间（毫秒）：30 分钟自动换一条新的，避免 MySQL 单方面断开后拿到死连接
+      max-lifetime: 1800000
 
 mybatis-plus:
   # mapper XML 文件位置（联表等自定义 SQL 的住处）
   mapper-locations: classpath:mapper/*.xml
   configuration:
     # 开发期打印 SQL，上线前删掉
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
