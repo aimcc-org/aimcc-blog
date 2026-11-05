@@ -21,6 +21,6 @@ public interface ArticleService {
      */
     Page<ArticleListVO> listArticles(int page, int size, ArticleSort sort, Long categoryId, Long tagId);
 
-    /** 按 id 查询文章详情 */
-    ArticleDetailVO getArticleById(Long id);
+    /** 按 id 查询文章详情（ip 用于浏览量去重） */
+    ArticleDetailVO getArticleById(Long id, String ip);
 }

@@ -5,49 +5,58 @@ import com.aimcc.blog.exception.BizException;
 import com.aimcc.blog.mapper.ArticleMapper;
 import com.aimcc.blog.mapper.TagMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ArticleServiceImplTests {
     private final ArticleMapper articleMapper = mock(ArticleMapper.class);
+    private final StringRedisTemplate redisTemplate = mock(StringRedisTemplate.class);
+    @SuppressWarnings("unchecked")
+    private final ValueOperations<String, String> valueOps = mock(ValueOperations.class);
     private final ArticleServiceImpl service =
-            new ArticleServiceImpl(articleMapper, mock(TagMapper.class));
+            new ArticleServiceImpl(articleMapper, mock(TagMapper.class), redisTemplate);
 
     @Test
     void detailReturnsViewCountAfterIncrement() {
-        Article before = publishedArticle(10);
-        Article after = publishedArticle(11);
-        when(articleMapper.selectById(1L)).thenReturn(before, after);
+        Article article = publishedArticle(11);
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
+        when(valueOps.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
+        when(articleMapper.selectById(1L)).thenReturn(article);
+        when(articleMapper.update(isNull(), any())).thenReturn(1);
 
-        var detail = service.getArticleById(1L);
+        var detail = service.getArticleById(1L, "127.0.0.1");
 
         assertEquals(11, detail.getViewCount());
         assertEquals("# 正文", detail.getContent());
-        var order = inOrder(articleMapper);
-        order.verify(articleMapper).selectById(1L);
-        order.verify(articleMapper).update(isNull(), any(com.baomidou.mybatisplus.core.conditions.Wrapper.class));
-        order.verify(articleMapper).selectById(1L);
     }
 
     @Test
     void missingArticleReturns404WithoutIncrement() {
-        when(articleMapper.selectById(1L)).thenReturn(null);
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
+        when(valueOps.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
+        when(articleMapper.update(isNull(), any())).thenReturn(0);
+
         assertEquals(404, assertThrows(BizException.class,
-                () -> service.getArticleById(1L)).getCode());
-        verify(articleMapper).selectById(1L);
-        verifyNoMoreInteractions(articleMapper);
+                () -> service.getArticleById(1L, "127.0.0.1")).getCode());
     }
 
     @Test
-    void unpublishedArticleReturns404WithoutIncrement() {
-        Article draft = publishedArticle(10);
-        draft.setStatus(0);
-        when(articleMapper.selectById(1L)).thenReturn(draft);
-        assertEquals(404, assertThrows(BizException.class,
-                () -> service.getArticleById(1L)).getCode());
-        verify(articleMapper).selectById(1L);
-        verifyNoMoreInteractions(articleMapper);
+    void repeatVisitDoesNotIncrement() {
+        Article article = publishedArticle(11);
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
+        when(valueOps.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(false); // 重复访问
+        when(articleMapper.selectById(1L)).thenReturn(article);
+
+        var detail = service.getArticleById(1L, "127.0.0.1");
+
+        assertEquals(11, detail.getViewCount());
+        // 重复访问不应该执行 update
+        verify(articleMapper, never()).update(isNull(), any());
     }
 
     private Article publishedArticle(int viewCount) {

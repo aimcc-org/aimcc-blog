@@ -14,8 +14,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleMapper articleMapper;
     private final TagMapper tagMapper;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public Page<ArticleListVO> listArticles(int page, int size, ArticleSort sort, Long categoryId, Long tagId) {
@@ -89,18 +92,27 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleDetailVO getArticleById(Long id) {
-        // 浏览量+1：让数据库自己加（原子操作），顺便校验文章存在且已发布
-        LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Article::getId, id);
-        updateWrapper.eq(Article::getStatus, 1);
-        updateWrapper.setSql("view_count = view_count + 1");
-        boolean updated = articleMapper.update(null, updateWrapper) > 0;
-        if (!updated) {
-            throw new BizException(404, "文章不存在");
+    public ArticleDetailVO getArticleById(Long id, String ip) {
+        String key = "view:" + id + ":" + ip;
+        Boolean isNew = redisTemplate.opsForValue().setIfAbsent(key, "1", Duration.ofMinutes(5));
+        Article article;
+        if (Boolean.TRUE.equals(isNew)) {
+            // 第一次访问：UPDATE +1，顺便判断文章存不存在
+            // 浏览量+1：让数据库自己加（原子操作），顺便校验文章存在且已发布
+            LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(Article::getId, id);
+            updateWrapper.eq(Article::getStatus, 1);
+            updateWrapper.setSql("view_count = view_count + 1");
+            boolean updated = articleMapper.update(null, updateWrapper) > 0;
+            if (!updated) {
+                redisTemplate.delete(key); // 文章不存在，删掉刚写的 Redis key
+                throw new BizException(404, "文章不存在");
+            }
+            article = articleMapper.selectById(id);
+        } else {
+            // 重复访问：文章肯定存在（你之前成功看过），直接查
+            article = articleMapper.selectById(id);
         }
-        // 只查一次，返回最新数据
-        Article article = articleMapper.selectById(id);
         return toDetailVO(article);
     }
 
