@@ -41,3 +41,12 @@ mybatis-plus:
   configuration:
     # 开发期打印 SQL，上线前删掉
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# SpringDoc 接口文档配置
+springdoc:
+  # /v3/api-docs 接口文档 JSON 开关：生产环境改成 false
+  api-docs:
+    enabled: true
+  # /swagger-ui.html 可视化文档页面开关：生产环境改成 false
+  swagger-ui:
+    enabled: true
