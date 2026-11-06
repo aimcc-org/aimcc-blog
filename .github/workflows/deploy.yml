@@ -59,4 +59,5 @@ jobs:
       - name: Deploy frontend
         run: |
           ssh root@${{ secrets.SERVER_IP }} "rm -rf /var/www/blog/*"
-          scp -r front/blog-web/dist/* root@${{ secrets.SERVER_IP }}:/var/www/blog/
+          scp -r front/blog-web/dist/main/* root@${{ secrets.SERVER_IP }}:/var/www/blog/
+          ssh root@${{ secrets.SERVER_IP }} "chown -R www-data:www-data /var/www/blog"
