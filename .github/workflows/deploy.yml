@@ -36,6 +36,7 @@ jobs:
           version: 9.14.4
 
       - name: Build frontend
+        working-directory: front
         run: |
           pnpm install:all
           pnpm build
