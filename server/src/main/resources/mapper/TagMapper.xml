@@ -36,4 +36,9 @@
         </foreach>
     </insert>
 
+    <!-- 删除某篇文章的所有标签关联 -->
+    <delete id="deleteArticleTags">
+        delete from article_tag where article_id = #{articleId}
+    </delete>
+
 </mapper>

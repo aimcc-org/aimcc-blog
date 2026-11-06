@@ -31,4 +31,11 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @param tagIds    标签 id 列表
      */
     void insertArticleTags(@Param("articleId") Long articleId, @Param("tagIds") List<Long> tagIds);
+
+    /**
+     * 删除某篇文章的所有标签关联
+     *
+     * @param articleId 文章 id
+     */
+    void deleteArticleTags(@Param("articleId") Long articleId);
 }
