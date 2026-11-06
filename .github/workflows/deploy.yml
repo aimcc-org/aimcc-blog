@@ -44,24 +44,12 @@ jobs:
 
       # 4. 配置 SSH
       - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Debug SSH key
-        run: |
-          echo "=== First line ==="
-          head -1 ~/.ssh/id_ed25519
-          echo "=== Last line ==="
-          tail -1 ~/.ssh/id_ed25519
-          echo "=== Total lines ==="
-          wc -l ~/.ssh/id_ed25519
-
-      - name: Test SSH connection
-        run: |
-          ssh -v root@${{ secrets.SERVER_IP }} "echo 'SSH connected successfully'"
+      - name: Add server to known hosts
+        run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
       # 5. 上传后端 jar 并重启服务
       - name: Deploy backend
