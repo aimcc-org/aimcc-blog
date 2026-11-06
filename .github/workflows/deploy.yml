@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '26'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -36,9 +36,8 @@ jobs:
           version: 9.14.4
 
       - name: Build frontend
-        working-directory: front/blog-web
         run: |
-          pnpm install
+          pnpm install:all
           pnpm build
 
       # 4. 配置 SSH
