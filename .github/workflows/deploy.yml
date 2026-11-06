@@ -39,6 +39,7 @@ jobs:
         working-directory: front
         run: |
           pnpm install:all
+          cd blog-web
           pnpm build
 
       # 4. 配置 SSH
