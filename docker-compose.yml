@@ -62,7 +62,7 @@ services:
       # 注意这里的主机名：
       #   mysql / redis 就是上面两个服务的名字，compose 内部网络里能直接解析
       #   端口用容器内部的 3306 / 6379，不是宿主机的 3307
-      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
       DB_USERNAME: blog
       DB_PASSWORD: root1234
       SPRING_DATA_REDIS_HOST: redis
