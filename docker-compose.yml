@@ -53,7 +53,7 @@ services:
   # ---------- Spring Boot 应用 ----------
   server:
     # build: 用 server/Dockerfile 现场构建镜像
-    # （之前是 docker build -t blog-server:v1 手动构建，现在交给 compose）
+    # 也可以切到 server 目录手动构建：cd server && docker build -t blog-server:v1 .
     build: ./server
     container_name: blog-server
     ports:
