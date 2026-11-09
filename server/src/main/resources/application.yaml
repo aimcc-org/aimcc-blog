@@ -21,7 +21,8 @@ spring:
     # blog 账号已换回官方默认认证插件 caching_sha2_password
     url: jdbc:mysql://localhost:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8
     # 密码通过环境变量 DB_PASSWORD 注入，不在文件中保存明文
-    username: ${DB_USERNAME:root}
+    # 默认用 blog 账号，可通过环境变量 DB_USERNAME 覆盖
+    username: ${DB_USERNAME:blog}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
     # HikariCP 数据库连接池配置
