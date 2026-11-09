@@ -1,0 +1,80 @@
+# ============================================================
+# docker-compose.yml —— 一条命令把 mysql / redis / server 三个容器起全
+#
+# 用法（在本文件所在目录执行）：
+#   docker compose up -d      启动全部（-d 后台运行）
+#   docker compose ps         看状态
+#   docker compose logs -f    看日志
+#   docker compose down       停掉并删除容器（数据卷保留）
+#
+# 和手敲 docker run 最大的区别：
+#   compose 会自动建一个内部网络，三个容器都在这个网络里，
+#   彼此可以直接用「服务名」当主机名访问（mysql / redis），
+#   完全不用管 3307、host.docker.internal 这些东西。
+# ============================================================
+
+services:
+  # ---------- MySQL ----------
+  mysql:
+    image: mysql:8
+    container_name: blog-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: aimcc_blog
+      MYSQL_USER: blog
+      MYSQL_PASSWORD: root1234
+    ports:
+      # 仍然映射到宿主机 3307，方便你用 DBeaver 从 Mac 直接连
+      # server 容器不走这个端口，它走内部网络直连 mysql:3306
+      - "3307:3306"
+    volumes:
+      # 挂到已有的卷上，之前建好的数据和账号都在里面，不会丢
+      - blog-mysql-data:/var/lib/mysql
+    healthcheck:
+      # 探活：能 ping 通才算「准备好了」
+      # 下面 server 会等它 healthy 之后才启动，避免「数据库还没起来应用就连」
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot1234"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ---------- Redis ----------
+  redis:
+    # 用 8（Debian 底座）而不是 8-alpine：
+    #   alpine 体积小，但容器里没有 bash / ps 这些常用命令，排查问题不方便。
+    # 本地和服务器统一用 8，保证两边环境一致。
+    image: redis:8
+    container_name: blog-redis
+    # 镜像名后面跟的这段就是覆盖启动命令，给 Redis 加密码
+    command: redis-server --requirepass root1234
+    ports:
+      - "6379:6379"
+
+  # ---------- Spring Boot 应用 ----------
+  server:
+    # build: 用 server/Dockerfile 现场构建镜像
+    # （之前是 docker build -t blog-server:v1 手动构建，现在交给 compose）
+    build: ./server
+    container_name: blog-server
+    ports:
+      - "8080:8080"
+    environment:
+      # 注意这里的主机名：
+      #   mysql / redis 就是上面两个服务的名字，compose 内部网络里能直接解析
+      #   端口用容器内部的 3306 / 6379，不是宿主机的 3307
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      REDIS_PASSWORD: root1234
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+volumes:
+  # 声明用已有的卷（不写 name 的话 compose 会自动加项目名前缀，变成新卷）
+  blog-mysql-data:
+    name: blog-mysql-data
