@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
 
+# 工作流级别的环境变量，下面每个 step 都能用
+env:
+  # ACR 仓库地址（不含 :tag），构建和推送都要拼它
+  IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-server
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,7 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. 后端打包：JDK 25 + Maven
+      # ============================================================
+      # 后端：先打 jar，再打成 Docker 镜像，最后推到阿里云 ACR
+      # ============================================================
+
       - name: Setup JDK 25
         uses: actions/setup-java@v4
         with:
@@ -24,7 +32,34 @@ jobs:
         working-directory: server
         run: mvn clean package -DskipTests
 
-      # 3. 前端打包：Node + pnpm
+      # 登录 ACR：registry 只写域名，不能带 https://
+      - name: Login to Aliyun ACR
+        uses: docker/login-action@v3
+        with:
+          registry: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # 构建镜像
+      # - runner 本身是 x86_64，所以不用写 --platform（本机 Mac 才需要）
+      # - 构建上下文是 ./server，Dockerfile 里 COPY target/xxx.jar 是相对它算的
+      # - 打两个标签：latest 给自动部署用，sha 留给以后回滚用
+      - name: Build server image
+        run: |
+          docker build \
+            -t $IMAGE:latest \
+            -t $IMAGE:${{ github.sha }} \
+            ./server
+
+      - name: Push server image
+        run: |
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}
+
+      # ============================================================
+      # 前端：仍然是构建 + scp 静态文件（前端还没容器化）
+      # ============================================================
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -42,7 +77,10 @@ jobs:
           cd blog-web
           pnpm build
 
-      # 4. 配置 SSH
+      # ============================================================
+      # 部署到服务器
+      # ============================================================
+
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.1
         with:
@@ -51,13 +89,15 @@ jobs:
       - name: Add server to known hosts
         run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      # 5. 上传后端 jar 并重启服务
+      # 后端部署：不再传 jar、不再重启 systemd 服务
+      # 改成「让服务器从 ACR 拉最新镜像，然后重建 server 容器」
+      # - docker compose pull server   只拉 server 这一个服务的新镜像
+      # - docker compose up -d server  只重建 server，mysql / redis 不动
       - name: Deploy backend
         run: |
-          scp server/target/server-0.0.1-SNAPSHOT.jar root@${{ secrets.SERVER_IP }}:/opt/blog/blog.jar
-          ssh root@${{ secrets.SERVER_IP }} "systemctl restart blog"
+          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull server && docker compose up -d server"
 
-      # 6. 上传前端静态文件
+      # 前端部署：保持原样
       - name: Deploy frontend
         run: |
           ssh root@${{ secrets.SERVER_IP }} "rm -rf /var/www/blog/*"
