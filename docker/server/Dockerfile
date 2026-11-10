@@ -1,6 +1,8 @@
-# 基础镜像：自带 Java 25 运行时的 Linux
-# 用 jre 不用 jdk：jar 已经编译好，运行只需要 JRE，体积小一半
-FROM eclipse-temurin:25-jre
+# 基础镜像：自带 Java 25 运行时的 Alpine Linux
+# - 用 jre 不用 jdk：jar 已经编译好，运行只需要 JRE，体积小一半
+# - 用 alpine 不用 Ubuntu 版：基础镜像从 478MB 降到 226MB，整体省掉约 250MB
+# - 代价是没有 bash、ps 这些排查工具，只有 busybox 的 sh
+FROM eclipse-temurin:25-jre-alpine
 
 # 容器内的工作目录，后面的相对路径都以它为基准
 WORKDIR /app
