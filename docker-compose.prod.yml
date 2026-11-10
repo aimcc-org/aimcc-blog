@@ -62,4 +62,9 @@ services:
     restart: unless-stopped
 
 volumes:
+  # 显式写死卷名：compose 默认会给卷名加「项目名_」前缀，而项目名取自目录名
+  # （服务器上是 /opt/blog-compose → blog-compose）。哪天目录改名，前缀就变了，
+  # compose 会挂到一个新建的空卷上，表现就是「数据库空了」。
+  # 这里写成完整名字，从此和目录名解耦。
   blog-mysql-data:
+    name: blog-compose_blog-mysql-data
