@@ -1,0 +1,65 @@
+# 服务器（生产）用的 compose 文件
+# ------------------------------------------------------------
+# 和本地 docker-compose.yml 的区别：
+#   1. 镜像从 ACR 拉，不在服务器上构建（服务器没有源码，也没有 JDK / Node）
+#   2. 只有 nginx 暴露 80，其余服务都不对外开端口：
+#      mysql / redis 只在容器网络内被 server 访问，server 只被 nginx 访问
+#   3. 全部加 restart: unless-stopped，服务器重启后容器自动拉起
+#
+# 部署方式：CI 每次部署前把它同步到服务器 /opt/blog-compose/docker-compose.yml
+# 注意：文件名和目录必须保持不变，因为 compose 项目名取自目录名，
+#      数据卷名字带项目名前缀，改名会导致挂到一个空卷上
+# ------------------------------------------------------------
+services:
+  mysql:
+    image: mysql:8
+    container_name: blog-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: aimcc_blog
+      MYSQL_USER: blog
+      MYSQL_PASSWORD: root1234
+    volumes:
+      - blog-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot1234"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/redis:8
+    container_name: blog-redis
+    command: redis-server --requirepass root1234
+    restart: unless-stopped
+
+  server:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-server:latest
+    container_name: blog-server
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      REDIS_PASSWORD: root1234
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  nginx:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-nginx:latest
+    container_name: blog-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      server:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  blog-mysql-data:

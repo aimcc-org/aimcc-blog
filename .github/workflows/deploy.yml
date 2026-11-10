@@ -118,6 +118,15 @@ jobs:
       - name: Add server to known hosts
         run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
+      # 同步 compose 配置：让服务器上的 /opt/blog-compose/docker-compose.yml
+      # 永远等于仓库里的 docker-compose.prod.yml，避免手工改服务器造成配置漂移
+      # 顺序是「先传临时文件 → 备份旧的 → 替换 → 校验语法」，
+      # 任何一步失败都不会破坏正在运行的那份配置
+      - name: Sync compose file
+        run: |
+          scp docker-compose.prod.yml root@${{ secrets.SERVER_IP }}:/opt/blog-compose/docker-compose.yml.new
+          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && cp docker-compose.yml docker-compose.yml.bak && mv docker-compose.yml.new docker-compose.yml && docker compose config -q && echo 'compose 配置校验通过'"
+
       # 后端部署：不再传 jar、不再重启 systemd 服务
       # 改成「让服务器从 ACR 拉最新镜像，然后重建 server 容器」
       # - docker compose pull server   只拉 server 这一个服务的新镜像
