@@ -8,6 +8,8 @@ on:
 env:
   # ACR 仓库地址（不含 :tag），构建和推送都要拼它
   IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-server
+  # 前端镜像：nginx + 打进镜像的静态文件
+  FRONT_IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-nginx
 
 jobs:
   deploy:
@@ -59,7 +61,7 @@ jobs:
           docker push $IMAGE:${{ github.sha }}
 
       # ============================================================
-      # 前端：仍然是构建 + scp 静态文件（前端还没容器化）
+      # 前端：先 pnpm build 产出 dist/main，再打成 nginx 镜像
       # ============================================================
 
       - name: Setup Node
@@ -78,6 +80,23 @@ jobs:
           pnpm install:all
           cd blog-web
           pnpm build
+
+      # 构建前端镜像
+      # - 必须排在 Build frontend 之后：Dockerfile 里 COPY 的 dist/main 这时才存在
+      # - 上下文是仓库根（Dockerfile 要同时拿 docker/nginx/nginx.conf 和 dist/main）
+      # - .dockerignore 白名单已经把无关文件挡在上下文之外
+      - name: Build frontend image
+        run: |
+          docker build \
+            -f docker/nginx/Dockerfile \
+            -t $FRONT_IMAGE:latest \
+            -t $FRONT_IMAGE:${{ github.sha }} \
+            .
+
+      - name: Push frontend image
+        run: |
+          docker push $FRONT_IMAGE:latest
+          docker push $FRONT_IMAGE:${{ github.sha }}
 
       # ============================================================
       # 部署到服务器
@@ -99,9 +118,10 @@ jobs:
         run: |
           ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull server && docker compose up -d server"
 
-      # 前端部署：保持原样
+      # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
+      # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog
+      # - docker compose pull nginx  只拉 nginx 这一个服务的新镜像
+      # - docker compose up -d nginx 只重建 nginx，mysql / redis / server 不动
       - name: Deploy frontend
         run: |
-          ssh root@${{ secrets.SERVER_IP }} "rm -rf /var/www/blog/*"
-          scp -r front/blog-web/dist/main/* root@${{ secrets.SERVER_IP }}:/var/www/blog/
-          ssh root@${{ secrets.SERVER_IP }} "chown -R www-data:www-data /var/www/blog"
+          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull nginx && docker compose up -d nginx"
