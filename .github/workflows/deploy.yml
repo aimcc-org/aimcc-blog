@@ -81,9 +81,17 @@ jobs:
           cd blog-web
           pnpm build
 
+      # 构建管理后台（React SPA）
+      # 和 blog-web 一样产出静态文件，最后由同一个 nginx 镜像托管
+      # 多一层 check-architecture + tsc 类型检查，失败会直接中断部署
+      - name: Build admin
+        working-directory: front/blog-admin
+        run: pnpm build
+
       # 构建前端镜像
-      # - 必须排在 Build frontend 之后：Dockerfile 里 COPY 的 dist/main 这时才存在
-      # - 上下文是仓库根（Dockerfile 要同时拿 docker/nginx/nginx.conf 和 dist/main）
+      # - 必须排在 Build frontend / Build admin 之后：
+      #   Dockerfile 里 COPY 的两个 dist 这时才存在
+      # - 上下文是仓库根（Dockerfile 要同时拿 docker/nginx/nginx.conf 和两个 dist）
       # - .dockerignore 白名单已经把无关文件挡在上下文之外
       - name: Build frontend image
         run: |

@@ -13,6 +13,11 @@ COPY docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 # 前提是前端已经构建过（pnpm build 产出 dist/main）
 COPY front/blog-web/dist/main /usr/share/nginx/html
 
+# 管理后台：React SPA 的打包产物，放进 /admin 子目录
+# 访问路径就是 /admin/，由 nginx.conf 里的 location /admin/ 接管
+# 前提是 admin 也构建过（pnpm build 产出 front/blog-admin/dist）
+COPY front/blog-admin/dist /usr/share/nginx/html/admin
+
 # 声明服务监听 80
 # 只是声明，真正对外映射由 compose 的 ports 决定
 EXPOSE 80

@@ -9,3 +9,6 @@
 
 # 前端构建产物：/** 表示连目录里的子文件一起放行
 !front/blog-web/dist/main/**
+
+# 管理后台构建产物（React SPA，产物在 dist 根下）
+!front/blog-admin/dist/**
