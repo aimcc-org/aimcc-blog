@@ -42,11 +42,13 @@ jobs:
 
       # 构建镜像
       # - runner 本身是 x86_64，所以不用写 --platform（本机 Mac 才需要）
-      # - 构建上下文是 ./server，Dockerfile 里 COPY target/xxx.jar 是相对它算的
+      # - 构建上下文是 ./server，Dockerfile 在 docker/server/ 下，用 -f 指定
+      # - Dockerfile 里 COPY target/xxx.jar 是相对上下文（server/）算的
       # - 打两个标签：latest 给自动部署用，sha 留给以后回滚用
       - name: Build server image
         run: |
           docker build \
+            -f docker/server/Dockerfile \
             -t $IMAGE:latest \
             -t $IMAGE:${{ github.sha }} \
             ./server

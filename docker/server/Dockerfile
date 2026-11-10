@@ -6,7 +6,8 @@ FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 # 把打好的 jar 拷进镜像
-# 源路径相对于构建上下文（即 server/ 目录），所以要在这里执行 docker build
+# 源路径相对于「构建上下文」= server/ 目录，不是相对这个 Dockerfile 所在的位置
+# 所以构建命令是：docker build -f docker/server/Dockerfile ./server
 # 目标路径写绝对路径，避免相对路径被 WORKDIR 拼接后和启动命令对不上
 COPY target/server-0.0.1-SNAPSHOT.jar /app/app.jar
 

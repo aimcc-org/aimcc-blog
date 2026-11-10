@@ -52,9 +52,12 @@ services:
 
   # ---------- Spring Boot 应用 ----------
   server:
-    # build: 用 server/Dockerfile 现场构建镜像
-    # 也可以切到 server 目录手动构建：cd server && docker build -t blog-server:v1 .
-    build: ./server
+    # 镜像定义集中在 docker/server/Dockerfile，monorepo 的部署资产统一放 docker/ 下
+    # context 仍然是 server/：jar 就在 server/target 里，上下文越小传得越快
+    # dockerfile 路径相对 context 计算，所以用 ../ 回到仓库根
+    build:
+      context: ./server
+      dockerfile: ../docker/server/Dockerfile
     container_name: blog-server
     ports:
       - "8080:8080"
@@ -72,6 +75,22 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_started
+
+  # ---------- 前端（Nginx） ----------
+  nginx:
+    # 部署资产放在仓库根 docker/nginx/ 下（monorepo 里它不属于某个前端包）
+    # context 是仓库根目录，Dockerfile 里 COPY 的路径都相对仓库根写
+    # 构建前前端必须已经 build 过（front/blog-web/dist/main 存在），否则会报找不到文件
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: blog-nginx
+    ports:
+      # 宿主机 80 → 容器 80，浏览器直接访问 http://localhost
+      - "80:80"
+    depends_on:
+      server:
         condition: service_started
 
 volumes:
