@@ -36,7 +36,12 @@ services:
 
   server:
     image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-server:latest
-    container_name: blog-server
+    # 不能写 container_name：副本必须由 compose 自动命名（blog-compose-server-1 / -2），
+    # 写死了第二个副本会报 Conflict. The container name "/blog-server" is already in use
+    # 副本数写在这里而不是靠命令行 --scale：
+    # CI 的 up -d server 不带 --scale，会把副本数收敛回这里的值，手工 scale 是一次性的
+    deploy:
+      replicas: 2
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
       DB_USERNAME: blog
