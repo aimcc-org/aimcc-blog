@@ -51,6 +51,11 @@ services:
       - "6379:6379"
 
   # ---------- Spring Boot 应用 ----------
+  # 注意：这里故意不写 container_name，也不映射 ports
+  #   container_name 写死会让第二个副本撞名（Conflict），--scale 直接失败
+  #   固定映射 8080:8080 也只有第一个副本能拿到端口，第二个必然冲突
+  # 结论：要能横向扩容的服务，容器名交给 compose 生成（blog-server-1 / blog-server-2），
+  #       外部统一从 nginx（80 端口）进来，不直连后端
   server:
     # 镜像定义集中在 docker/server/Dockerfile，monorepo 的部署资产统一放 docker/ 下
     # context 仍然是 server/：jar 就在 server/target 里，上下文越小传得越快
@@ -58,9 +63,11 @@ services:
     build:
       context: ./server
       dockerfile: ../docker/server/Dockerfile
-    container_name: blog-server
-    ports:
-      - "8080:8080"
+    # 默认起 2 个副本，和生产保持一致（生产同样写 replicas: 2）
+    # 写在这里就不必每次 up 都带 --scale server=2；
+    # 想临时缩回 1 个：docker compose up -d --scale server=1（命令行参数优先于这里）
+    deploy:
+      replicas: 2
     environment:
       # 注意这里的主机名：
       #   mysql / redis 就是上面两个服务的名字，compose 内部网络里能直接解析
