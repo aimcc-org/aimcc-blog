@@ -66,6 +66,13 @@
             <artifactId>sa-token-spring-boot4-starter</artifactId>
             <version>1.46.0</version>
         </dependency>
+        <!-- 会话外置到 Redis：默认登录态存在 JVM 内存里，多实例部署会随机 401。
+             加上这个依赖后 Sa-Token 的 SaTokenDao 自动换成 Redis 实现，所有实例共享同一份登录态 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+            <version>1.46.0</version>
+        </dependency>
         <!-- 只借 spring-security-crypto 的 BCrypt 密码加密工具（不引入 Security 全家桶） -->
         <dependency>
             <groupId>org.springframework.security</groupId>
