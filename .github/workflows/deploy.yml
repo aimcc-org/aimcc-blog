@@ -67,12 +67,31 @@ jobs:
           build_image blog-public-service "$IMAGE_PUBLIC"
           build_image blog-admin-service "$IMAGE_ADMIN"
 
+      # 跨境推送到阿里云 ACR 时，单个大层（基础镜像约 170MB）容易在传输中被掐断，
+      # 报 "use of closed network connection"。docker push 已成功上传的层会被跳过，
+      # 所以失败后重试相当于断点续传，代价很低。
       - name: Push backend images
         run: |
           set -e
+          push_with_retry() {
+            image="$1"
+            tag="$2"
+            attempt=1
+            while [ "$attempt" -le 5 ]; do
+              echo "推送 ${image}:${tag}（第 ${attempt} 次）"
+              if docker push "${image}:${tag}"; then
+                return 0
+              fi
+              echo "::warning::推送 ${image}:${tag} 失败，20 秒后重试"
+              attempt=$((attempt + 1))
+              sleep 20
+            done
+            echo "::error::推送 ${image}:${tag} 连续 5 次失败"
+            return 1
+          }
           for image in "$IMAGE_GATEWAY" "$IMAGE_PUBLIC" "$IMAGE_ADMIN"; do
-            docker push $image:latest
-            docker push $image:${{ github.sha }}
+            push_with_retry "$image" latest
+            push_with_retry "$image" "${GITHUB_SHA}"
           done
 
       # ============================================================
@@ -118,8 +137,24 @@ jobs:
 
       - name: Push frontend image
         run: |
-          docker push $FRONT_IMAGE:latest
-          docker push $FRONT_IMAGE:${{ github.sha }}
+          set -e
+          push_with_retry() {
+            tag="$1"
+            attempt=1
+            while [ "$attempt" -le 5 ]; do
+              echo "推送 ${FRONT_IMAGE}:${tag}（第 ${attempt} 次）"
+              if docker push "${FRONT_IMAGE}:${tag}"; then
+                return 0
+              fi
+              echo "::warning::推送 ${FRONT_IMAGE}:${tag} 失败，20 秒后重试"
+              attempt=$((attempt + 1))
+              sleep 20
+            done
+            echo "::error::推送 ${FRONT_IMAGE}:${tag} 连续 5 次失败"
+            return 1
+          }
+          push_with_retry latest
+          push_with_retry "${GITHUB_SHA}"
 
       # ============================================================
       # 部署到服务器
