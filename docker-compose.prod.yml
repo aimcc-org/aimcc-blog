@@ -71,6 +71,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+      # 生产环境关闭接口文档，避免暴露 admin 的写接口
+      SPRINGDOC_ENABLED: "false"
     depends_on:
       mysql:
         condition: service_healthy
@@ -93,6 +95,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+      # 生产环境关闭接口文档，避免暴露 admin 的写接口
+      SPRINGDOC_ENABLED: "false"
     depends_on:
       mysql:
         condition: service_healthy

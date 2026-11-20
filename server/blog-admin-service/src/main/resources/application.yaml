@@ -31,6 +31,14 @@ mybatis-plus:
 
 springdoc:
   api-docs:
-    enabled: true
+    # 与 public 的 /api/v3/api-docs 区分开，否则网关只会把文档请求分给 public
+    # 实际 URL = context-path(/api) + 这里的路径 = /api/admin/v3/api-docs
+    path: /admin/v3/api-docs
+    # 生产环境用 SPRINGDOC_ENABLED=false 关掉，避免把管理接口暴露出去
+    enabled: ${SPRINGDOC_ENABLED:true}
   swagger-ui:
-    enabled: true
+    # UI 页面同样带上 admin 前缀；注意 UI 的静态资源仍在 /api/swagger-ui 下，
+    # 走网关会被分给 public，所以 admin 的 UI 请直连端口访问：
+    # http://localhost:8082/api/admin/swagger-ui.html
+    path: /admin/swagger-ui.html
+    enabled: ${SPRINGDOC_ENABLED:true}
