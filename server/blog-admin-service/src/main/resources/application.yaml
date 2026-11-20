@@ -13,12 +13,6 @@ spring:
       host: localhost
       port: 6379
       password: ${REDIS_PASSWORD:}
-  flyway:
-    # 只有本服务执行数据库迁移
-    enabled: true
-    # 存量库：把已有表结构视为 V1 已完成，从 V2 开始执行
-    baseline-on-migrate: true
-    baseline-version: 1
   datasource:
     # 默认值面向本地开发：直连本机 MySQL 3306
     # 容器内由 SPRING_DATASOURCE_URL 覆盖成 jdbc:mysql://mysql:3306/...

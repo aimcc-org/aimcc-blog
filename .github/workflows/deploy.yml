@@ -8,9 +8,11 @@ on:
 env:
   # 后端三个服务各一个 ACR 仓库（不含 :tag），构建和推送都要拼它
   # 拆成三个仓库而不是一个镜像三个 tag：三个服务可以独立发布、独立回滚
+  # migration 是第四个镜像：一次性迁移任务，跑完即退，不常驻
   IMAGE_GATEWAY: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-gateway
   IMAGE_PUBLIC: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-public
   IMAGE_ADMIN: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-admin
+  IMAGE_MIGRATION: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-migration
   # 前端镜像：nginx + 打进镜像的静态文件
   FRONT_IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-nginx
 
@@ -66,6 +68,8 @@ jobs:
           build_image blog-gateway "$IMAGE_GATEWAY"
           build_image blog-public-service "$IMAGE_PUBLIC"
           build_image blog-admin-service "$IMAGE_ADMIN"
+          # 迁移镜像体积很小（只有 Flyway + 驱动 + SQL），但它必须比业务镜像先跑
+          build_image blog-migration "$IMAGE_MIGRATION"
 
       # 跨境推送到阿里云 ACR 时，单个大层（基础镜像约 170MB）容易在传输中被掐断，
       # 报 "use of closed network connection"。docker push 已成功上传的层会被跳过，
@@ -89,7 +93,7 @@ jobs:
             echo "::error::推送 ${image}:${tag} 连续 5 次失败"
             return 1
           }
-          for image in "$IMAGE_GATEWAY" "$IMAGE_PUBLIC" "$IMAGE_ADMIN"; do
+          for image in "$IMAGE_GATEWAY" "$IMAGE_PUBLIC" "$IMAGE_ADMIN" "$IMAGE_MIGRATION"; do
             push_with_retry "$image" latest
             push_with_retry "$image" "${GITHUB_SHA}"
           done
@@ -184,7 +188,7 @@ jobs:
       # - 顺序有依赖：gateway 依赖 public / admin 先起来，compose 会按 depends_on 排
       - name: Deploy backend
         run: |
-          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull gateway public admin && docker compose up -d --remove-orphans gateway public admin"
+          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull migration gateway public admin && docker compose up -d --remove-orphans gateway public admin"
 
       # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
       # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog

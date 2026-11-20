@@ -9,7 +9,8 @@
 # 三个后端的分工：
 #   gateway 8080  唯一入口，按路径前缀分流
 #   public  8081  /api/** 读接口，可多副本
-#   admin   8082  /api/admin/** 写接口 + 登录 + Flyway 迁移，只有 1 个副本
+#   admin   8082  /api/admin/** 写接口 + 登录，只有 1 个副本
+#   migration     一次性迁移任务，跑完退出，public / admin 等它成功后才启动
 #
 # 部署方式：CI 每次部署前把它同步到服务器 /opt/blog-compose/docker-compose.yml
 # 注意：文件名和目录必须保持不变，因为 compose 项目名取自目录名，
@@ -39,6 +40,19 @@ services:
     command: redis-server --requirepass root1234
     restart: unless-stopped
 
+  # ---------- 数据库迁移：一次性任务 ----------
+  # 镜像跑完即退（Exited 0），不常驻、不占端口；public / admin 依赖它成功退出后才启动
+  migration:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-migration:latest
+    restart: "no"
+    environment:
+      DB_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   # ---------- 公开服务 ----------
   public:
     image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-public:latest
@@ -62,12 +76,14 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      migration:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   # ---------- 管理服务 ----------
   admin:
     image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-admin:latest
-    # 只能 1 个副本：Flyway 迁移由本服务独占执行
+    # 迁移已移出，本服务不再持有 Flyway 锁，理论上可多副本；先保持 1
     deploy:
       replicas: 1
     environment:
@@ -82,6 +98,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      migration:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   # ---------- 网关 ----------

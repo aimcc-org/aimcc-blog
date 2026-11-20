@@ -37,19 +37,8 @@
             <version>${mybatis-plus.version}</version>
         </dependency>
 
-        <!-- Flyway 只在管理服务启用：两个服务都跑迁移会抢着建表 -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-flyway</artifactId>
-        </dependency>
+        <!-- 数据库迁移不再由本服务执行：迁移脚本和 Flyway 已移到 blog-migration 模块，
+             部署时作为一个跑完即退的一次性任务，先于本服务启动 -->
 
         <!-- Sa-Token：登录认证 + 会话外置 Redis（多实例共享登录态） -->
         <dependency>

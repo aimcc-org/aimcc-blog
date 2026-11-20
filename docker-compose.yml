@@ -51,6 +51,30 @@ services:
     ports:
       - "6379:6379"
 
+  # ---------- 数据库迁移：一次性任务，跑完即退 ----------
+  # 之前迁移是在 admin 启动时执行的，导致 admin 只能单副本、迁移失败就等于服务起不来。
+  # 现在拆成独立容器：先迁移，成功后 public / admin 才启动。
+  # 这个容器没有 ports、不常驻，成功退出后状态是 Exited (0)，属于正常现象。
+  migration:
+    build:
+      context: ./server
+      dockerfile: ../docker/server/Dockerfile
+      args:
+        MODULE: blog-migration
+        # 迁移任务不监听端口，PORT 只是镜像元信息，随便给个值即可
+        PORT: 8080
+    image: blog-migration:v1
+    # 跑完就退出；如果被 restart 策略拉起来，会反复执行迁移
+    restart: "no"
+    environment:
+      # 注意这里是容器内网络：mysql:3306，不是宿主机的 3307
+      DB_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   # ---------- 公开服务：前台博客的只读接口 ----------
   # 不写 container_name、不映射 ports：
   #   container_name 写死会让第二个副本撞名（Conflict），--scale 直接失败
@@ -82,8 +106,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      # 迁移必须先跑完且成功（Exited 0），否则不启动：宁可起不来，也不要在半旧的结构上跑
+      migration:
+        condition: service_completed_successfully
 
-  # ---------- 管理服务：后台写接口 + 登录鉴权 + 数据库迁移 ----------
+  # ---------- 管理服务：后台写接口 + 登录鉴权 ----------
   admin:
     build:
       context: ./server
@@ -92,9 +119,8 @@ services:
         MODULE: blog-admin-service
         PORT: 8082
     image: blog-admin:v1
-    # 只能 1 个副本：Flyway 迁移由本服务独占执行
-    # 多副本同时启动会一起抢 schema history 表锁，虽然不会建乱表，
-    # 但首次 baseline 阶段会互相等待，启动变慢且日志难读
+    # 迁移已经移出本服务，理论上可以多副本了；
+    # 先保持 1，等真正需要扩容时再改，避免一次动太多
     deploy:
       replicas: 1
     environment:
@@ -109,6 +135,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      migration:
+        condition: service_completed_successfully
 
   # ---------- 网关：唯一入口，按路径前缀分流 ----------
   gateway:
