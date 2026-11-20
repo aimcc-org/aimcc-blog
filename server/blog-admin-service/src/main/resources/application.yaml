@@ -20,6 +20,8 @@ spring:
     baseline-on-migrate: true
     baseline-version: 1
   datasource:
+    # 默认值面向本地开发：直连本机 MySQL 3306
+    # 容器内由 SPRING_DATASOURCE_URL 覆盖成 jdbc:mysql://mysql:3306/...
     url: jdbc:mysql://localhost:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8
     username: ${DB_USERNAME:blog}
     password: ${DB_PASSWORD:}
