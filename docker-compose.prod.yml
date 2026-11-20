@@ -3,8 +3,13 @@
 # 和本地 docker-compose.yml 的区别：
 #   1. 镜像从 ACR 拉，不在服务器上构建（服务器没有源码，也没有 JDK / Node）
 #   2. 只有 nginx 暴露 80，其余服务都不对外开端口：
-#      mysql / redis 只在容器网络内被 server 访问，server 只被 nginx 访问
+#      mysql / redis 只在容器网络内被后端访问，三个后端只被网关访问，网关只被 nginx 访问
 #   3. 全部加 restart: unless-stopped，服务器重启后容器自动拉起
+#
+# 三个后端的分工：
+#   gateway 8080  唯一入口，按路径前缀分流
+#   public  8081  /api/** 读接口，可多副本
+#   admin   8082  /api/admin/** 写接口 + 登录 + Flyway 迁移，只有 1 个副本
 #
 # 部署方式：CI 每次部署前把它同步到服务器 /opt/blog-compose/docker-compose.yml
 # 注意：文件名和目录必须保持不变，因为 compose 项目名取自目录名，
@@ -34,14 +39,17 @@ services:
     command: redis-server --requirepass root1234
     restart: unless-stopped
 
-  server:
-    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-server:latest
-    # 不能写 container_name：副本必须由 compose 自动命名（blog-compose-server-1 / -2），
-    # 写死了第二个副本会报 Conflict. The container name "/blog-server" is already in use
+  # ---------- 公开服务 ----------
+  public:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-public:latest
+    # 不能写 container_name：副本必须由 compose 自动命名（blog-compose-public-1 / -2），
+    # 写死了第二个副本会报 Conflict. The container name "..." is already in use
     # 副本数写在这里而不是靠命令行 --scale：
-    # CI 的 up -d server 不带 --scale，会把副本数收敛回这里的值，手工 scale 是一次性的
+    # CI 的 up -d public 不带 --scale，会把副本数收敛回这里的值
+    # 先 1 副本：2 核 4G 机器上 5 个 JVM 会贴着内存上限跑，同机多副本也不解决什么
+    # 以后有多台机器或升配了再改回 2
     deploy:
-      replicas: 2
+      replicas: 1
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
       DB_USERNAME: blog
@@ -56,13 +64,50 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  # ---------- 管理服务 ----------
+  admin:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-admin:latest
+    # 只能 1 个副本：Flyway 迁移由本服务独占执行
+    deploy:
+      replicas: 1
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      REDIS_PASSWORD: root1234
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  # ---------- 网关 ----------
+  gateway:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-gateway:latest
+    # 先 1 副本，理由同上；网关属于单点角色，等有多台机器时再做多副本
+    deploy:
+      replicas: 1
+    environment:
+      # 用服务名而不是 localhost：容器里的 localhost 指的是容器自己
+      PUBLIC_URI: "http://public:8081"
+      ADMIN_URI: "http://admin:8082"
+    depends_on:
+      public:
+        condition: service_started
+      admin:
+        condition: service_started
+    restart: unless-stopped
+
   nginx:
     image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-nginx:latest
     container_name: blog-nginx
     ports:
       - "80:80"
     depends_on:
-      server:
+      gateway:
         condition: service_started
     restart: unless-stopped
 

@@ -1,16 +1,17 @@
 # ============================================================
-# docker-compose.yml —— 一条命令把 mysql / redis / server 三个容器起全
+# docker-compose.yml —— 一条命令把「两个中间件 + 三个后端 + 前端」六个容器起全
 #
 # 用法（在本文件所在目录执行）：
-#   docker compose up -d      启动全部（-d 后台运行）
-#   docker compose ps         看状态
-#   docker compose logs -f    看日志
-#   docker compose down       停掉并删除容器（数据卷保留）
+#   docker compose up -d --build   构建镜像并启动全部（-d 后台运行）
+#   docker compose ps              看状态
+#   docker compose logs -f         看日志
+#   docker compose down           停掉并删除容器（数据卷保留）
+#   docker compose up -d --remove-orphans   服务改名后清掉旧容器时用
 #
-# 和手敲 docker run 最大的区别：
-#   compose 会自动建一个内部网络，三个容器都在这个网络里，
-#   彼此可以直接用「服务名」当主机名访问（mysql / redis），
-#   完全不用管 3307、host.docker.internal 这些东西。
+# 拓扑（对外只有 nginx 的 80 端口）：
+#   浏览器 → nginx:80 → gateway:8080 ┬→ public:8081  (/api/**)
+#                                   └→ admin:8082   (/api/admin/**)
+# 三个后端都不映射宿主机端口，只能经网关访问
 # ============================================================
 
 services:
@@ -25,14 +26,14 @@ services:
       MYSQL_PASSWORD: root1234
     ports:
       # 仍然映射到宿主机 3307，方便你用 DBeaver 从 Mac 直接连
-      # server 容器不走这个端口，它走内部网络直连 mysql:3306
+      # 后端容器不走这个端口，它走内部网络直连 mysql:3306
       - "3307:3306"
     volumes:
       # 挂到已有的卷上，之前建好的数据和账号都在里面，不会丢
       - blog-mysql-data:/var/lib/mysql
     healthcheck:
       # 探活：能 ping 通才算「准备好了」
-      # 下面 server 会等它 healthy 之后才启动，避免「数据库还没起来应用就连」
+      # 三个后端都会等它 healthy 之后才启动，避免「数据库还没起来应用就连」
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot1234"]
       interval: 5s
       timeout: 3s
@@ -50,28 +51,26 @@ services:
     ports:
       - "6379:6379"
 
-  # ---------- Spring Boot 应用 ----------
-  # 注意：这里故意不写 container_name，也不映射 ports
+  # ---------- 公开服务：前台博客的只读接口 ----------
+  # 不写 container_name、不映射 ports：
   #   container_name 写死会让第二个副本撞名（Conflict），--scale 直接失败
-  #   固定映射 8080:8080 也只有第一个副本能拿到端口，第二个必然冲突
-  # 结论：要能横向扩容的服务，容器名交给 compose 生成（blog-server-1 / blog-server-2），
-  #       外部统一从 nginx（80 端口）进来，不直连后端
-  server:
-    # 镜像定义集中在 docker/server/Dockerfile，monorepo 的部署资产统一放 docker/ 下
-    # context 仍然是 server/：jar 就在 server/target 里，上下文越小传得越快
-    # dockerfile 路径相对 context 计算，所以用 ../ 回到仓库根
+  #   固定映射端口也只有第一个副本能拿到，第二个必然冲突
+  public:
     build:
+      # jar 在 server/blog-public-service/target 里，上下文仍是 server/
       context: ./server
       dockerfile: ../docker/server/Dockerfile
-    # 默认起 2 个副本，和生产保持一致（生产同样写 replicas: 2）
-    # 写在这里就不必每次 up 都带 --scale server=2；
-    # 想临时缩回 1 个：docker compose up -d --scale server=1（命令行参数优先于这里）
+      args:
+        MODULE: blog-public-service
+        PORT: 8081
+    image: blog-public:v1
+    # 先按 1 个副本跑：本机内存有限，多副本的收益主要是同机进程重启不中断，
+    # 想验证多实例共享 Redis 缓存时临时改回 2（--scale public=2 也行，但 CI/up 会收敛回这里的值）
     deploy:
-      replicas: 2
+      replicas: 1
     environment:
-      # 注意这里的主机名：
-      #   mysql / redis 就是上面两个服务的名字，compose 内部网络里能直接解析
-      #   端口用容器内部的 3306 / 6379，不是宿主机的 3307
+      # mysql / redis 就是上面的服务名，compose 内部网络里能直接解析
+      # 端口用容器内部的 3306 / 6379，不是宿主机的 3307
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
       DB_USERNAME: blog
       DB_PASSWORD: root1234
@@ -82,6 +81,56 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_started
+
+  # ---------- 管理服务：后台写接口 + 登录鉴权 + 数据库迁移 ----------
+  admin:
+    build:
+      context: ./server
+      dockerfile: ../docker/server/Dockerfile
+      args:
+        MODULE: blog-admin-service
+        PORT: 8082
+    image: blog-admin:v1
+    # 只能 1 个副本：Flyway 迁移由本服务独占执行
+    # 多副本同时启动会一起抢 schema history 表锁，虽然不会建乱表，
+    # 但首次 baseline 阶段会互相等待，启动变慢且日志难读
+    deploy:
+      replicas: 1
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      REDIS_PASSWORD: root1234
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # ---------- 网关：唯一入口，按路径前缀分流 ----------
+  gateway:
+    build:
+      context: ./server
+      dockerfile: ../docker/server/Dockerfile
+      args:
+        MODULE: blog-gateway
+        PORT: 8080
+    image: blog-gateway:v1
+    # 同上，先 1 个副本；网关虽无状态，但同机多副本只是多占一份内存
+    deploy:
+      replicas: 1
+    environment:
+      # 覆盖 application.yaml 里的默认 localhost 地址
+      # 用服务名而不是 localhost：容器里的 localhost 指的是容器自己
+      PUBLIC_URI: "http://public:8081"
+      ADMIN_URI: "http://admin:8082"
+    depends_on:
+      public:
+        condition: service_started
+      admin:
         condition: service_started
 
   # ---------- 前端（Nginx） ----------
@@ -97,7 +146,7 @@ services:
       # 宿主机 80 → 容器 80，浏览器直接访问 http://localhost
       - "80:80"
     depends_on:
-      server:
+      gateway:
         condition: service_started
 
 volumes:
