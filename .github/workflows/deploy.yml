@@ -6,8 +6,11 @@ on:
 
 # 工作流级别的环境变量，下面每个 step 都能用
 env:
-  # ACR 仓库地址（不含 :tag），构建和推送都要拼它
-  IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-server
+  # 后端三个服务各一个 ACR 仓库（不含 :tag），构建和推送都要拼它
+  # 拆成三个仓库而不是一个镜像三个 tag：三个服务可以独立发布、独立回滚
+  IMAGE_GATEWAY: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-gateway
+  IMAGE_PUBLIC: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-public
+  IMAGE_ADMIN: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-admin
   # 前端镜像：nginx + 打进镜像的静态文件
   FRONT_IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-nginx
 
@@ -45,20 +48,32 @@ jobs:
       # 构建镜像
       # - runner 本身是 x86_64，所以不用写 --platform（本机 Mac 才需要）
       # - 构建上下文是 ./server，Dockerfile 在 docker/server/ 下，用 -f 指定
-      # - Dockerfile 里 COPY target/xxx.jar 是相对上下文（server/）算的
-      # - 打两个标签：latest 给自动部署用，sha 留给以后回滚用
-      - name: Build server image
+      # - 一个 Dockerfile 打三个模块，靠 --build-arg MODULE 区分要拷哪个 jar
+      # - 每个镜像打两个标签：latest 给自动部署用，sha 留给以后回滚用
+      - name: Build backend images
         run: |
-          docker build \
-            -f docker/server/Dockerfile \
-            -t $IMAGE:latest \
-            -t $IMAGE:${{ github.sha }} \
-            ./server
+          set -e
+          build_image() {
+            module=$1
+            image=$2
+            docker build \
+              -f docker/server/Dockerfile \
+              --build-arg MODULE=$module \
+              -t $image:latest \
+              -t $image:${{ github.sha }} \
+              ./server
+          }
+          build_image blog-gateway "$IMAGE_GATEWAY"
+          build_image blog-public-service "$IMAGE_PUBLIC"
+          build_image blog-admin-service "$IMAGE_ADMIN"
 
-      - name: Push server image
+      - name: Push backend images
         run: |
-          docker push $IMAGE:latest
-          docker push $IMAGE:${{ github.sha }}
+          set -e
+          for image in "$IMAGE_GATEWAY" "$IMAGE_PUBLIC" "$IMAGE_ADMIN"; do
+            docker push $image:latest
+            docker push $image:${{ github.sha }}
+          done
 
       # ============================================================
       # 前端：先 pnpm build 产出 dist/main，再打成 nginx 镜像
@@ -127,13 +142,14 @@ jobs:
           scp docker-compose.prod.yml root@${{ secrets.SERVER_IP }}:/opt/blog-compose/docker-compose.yml.new
           ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && cp docker-compose.yml docker-compose.yml.bak && mv docker-compose.yml.new docker-compose.yml && docker compose config -q && echo 'compose 配置校验通过'"
 
-      # 后端部署：不再传 jar、不再重启 systemd 服务
-      # 改成「让服务器从 ACR 拉最新镜像，然后重建 server 容器」
-      # - docker compose pull server   只拉 server 这一个服务的新镜像
-      # - docker compose up -d server  只重建 server，mysql / redis 不动
+      # 后端部署：让服务器从 ACR 拉最新镜像，然后重建三个后端服务
+      # - pull / up 都显式点名 gateway public admin：mysql / redis / nginx 不动
+      # - --remove-orphans 清掉改名前的旧 server 容器（服务名从 server 拆成三个后
+      #   旧容器就是「孤儿」，留着会占端口和内存）
+      # - 顺序有依赖：gateway 依赖 public / admin 先起来，compose 会按 depends_on 排
       - name: Deploy backend
         run: |
-          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull server && docker compose up -d server"
+          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull gateway public admin && docker compose up -d --remove-orphans gateway public admin"
 
       # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
       # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog
