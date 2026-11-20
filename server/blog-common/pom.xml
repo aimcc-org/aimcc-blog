@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.aimcc</groupId>
+        <artifactId>server-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>blog-common</artifactId>
+    <name>blog-common</name>
+    <description>两个服务共用的无业务含义的公共件：统一返回体、业务异常</description>
+
+    <dependencies>
+        <!-- ApiResult / BizException 都用 Lombok 生成 getter -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <!-- 刻意不依赖 spring-boot-starter-webmvc：
+         以后网关模块（WebFlux）要能依赖本模块，而 WebMVC 与 WebFlux 不能共存于同一个 classpath -->
+</project>

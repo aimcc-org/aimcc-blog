@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: blog-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # 后端都是本机进程；以后进容器改成服务名（http://blog-public-service:8081）
+          httpclient:
+            connect-timeout: 3000
+            response-timeout: 10s
+          # 后端地址可通过环境变量覆盖：本机跑 jar 用默认值，容器里注入服务名
+          routes:
+            # 管理路由必须排在前面：/api/admin/** 同时命中下面那条 /api/**
+            # 用 order 显式压到最优先，不依赖 YAML 书写顺序
+            - id: admin-api
+              uri: ${ADMIN_URI:http://localhost:8082}
+              order: -1
+              predicates:
+                - Path=/api/admin/**
+            - id: public-api
+              uri: ${PUBLIC_URI:http://localhost:8081}
+              order: 0
+              predicates:
+                - Path=/api/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

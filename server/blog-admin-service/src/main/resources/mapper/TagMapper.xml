@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aimcc.blog.mapper.TagMapper">
+
+    <!-- 批量插入文章标签连线 -->
+    <insert id="insertArticleTags">
+        insert into article_tag (article_id, tag_id)
+        values
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{articleId}, #{tagId})
+        </foreach>
+    </insert>
+
+    <!-- 删除某篇文章的所有标签关联 -->
+    <delete id="deleteArticleTags">
+        delete from article_tag where article_id = #{articleId}
+    </delete>
+
+</mapper>
