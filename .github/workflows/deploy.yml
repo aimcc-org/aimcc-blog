@@ -6,13 +6,15 @@ on:
 
 # 工作流级别的环境变量，下面每个 step 都能用
 env:
-  # 后端三个服务各一个 ACR 仓库（不含 :tag），构建和推送都要拼它
-  # 拆成三个仓库而不是一个镜像三个 tag：三个服务可以独立发布、独立回滚
-  # migration 是第四个镜像：一次性迁移任务，跑完即退，不常驻
+  # 后端每个可运行模块各一个 ACR 仓库（不含 :tag），构建和推送都要拼它
+  # 拆成多个仓库而不是一个镜像多个 tag：各服务可以独立发布、独立回滚
+  # migration 是一次性迁移任务，跑完即退；eureka 是注册中心，常驻但不转发流量
   IMAGE_GATEWAY: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-gateway
   IMAGE_PUBLIC: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-public
   IMAGE_ADMIN: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-admin
   IMAGE_MIGRATION: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-migration
+  # 注册中心：Eureka Server，保存服务名单，不参与请求转发
+  IMAGE_EUREKA: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-eureka
   # 前端镜像：nginx + 打进镜像的静态文件
   FRONT_IMAGE: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-nginx
 
@@ -70,6 +72,8 @@ jobs:
           build_image blog-admin-service "$IMAGE_ADMIN"
           # 迁移镜像体积很小（只有 Flyway + 驱动 + SQL），但它必须比业务镜像先跑
           build_image blog-migration "$IMAGE_MIGRATION"
+          # 注册中心：网关和业务服务都依赖它，必须先于它们启动
+          build_image blog-eureka "$IMAGE_EUREKA"
 
       # 跨境推送到阿里云 ACR 时，单个大层（基础镜像约 170MB）容易在传输中被掐断，
       # 报 "use of closed network connection"。docker push 已成功上传的层会被跳过，
@@ -93,7 +97,7 @@ jobs:
             echo "::error::推送 ${image}:${tag} 连续 5 次失败"
             return 1
           }
-          for image in "$IMAGE_GATEWAY" "$IMAGE_PUBLIC" "$IMAGE_ADMIN" "$IMAGE_MIGRATION"; do
+          for image in "$IMAGE_GATEWAY" "$IMAGE_PUBLIC" "$IMAGE_ADMIN" "$IMAGE_MIGRATION" "$IMAGE_EUREKA"; do
             push_with_retry "$image" latest
             push_with_retry "$image" "${GITHUB_SHA}"
           done
@@ -181,14 +185,15 @@ jobs:
           scp docker-compose.prod.yml root@${{ secrets.SERVER_IP }}:/opt/blog-compose/docker-compose.yml.new
           ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && cp docker-compose.yml docker-compose.yml.bak && mv docker-compose.yml.new docker-compose.yml && docker compose config -q && echo 'compose 配置校验通过'"
 
-      # 后端部署：让服务器从 ACR 拉最新镜像，然后重建三个后端服务
-      # - pull / up 都显式点名 gateway public admin：mysql / redis / nginx 不动
+      # 后端部署：让服务器从 ACR 拉最新镜像，然后重建后端服务
+      # - pull / up 都显式点名 eureka gateway public admin：mysql / redis / nginx 不动
+      # - eureka 必须带上：它的镜像是新仓库，不拉就起不来
       # - --remove-orphans 清掉改名前的旧 server 容器（服务名从 server 拆成三个后
       #   旧容器就是「孤儿」，留着会占端口和内存）
       # - 顺序有依赖：gateway 依赖 public / admin 先起来，compose 会按 depends_on 排
       - name: Deploy backend
         run: |
-          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull migration gateway public admin && docker compose up -d --remove-orphans gateway public admin"
+          ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull migration eureka gateway public admin && docker compose up -d --remove-orphans eureka gateway public admin"
 
       # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
       # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog

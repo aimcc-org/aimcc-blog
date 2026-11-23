@@ -47,6 +47,21 @@ services:
       retries: 10
     restart: unless-stopped
 
+
+  # ---------- 注册中心：保存服务名册，不参与请求转发 ----------
+  # +200MB 内存，换来的是「后端副本数随便改、挂掉的实例自动从名册消失」
+  # 单独一个服务：网关发版重启不会连带注册中心一起消失
+  eureka:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-eureka:latest
+    healthcheck:
+      # /eureka/apps 返回 200 就说明能正常应答查询
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8761/eureka/apps"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+
   # ---------- 数据库迁移：一次性任务 ----------
   # 镜像跑完即退（Exited 0），不常驻、不占端口；public / admin 依赖它成功退出后才启动
   migration:
@@ -78,6 +93,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+      # 注册中心地址（容器内网络）
+      EUREKA_URL: "http://eureka:8761/eureka"
       # 生产环境关闭接口文档，避免暴露 admin 的写接口
       SPRINGDOC_ENABLED: "false"
     healthcheck:
@@ -88,6 +105,9 @@ services:
       retries: 6
       start_period: 30s
     depends_on:
+      # 注册中心没起来就没有名册，后端地址无从查起
+      eureka:
+        condition: service_healthy
       mysql:
         condition: service_healthy
       redis:
@@ -109,6 +129,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+      # 注册中心地址（容器内网络）
+      EUREKA_URL: "http://eureka:8761/eureka"
       # 生产环境关闭接口文档，避免暴露 admin 的写接口
       SPRINGDOC_ENABLED: "false"
     healthcheck:
@@ -119,6 +141,9 @@ services:
       retries: 6
       start_period: 30s
     depends_on:
+      # 注册中心没起来就没有名册，后端地址无从查起
+      eureka:
+        condition: service_healthy
       mysql:
         condition: service_healthy
       redis:
@@ -134,9 +159,8 @@ services:
     deploy:
       replicas: 1
     environment:
-      # 用服务名而不是 localhost：容器里的 localhost 指的是容器自己
-      PUBLIC_URI: "http://public:8081"
-      ADMIN_URI: "http://admin:8082"
+      # 后端地址不再写死：网关按 lb://服务名 到这里查实例列表
+      EUREKA_URL: "http://eureka:8761/eureka"
     healthcheck:
       # 网关没有 context-path，health 在根路径
       test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8080/actuator/health"]
@@ -145,6 +169,9 @@ services:
       retries: 6
       start_period: 30s
     depends_on:
+      # 注册中心没起来就没有名册，后端地址无从查起
+      eureka:
+        condition: service_healthy
       public:
         condition: service_healthy
       admin:

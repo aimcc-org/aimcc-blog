@@ -58,6 +58,25 @@ services:
       timeout: 3s
       retries: 10
 
+  # ---------- 注册中心：只保存服务名册，不参与请求转发 ----------
+  # 网关从这里拉「public 有哪些实例」，然后直连实例 IP：请求流量不经过它。
+  # 单独一个进程：网关发版重启不会连带注册中心一起消失。
+  eureka:
+    build:
+      context: ./server
+      dockerfile: ../docker/server/Dockerfile
+      args:
+        MODULE: blog-eureka
+        PORT: 8761
+    image: aimcc-blog-eureka:latest
+    healthcheck:
+      # /eureka/apps 返回 200 就说明注册中心能正常应答查询
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8761/eureka/apps"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
   # ---------- 数据库迁移：一次性任务，跑完即退 ----------
   # 之前迁移是在 admin 启动时执行的，导致 admin 只能单副本、迁移失败就等于服务起不来。
   # 现在拆成独立容器：先迁移，成功后 public / admin 才启动。
@@ -96,10 +115,11 @@ services:
         MODULE: blog-public-service
         PORT: 8081
     image: aimcc-blog-public:latest
-    # 先按 1 个副本跑：本机内存有限，多副本的收益主要是同机进程重启不中断，
-    # 想验证多实例共享 Redis 缓存时临时改回 2（--scale public=2 也行，但 CI/up 会收敛回这里的值）
+    # 两个副本：验证 Eureka 名册 + 网关 lb:// 的轮询与故障摘除。
+    # 两个容器共享同一个服务名 public，网关不认这个名字——
+    # 它只认真实实例的 IP，IP 由 Eureka 提供，所以副本数随便改都能被发现
     deploy:
-      replicas: 1
+      replicas: 2
     environment:
       # mysql / redis 就是上面的服务名，compose 内部网络里能直接解析
       # 端口用容器内部的 3306 / 6379，不是宿主机的 3307
@@ -109,6 +129,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+      # 注册中心地址（容器内网络，用服务名而不是 localhost）
+      EUREKA_URL: "http://eureka:8761/eureka"
     healthcheck:
       # 探 actuator：HTTP 200 才算健康。health 里含 db / redis 检查，
       # 所以这一条同时代表「Spring 上下文起完 + 数据源可连」，而不只是「Java 进程还在」
@@ -120,6 +142,9 @@ services:
       # JVM 冷启动期间失败不计入 retries，避免启动慢一点就被判死
       start_period: 30s
     depends_on:
+      # 注册中心没起来就没有名册，后端地址无从查起
+      eureka:
+        condition: service_healthy
       mysql:
         condition: service_healthy
       redis:
@@ -148,6 +173,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+      # 注册中心地址（容器内网络，用服务名而不是 localhost）
+      EUREKA_URL: "http://eureka:8761/eureka"
     healthcheck:
       # 与 public 同理，只是端口和路径前缀不同：8082 + /api
       test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8082/api/actuator/health"]
@@ -156,6 +183,9 @@ services:
       retries: 6
       start_period: 30s
     depends_on:
+      # 注册中心没起来就没有名册，后端地址无从查起
+      eureka:
+        condition: service_healthy
       mysql:
         condition: service_healthy
       redis:
@@ -177,9 +207,8 @@ services:
       replicas: 1
     environment:
       # 覆盖 application.yaml 里的默认 localhost 地址
-      # 用服务名而不是 localhost：容器里的 localhost 指的是容器自己
-      PUBLIC_URI: "http://public:8081"
-      ADMIN_URI: "http://admin:8082"
+      # 后端地址不再写死，网关按 lb://服务名 去这里查实例列表
+      EUREKA_URL: "http://eureka:8761/eureka"
     healthcheck:
       # 网关没有 context-path，health 就在根路径上
       test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8080/actuator/health"]
@@ -188,6 +217,9 @@ services:
       retries: 6
       start_period: 30s
     depends_on:
+      # 注册中心没起来就没有名册，后端地址无从查起
+      eureka:
+        condition: service_healthy
       public:
         condition: service_healthy
       admin:
