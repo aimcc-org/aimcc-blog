@@ -69,6 +69,10 @@ services:
         MODULE: blog-eureka
         PORT: 8761
     image: aimcc-blog-eureka:latest
+    # 只在本机映射：浏览器打开 http://localhost:8761 就能看到名册页面
+    # 生产不映射端口，注册中心只允许容器网络内部访问
+    ports:
+      - "8761:8761"
     healthcheck:
       # /eureka/apps 返回 200 就说明注册中心能正常应答查询
       test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8761/eureka/apps"]
