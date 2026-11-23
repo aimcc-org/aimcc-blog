@@ -38,6 +38,13 @@ services:
     image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/redis:8
     container_name: blog-redis
     command: redis-server --requirepass root1234
+    healthcheck:
+      # public / admin 的依赖条件是 service_healthy，被依赖的服务就必须自己配 healthcheck，
+      # 否则 compose 在 up 阶段直接报 "has no healthcheck configured" 并终止部署
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "root1234", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     restart: unless-stopped
 
   # ---------- 数据库迁移：一次性任务 ----------
