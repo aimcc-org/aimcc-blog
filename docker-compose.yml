@@ -50,6 +50,13 @@ services:
     command: redis-server --requirepass root1234
     ports:
       - "6379:6379"
+    healthcheck:
+      # 能 PONG 才算就绪。redis 起得快，但「容器起来了」和「能接受命令」是两回事
+      # --no-auth-warning 只是不打印密码提示，退出码仍然由 PING 的结果决定
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "root1234", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   # ---------- 数据库迁移：一次性任务，跑完即退 ----------
   # 之前迁移是在 admin 启动时执行的，导致 admin 只能单副本、迁移失败就等于服务起不来。
@@ -101,11 +108,21 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+    healthcheck:
+      # 探 actuator：HTTP 200 才算健康。health 里含 db / redis 检查，
+      # 所以这一条同时代表「Spring 上下文起完 + 数据源可连」，而不只是「Java 进程还在」
+      # wget 是镜像里自带的 busybox 命令，失败时退出码非 0，compose 只认退出码
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8081/api/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      # JVM 冷启动期间失败不计入 retries，避免启动慢一点就被判死
+      start_period: 30s
     depends_on:
       mysql:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       # 迁移必须先跑完且成功（Exited 0），否则不启动：宁可起不来，也不要在半旧的结构上跑
       migration:
         condition: service_completed_successfully
@@ -130,11 +147,18 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       REDIS_PASSWORD: root1234
+    healthcheck:
+      # 与 public 同理，只是端口和路径前缀不同：8082 + /api
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8082/api/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     depends_on:
       mysql:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       migration:
         condition: service_completed_successfully
 
@@ -155,11 +179,18 @@ services:
       # 用服务名而不是 localhost：容器里的 localhost 指的是容器自己
       PUBLIC_URI: "http://public:8081"
       ADMIN_URI: "http://admin:8082"
+    healthcheck:
+      # 网关没有 context-path，health 就在根路径上
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     depends_on:
       public:
-        condition: service_started
+        condition: service_healthy
       admin:
-        condition: service_started
+        condition: service_healthy
 
   # ---------- 前端（Nginx） ----------
   nginx:
@@ -175,7 +206,7 @@ services:
       - "80:80"
     depends_on:
       gateway:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   # 声明用已有的卷（不写 name 的话 compose 会自动加项目名前缀，变成新卷）

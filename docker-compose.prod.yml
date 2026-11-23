@@ -73,11 +73,18 @@ services:
       REDIS_PASSWORD: root1234
       # 生产环境关闭接口文档，避免暴露 admin 的写接口
       SPRINGDOC_ENABLED: "false"
+    healthcheck:
+      # 探 actuator：HTTP 200 才算健康，含 db / redis 检查，代表「能接请求」而不只是「进程活着」
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8081/api/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     depends_on:
       mysql:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       migration:
         condition: service_completed_successfully
     restart: unless-stopped
@@ -97,11 +104,18 @@ services:
       REDIS_PASSWORD: root1234
       # 生产环境关闭接口文档，避免暴露 admin 的写接口
       SPRINGDOC_ENABLED: "false"
+    healthcheck:
+      # 探 actuator：HTTP 200 才算健康，含 db / redis 检查，代表「能接请求」而不只是「进程活着」
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8082/api/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     depends_on:
       mysql:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       migration:
         condition: service_completed_successfully
     restart: unless-stopped
@@ -116,11 +130,18 @@ services:
       # 用服务名而不是 localhost：容器里的 localhost 指的是容器自己
       PUBLIC_URI: "http://public:8081"
       ADMIN_URI: "http://admin:8082"
+    healthcheck:
+      # 网关没有 context-path，health 在根路径
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     depends_on:
       public:
-        condition: service_started
+        condition: service_healthy
       admin:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
   nginx:
@@ -130,7 +151,7 @@ services:
       - "80:80"
     depends_on:
       gateway:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

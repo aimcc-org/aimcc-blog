@@ -29,6 +29,18 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
 
+management:
+  endpoints:
+    web:
+      exposure:
+        # 只暴露 health，实际地址 = context-path(/api) + /actuator/health
+        # compose 的 healthcheck 靠它判断「能接请求了没有」
+        include: health
+  endpoint:
+    health:
+      # 只回 UP / DOWN，不把 db、redis 的细节暴露出去
+      show-details: never
+
 springdoc:
   api-docs:
     # 与 public 的 /api/v3/api-docs 区分开，否则网关只会把文档请求分给 public
