@@ -1,5 +1,6 @@
 package com.aimcc.blog.service.impl;
 
+import com.aimcc.blog.common.ErrorCode;
 import com.aimcc.blog.dto.AdminArticleRequest;
 import com.aimcc.blog.entity.Article;
 import com.aimcc.blog.exception.BizException;
@@ -46,7 +47,7 @@ public class AdminArticleServiceImpl implements AdminArticleService {
     public Long updateArticle(AdminArticleRequest request) {
         Article existing = articleMapper.selectById(request.getId());
         if (existing == null) {
-            throw new BizException(404, "文章不存在");
+            throw new BizException(ErrorCode.NOT_FOUND, "文章不存在");
         }
 
         Article article = new Article();
@@ -74,7 +75,7 @@ public class AdminArticleServiceImpl implements AdminArticleService {
     public void deleteArticle(Long id) {
         Article existing = articleMapper.selectById(id);
         if (existing == null) {
-            throw new BizException(404, "文章不存在");
+            throw new BizException(ErrorCode.NOT_FOUND, "文章不存在");
         }
 
         // 先删标签关联，再删文章

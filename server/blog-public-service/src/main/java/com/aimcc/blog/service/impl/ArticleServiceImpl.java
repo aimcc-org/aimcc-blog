@@ -1,5 +1,6 @@
 package com.aimcc.blog.service.impl;
 
+import com.aimcc.blog.common.ErrorCode;
 import com.aimcc.blog.dto.ArticleDetailVO;
 import com.aimcc.blog.dto.ArticleListVO;
 import com.aimcc.blog.dto.ArticleTagRow;
@@ -106,7 +107,7 @@ public class ArticleServiceImpl implements ArticleService {
             boolean updated = articleMapper.update(null, updateWrapper) > 0;
             if (!updated) {
                 redisTemplate.delete(key); // 文章不存在，删掉刚写的 Redis key
-                throw new BizException(404, "文章不存在");
+                throw new BizException(ErrorCode.NOT_FOUND, "文章不存在");
             }
             article = articleMapper.selectById(id);
         } else {

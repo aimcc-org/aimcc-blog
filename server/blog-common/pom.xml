@@ -15,11 +15,43 @@
     <description>两个服务共用的无业务含义的公共件：统一返回体、业务异常</description>
 
     <dependencies>
-        <!-- ApiResult / BizException 都用 Lombok 生成 getter -->
+        <!-- ApiResult / BizException / ErrorCode 都用 Lombok 生成 getter -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- 全局异常处理器要用的 Web 注解与异常类型。
+             用 provided 而不是 starter-webmvc：provided 只在本模块编译期可见、不传递给下游，
+             网关（WebFlux）依赖本模块时不会被塞进 Spring MVC，避免两者在同一 classpath 冲突 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- spring-webmvc 里的异常类继承自 ServletException，provided 作用域不会带出它的传递依赖，
+             所以这里要单独补一份 Servlet API（同样 provided，不进最终镜像） -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- @Slf4j 需要 slf4j API；运行时日志实现由各服务的 starter 提供，这里只要编译期可见 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- NotLoginException 的类型来源：异常处理器要接住 Sa-Token 抛的未登录异常。
+             它是个纯 Java 核心包，不带 Spring；public 虽然不抛这个异常，但类必须能加载 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-core</artifactId>
+            <version>${sa-token.version}</version>
         </dependency>
     </dependencies>
 

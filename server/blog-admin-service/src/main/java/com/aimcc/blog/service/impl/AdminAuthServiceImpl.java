@@ -1,6 +1,7 @@
 package com.aimcc.blog.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.aimcc.blog.common.ErrorCode;
 import com.aimcc.blog.dto.AdminLoginRequest;
 import com.aimcc.blog.dto.AdminRegisterRequest;
 import com.aimcc.blog.entity.AdminUser;
@@ -34,7 +35,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 注意：错误提示统一说"用户名或密码错误"，不区分哪个错——防外人试探枚举
         boolean matched = admin != null && encoder.matches(request.getPassword(), admin.getPasswordHash());
         if (!matched) {
-            throw new BizException(401, "用户名或密码错误");
+            throw new BizException(ErrorCode.UNAUTHORIZED, "用户名或密码错误");
         }
 
         // 三、验明正身 → Sa-Token 发 token（loginId 用账号 id）
@@ -47,20 +48,20 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     public Long register(AdminRegisterRequest request) {
         // 一、基础校验：非空 + 密码下限
         if (request.getUsername() == null || request.getUsername().isBlank()) {
-            throw new BizException(400, "用户名不能为空");
+            throw new BizException(ErrorCode.BAD_REQUEST, "用户名不能为空");
         }
         if (request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new BizException(400, "密码不能为空");
+            throw new BizException(ErrorCode.BAD_REQUEST, "密码不能为空");
         }
         if (request.getPassword().length() < 6) {
-            throw new BizException(400, "密码至少 6 位");
+            throw new BizException(ErrorCode.BAD_REQUEST, "密码至少 6 位");
         }
 
         // 二、用户名查重（数据库 UNIQUE 约束之外的代码侧提前拦截，报错更友好）
         LambdaQueryWrapper<AdminUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(AdminUser::getUsername, request.getUsername());
         if (adminUserMapper.selectOne(wrapper) != null) {
-            throw new BizException(400, "用户名已存在");
+            throw new BizException(ErrorCode.BAD_REQUEST, "用户名已存在");
         }
 
         // 三、密码写时加密：明文在这一行变成密文，方法结束后即被丢弃

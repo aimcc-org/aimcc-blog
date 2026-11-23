@@ -1,6 +1,7 @@
 package com.aimcc.blog.controller;
 
 import com.aimcc.blog.common.ApiResult;
+import com.aimcc.blog.common.ErrorCode;
 import com.aimcc.blog.dto.ArticleDetailVO;
 import com.aimcc.blog.dto.ArticleListVO;
 import com.aimcc.blog.enums.ArticleSort;
@@ -40,7 +41,7 @@ public class ArticleController {
         // 限流：每个 IP 每分钟最多 10 次
         String ip = IpUtils.getClientIp(request);
         if (!rateLimiter.tryAcquire(ip, 10)) {
-            throw new BizException(429, "请求太频繁，稍后再试");
+            throw new BizException(ErrorCode.TOO_MANY_REQUESTS);
         }
         // 防止恶意传 ?size=10000 一次读穿数据库
         if (size > 50) size = 50;
