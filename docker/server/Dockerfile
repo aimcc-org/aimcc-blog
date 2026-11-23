@@ -4,7 +4,7 @@
 # 构建上下文是 server/ 目录，用 MODULE 指定要打哪个模块的 jar：
 #   docker build -f docker/server/Dockerfile \
 #     --build-arg MODULE=blog-public-service \
-#     -t blog-public:v1 ./server
+#     -t aimcc-blog-public:latest ./server
 #
 # MODULE 不传会直接构建失败（下面有校验），避免默默打出一个空镜像
 # PORT 只是镜像元信息，真正监听端口由各模块 application.yaml 的 server.port 决定

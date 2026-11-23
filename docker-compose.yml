@@ -70,7 +70,8 @@ services:
         MODULE: blog-migration
         # 迁移任务不监听端口，PORT 只是镜像元信息，随便给个值即可
         PORT: 8080
-    image: blog-migration:v1
+    # 镜像名与 ACR 仓库名保持一致（去掉 registry 前缀），本地和线上对得上
+    image: aimcc-blog-migration:latest
     # 跑完就退出；如果被 restart 策略拉起来，会反复执行迁移
     restart: "no"
     environment:
@@ -94,7 +95,7 @@ services:
       args:
         MODULE: blog-public-service
         PORT: 8081
-    image: blog-public:v1
+    image: aimcc-blog-public:latest
     # 先按 1 个副本跑：本机内存有限，多副本的收益主要是同机进程重启不中断，
     # 想验证多实例共享 Redis 缓存时临时改回 2（--scale public=2 也行，但 CI/up 会收敛回这里的值）
     deploy:
@@ -135,7 +136,7 @@ services:
       args:
         MODULE: blog-admin-service
         PORT: 8082
-    image: blog-admin:v1
+    image: aimcc-blog-admin:latest
     # 迁移已经移出本服务，理论上可以多副本了；
     # 先保持 1，等真正需要扩容时再改，避免一次动太多
     deploy:
@@ -170,7 +171,7 @@ services:
       args:
         MODULE: blog-gateway
         PORT: 8080
-    image: blog-gateway:v1
+    image: aimcc-blog-gateway:latest
     # 同上，先 1 个副本；网关虽无状态，但同机多副本只是多占一份内存
     deploy:
       replicas: 1
@@ -200,6 +201,8 @@ services:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
+    # 显式写名字，不依赖 compose 按「项目目录名-服务名」自动推导
+    image: aimcc-blog-nginx:latest
     container_name: blog-nginx
     ports:
       # 宿主机 80 → 容器 80，浏览器直接访问 http://localhost
