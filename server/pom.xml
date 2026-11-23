@@ -23,6 +23,8 @@
         <module>blog-public-service</module>
         <module>blog-admin-service</module>
         <module>blog-gateway</module>
+        <!-- 注册中心：基础设施角色，独立进程，不参与请求转发 -->
+        <module>blog-eureka</module>
         <!-- 数据库迁移执行器：一次性任务，不常驻，不属于任何一个业务服务 -->
         <module>blog-migration</module>
     </modules>

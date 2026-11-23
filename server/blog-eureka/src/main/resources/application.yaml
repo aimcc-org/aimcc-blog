@@ -1,0 +1,24 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: blog-eureka
+
+eureka:
+  client:
+    # 我自己就是注册中心：不往别处注册，也不去别处拉名单
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    # 单机部署没有 peer，自我保护会把「大量实例掉线」当成自己网络故障而停止剔除，
+    # 学习阶段关掉它，让摘除行为是可预期的
+    enable-self-preservation: false
+    # 剔除扫描间隔：默认 60 秒，这里调快一点，挂掉的实例能更快从名册消失
+    eviction-interval-timer-in-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

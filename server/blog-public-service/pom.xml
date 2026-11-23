@@ -15,6 +15,12 @@
     <description>公开服务：面向前台博客的只读接口</description>
 
     <dependencies>
+
+        <!-- 注册中心客户端：启动时把自己登记到 Eureka，并每隔 30 秒刷新一次别人名单 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.aimcc</groupId>
             <artifactId>blog-common</artifactId>

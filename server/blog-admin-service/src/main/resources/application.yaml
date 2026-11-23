@@ -54,3 +54,13 @@ springdoc:
     # http://localhost:8082/api/admin/swagger-ui.html
     path: /admin/swagger-ui.html
     enabled: ${SPRINGDOC_ENABLED:true}
+
+
+eureka:
+  client:
+    service-url:
+      # 注册中心地址；容器里由 EUREKA_URL 注入服务名，本机跑 jar 默认 localhost
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    # 用容器 IP 注册而不是主机名：容器主机名是随机 ID，别的容器未必解析得到
+    prefer-ip-address: true

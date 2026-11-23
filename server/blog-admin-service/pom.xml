@@ -15,6 +15,12 @@
     <description>管理服务：后台读写接口 + 登录鉴权 + 数据库迁移</description>
 
     <dependencies>
+
+        <!-- 注册中心客户端：启动时把自己登记到 Eureka，并每隔 30 秒刷新一次别人名单 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.aimcc</groupId>
             <artifactId>blog-common</artifactId>

@@ -12,17 +12,19 @@ spring:
           httpclient:
             connect-timeout: 3000
             response-timeout: 10s
-          # 后端地址可通过环境变量覆盖：本机跑 jar 用默认值，容器里注入服务名
+          # 后端地址不再写死某一个实例，而是写「服务名」：
+          #   lb:// 后面的名字 = 后端 spring.application.name，Eureka 名册里的 key
+          # 网关每次转发时从本地缓存的实例列表里挑一个，多个副本自然被轮流使用
           routes:
             # 管理路由必须排在前面：/api/admin/** 同时命中下面那条 /api/**
             # 用 order 显式压到最优先，不依赖 YAML 书写顺序
             - id: admin-api
-              uri: ${ADMIN_URI:http://localhost:8082}
+              uri: lb://blog-admin-service
               order: -1
               predicates:
                 - Path=/api/admin/**
             - id: public-api
-              uri: ${PUBLIC_URI:http://localhost:8081}
+              uri: lb://blog-public-service
               order: 0
               predicates:
                 - Path=/api/**
@@ -32,3 +34,12 @@ management:
     web:
       exposure:
         include: health,info
+
+eureka:
+  client:
+    service-url:
+      # 注册中心地址；容器里由 EUREKA_URL 注入服务名，本机跑 jar 默认 localhost
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    # 用 IP 注册：网关要直连后端实例的 IP，主机名在容器网络里不一定能解析
+    prefer-ip-address: true

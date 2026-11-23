@@ -15,6 +15,12 @@
     <description>网关：统一入口 8080，按路径前缀把请求转给公开服务或管理服务</description>
 
     <dependencies>
+
+        <!-- 注册中心客户端：启动时把自己登记到 Eureka，并每隔 30 秒刷新一次别人名单 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.aimcc</groupId>
             <artifactId>blog-common</artifactId>
