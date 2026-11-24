@@ -168,13 +168,18 @@ jobs:
       # 部署到服务器
       # ============================================================
 
+      # 两台机器的私钥一起交给 ssh-agent，和 A 机的处理方式完全一致
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.10.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: |
+            ${{ secrets.SSH_PRIVATE_KEY }}
+            ${{ secrets.B_SSH_PRIVATE_KEY }}
 
-      - name: Add server to known hosts
-        run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+      - name: Add servers to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.B_SERVER_IP }} >> ~/.ssh/known_hosts
 
       # 同步 compose 配置：让服务器上的 /opt/blog-compose/docker-compose.yml
       # 永远等于仓库里的 deploy/compose-main.yml，避免手工改服务器造成配置漂移
@@ -196,6 +201,34 @@ jobs:
       - name: Deploy backend
         run: |
           ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull migration eureka gateway public admin && docker compose up -d --remove-orphans eureka gateway public admin"
+
+      # ============================================================
+      # B 机（北京轻量）：只跑一个 public 副本
+      # ============================================================
+      # 位置放在 A 机后端之后：先让 A 的新版本和网关就绪，再让 B 跟上，
+      # 避免出现「B 已跑新代码、A 还没发版」的中间态
+      # 注意：CI 不执行数据库迁移，表结构变更仍需在 A 机上手动跑 migration 容器；
+      #      B 机的 public 用的是 A 机的库，所以表没就绪时 B 会先挂掉
+      - name: Sync worker compose
+        run: |
+          scp deploy/compose-worker.yml root@${{ secrets.B_SERVER_IP }}:/opt/blog-worker/docker-compose.yml.new
+          ssh root@${{ secrets.B_SERVER_IP }} "cd /opt/blog-worker && cp docker-compose.yml docker-compose.yml.bak && mv docker-compose.yml.new docker-compose.yml && docker compose config -q && echo 'B compose 校验通过'"
+
+      # B 机的 ACR 登录态存在 /root/.docker/config.json，但密码一旦变更就会失效，
+      # 所以每次部署都重新登录一次；密码走 stdin，不出现在远端 ps 里
+      - name: Login to ACR on worker
+        run: |
+          printf '%s' "${{ secrets.ACR_PASSWORD }}" | ssh root@${{ secrets.B_SERVER_IP }} "docker login crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com -u ${{ secrets.ACR_USERNAME }} --password-stdin"
+
+      - name: Deploy worker
+        run: |
+          ssh root@${{ secrets.B_SERVER_IP }} "cd /opt/blog-worker && docker compose pull public && docker compose up -d public"
+
+      # 部署后验一次真实健康：health 里含 db / redis 检查，
+      # 能挡住「跨公网数据源配错」这类只在运行时才暴露的问题
+      - name: Verify worker
+        run: |
+          ssh root@${{ secrets.B_SERVER_IP }} "curl -sf --max-time 10 http://127.0.0.1:8081/api/actuator/health >/dev/null && echo 'B 机 public 健康'"
 
       # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
       # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog

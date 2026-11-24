@@ -23,12 +23,19 @@
 
 ## 同步方式
 
-- **A 机**：CI 自动同步。`.github/workflows/deploy.yml` 的 `Sync compose file` 步骤把 `deploy/compose-main.yml` 传上去，覆盖 `/opt/blog-compose/docker-compose.yml`
-- **B 机**：手动同步，B 机不进 CI
+两台机器都由 CI 自动同步（`.github/workflows/deploy.yml`）：
 
-  ```bash
-  scp deploy/compose-worker.yml root@<B 机 IP>:/opt/blog-worker/docker-compose.yml
-  ```
+- **A 机**：`Sync compose file` 把 `deploy/compose-main.yml` 传上去，覆盖 `/opt/blog-compose/docker-compose.yml`
+- **B 机**：`Sync worker compose` 把 `deploy/compose-worker.yml` 传上去，覆盖 `/opt/blog-worker/docker-compose.yml`
+
+两边都是「先传临时文件 → 备份旧的 → 替换 → 校验语法」，失败不会破坏正在跑的那份。
+
+手工同步（CI 不可用时）：
+
+```bash
+scp deploy/compose-main.yml   root@<A 机 IP>:/opt/blog-compose/docker-compose.yml
+scp deploy/compose-worker.yml root@<B 机 IP>:/opt/blog-worker/docker-compose.yml
+```
 
 ## 改动这份文件时的注意
 
