@@ -228,7 +228,9 @@ jobs:
       # 能挡住「跨公网数据源配错」这类只在运行时才暴露的问题
       - name: Verify worker
         run: |
-          ssh root@${{ secrets.B_SERVER_IP }} "curl -sf --max-time 10 http://127.0.0.1:8081/api/actuator/health >/dev/null && echo 'B 机 public 健康'"
+          # 2G 内存的机器起 Spring Boot 要 40 秒上下，up -d 刚返回时容器还没就绪，
+          # 这里重试 20 次、每次间隔 5 秒，最长等 100 秒
+          ssh root@${{ secrets.B_SERVER_IP }} 'for i in $(seq 1 20); do if curl -sf --max-time 10 http://127.0.0.1:8081/api/actuator/health >/dev/null; then echo "B 机 public 健康（第 $i 次探测）"; exit 0; fi; sleep 5; done; echo "B 机 public 100 秒内未就绪"; docker compose -f /opt/blog-worker/docker-compose.yml logs --tail=50 public; exit 1'
 
       # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
       # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog
