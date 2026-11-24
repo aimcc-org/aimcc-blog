@@ -206,9 +206,11 @@ services:
     restart: unless-stopped
 
 volumes:
-  # 显式写死卷名：compose 默认会给卷名加「项目名_」前缀，而项目名取自目录名
-  # （服务器上是 /opt/blog-compose → blog-compose）。哪天目录改名，前缀就变了，
-  # compose 会挂到一个新建的空卷上，表现就是「数据库空了」。
-  # 这里写成完整名字，从此和目录名解耦。
+  # 显式写死卷名，并且和本地的 docker-compose.yml 用同一个名字（blog-mysql-data）。
+  # 好处有两个：
+  #   1. 卷名不带「项目名_」前缀，目录改名、项目改名都不会挂到空卷上
+  #   2. 本地和服务器卷名一致，导出/导入、备份脚本不用再区分环境
+  # 注意：改名是一次性迁移。服务器上必须先停 mysql、把旧卷数据复制到新卷，
+  #      否则 mysql 用新卷启动会是一个空库（表能靠 Flyway 重建，文章数据不会自己回来）
   blog-mysql-data:
-    name: blog-compose_blog-mysql-data
+    name: blog-mysql-data
