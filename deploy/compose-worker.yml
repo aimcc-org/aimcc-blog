@@ -1,20 +1,23 @@
 # ============================================================
 # B 机（阿里云轻量 2C2G，北京）专用编排
 #
-# 用途：把 public 的第二个副本放到另一台机器上，验证「跨机器注册 + 网关跨机转发」
+# 职责：跑 public 和 admin 各一个副本，A 机保持 public 1 副本 + admin 1 副本。
+#       目标是验证「跨机注册 + 网关跨机转发」，也是 A 机到期后迁小机型的前置演练。
 #
 # 使用方式：
-#   1. 把本文件复制到 B 机的 /opt/blog-worker/docker-compose.yml
+#   1. CI 会把本文件同步到 B 机的 /opt/blog-worker/docker-compose.yml
 #      （目录名决定 compose 项目名，改目录名会改项目名；本文件不定义数据卷，改名无副作用）
-#   2. cd /opt/blog-worker && docker compose pull public && docker compose up -d public
+#   2. cd /opt/blog-worker && docker compose pull public admin && docker compose up -d --remove-orphans public admin
+#      --remove-orphans 会顺手清掉服务名变更后留下的旧容器
 #
 # 和 A 机的 deploy/compose-main.yml 的关键差异：
-#   1. 只有一个服务：不跑 mysql / redis / eureka / gateway / nginx
+#   1. 只跑两个业务服务：不跑 mysql / redis / eureka / gateway / nginx / migration
 #   2. 数据源、Redis、注册中心全部指向 A 机的公网地址
 #   3. 必须显式声明 EUREKA_INSTANCE_IP_ADDRESS：容器内探测到的是 172.x，
 #      A 机的网关在另一个机房，拿这个地址连不过来
 #   4. 不能写 depends_on：本机没有 mysql / redis / eureka 这些服务可依赖
 #   5. 不能写 container_name：以后想在这台机器上跑多副本会名字冲突
+#   6. 迁移脚本只在 A 机跑，这里的服务直接连迁移好的库
 # ============================================================
 
 services:
@@ -43,6 +46,34 @@ services:
     healthcheck:
       # 探 actuator：含 db / redis 检查，health 通过才说明跨公网的数据链路是通的
       test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8081/api/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+
+  admin:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-admin:latest
+    # 对外开 8082：同上，防火墙只放行 A 机公网 IP
+    ports:
+      - "8082:8082"
+    environment:
+      # ---------- 数据源：A 机公网 ----------
+      SPRING_DATASOURCE_URL: "jdbc:mysql://47.99.174.185:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+      # ---------- Redis：A 机公网（登录态、缓存都在这，跨公网延迟比 public 更敏感） ----------
+      SPRING_DATA_REDIS_HOST: "47.99.174.185"
+      SPRING_DATA_REDIS_PORT: 6379
+      REDIS_PASSWORD: root1234
+      # ---------- 注册中心：A 机公网 ----------
+      EUREKA_URL: "http://47.99.174.185:8761/eureka"
+      EUREKA_INSTANCE_IP_ADDRESS: "47.94.110.198"
+      EUREKA_INSTANCE_NON_SECURE_PORT: 8082
+      # 生产环境关闭接口文档
+      SPRINGDOC_ENABLED: "false"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8082/api/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 6

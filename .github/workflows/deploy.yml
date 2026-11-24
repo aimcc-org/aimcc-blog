@@ -203,12 +203,11 @@ jobs:
           ssh root@${{ secrets.SERVER_IP }} "cd /opt/blog-compose && docker compose pull migration eureka gateway public admin && docker compose up -d --remove-orphans eureka gateway public admin"
 
       # ============================================================
-      # B 机（北京轻量）：只跑一个 public 副本
+      # B 机（北京轻量）：public + admin 各一个副本
       # ============================================================
-      # 位置放在 A 机后端之后：先让 A 的新版本和网关就绪，再让 B 跟上，
-      # 避免出现「B 已跑新代码、A 还没发版」的中间态
+      # 位置放在 A 机后端之后：先让 A 的 public 和网关就绪，再让 B 的 admin 跟上
       # 注意：CI 不执行数据库迁移，表结构变更仍需在 A 机上手动跑 migration 容器；
-      #      B 机的 public 用的是 A 机的库，所以表没就绪时 B 会先挂掉
+      #      B 机的 admin 用的是 A 机的库，所以表没就绪时 B 会先挂掉
       - name: Sync worker compose
         run: |
           scp deploy/compose-worker.yml root@${{ secrets.B_SERVER_IP }}:/opt/blog-worker/docker-compose.yml.new
@@ -222,7 +221,7 @@ jobs:
 
       - name: Deploy worker
         run: |
-          ssh root@${{ secrets.B_SERVER_IP }} "cd /opt/blog-worker && docker compose pull public && docker compose up -d public"
+          ssh root@${{ secrets.B_SERVER_IP }} "cd /opt/blog-worker && docker compose pull public admin && docker compose up -d --remove-orphans public admin"
 
       # 部署后验一次真实健康：health 里含 db / redis 检查，
       # 能挡住「跨公网数据源配错」这类只在运行时才暴露的问题
@@ -230,7 +229,8 @@ jobs:
         run: |
           # 2G 内存的机器起 Spring Boot 要 40 秒上下，up -d 刚返回时容器还没就绪，
           # 这里重试 20 次、每次间隔 5 秒，最长等 100 秒
-          ssh root@${{ secrets.B_SERVER_IP }} 'for i in $(seq 1 20); do if curl -sf --max-time 10 http://127.0.0.1:8081/api/actuator/health >/dev/null; then echo "B 机 public 健康（第 $i 次探测）"; exit 0; fi; sleep 5; done; echo "B 机 public 100 秒内未就绪"; docker compose -f /opt/blog-worker/docker-compose.yml logs --tail=50 public; exit 1'
+          # 两个服务都要验：public 走 8081，admin 走 8082
+          ssh root@${{ secrets.B_SERVER_IP }} 'for i in $(seq 1 20); do p=$(curl -sf --max-time 10 http://127.0.0.1:8081/api/actuator/health >/dev/null && echo ok); a=$(curl -sf --max-time 10 http://127.0.0.1:8082/api/actuator/health >/dev/null && echo ok); if [ -n "$p" ] && [ -n "$a" ]; then echo "B 机 public + admin 健康（第 $i 次探测）"; exit 0; fi; sleep 5; done; echo "B 机 public/admin 100 秒内未全部就绪"; docker compose -f /opt/blog-worker/docker-compose.yml ps; docker compose -f /opt/blog-worker/docker-compose.yml logs --tail=30 public admin; exit 1'
 
       # 前端部署：不再 scp 静态文件，改成「拉新镜像 + 重建 nginx 容器」
       # - 静态文件已经打进镜像里，服务器上不再需要 /var/www/blog
