@@ -1,0 +1,50 @@
+# ============================================================
+# B 机（阿里云轻量 2C2G，北京）专用编排
+#
+# 用途：把 public 的第二个副本放到另一台机器上，验证「跨机器注册 + 网关跨机转发」
+#
+# 使用方式：
+#   1. 把本文件复制到 B 机的 /opt/blog-worker/docker-compose.yml
+#      （目录名决定 compose 项目名，改目录名会改项目名；本文件不定义数据卷，改名无副作用）
+#   2. cd /opt/blog-worker && docker compose pull public && docker compose up -d public
+#
+# 和 A 机的 deploy/compose-main.yml 的关键差异：
+#   1. 只有一个服务：不跑 mysql / redis / eureka / gateway / nginx
+#   2. 数据源、Redis、注册中心全部指向 A 机的公网地址
+#   3. 必须显式声明 EUREKA_INSTANCE_IP_ADDRESS：容器内探测到的是 172.x，
+#      A 机的网关在另一个机房，拿这个地址连不过来
+#   4. 不能写 depends_on：本机没有 mysql / redis / eureka 这些服务可依赖
+#   5. 不能写 container_name：以后想在这台机器上跑多副本会名字冲突
+# ============================================================
+
+services:
+  public:
+    image: crpi-f7ypz0n6qfy16uva.cn-beijing.personal.cr.aliyuncs.com/ckaicraft/aimcc-blog-public:latest
+    # 对外开 8081：供 A 机的网关访问。轻量服务器防火墙里只放行 A 机公网 IP
+    ports:
+      - "8081:8081"
+    environment:
+      # ---------- 数据源：A 机公网 ----------
+      SPRING_DATASOURCE_URL: "jdbc:mysql://47.99.174.185:3306/aimcc_blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8"
+      DB_USERNAME: blog
+      DB_PASSWORD: root1234
+      # ---------- Redis：A 机公网 ----------
+      SPRING_DATA_REDIS_HOST: "47.99.174.185"
+      SPRING_DATA_REDIS_PORT: 6379
+      REDIS_PASSWORD: root1234
+      # ---------- 注册中心：A 机公网 ----------
+      EUREKA_URL: "http://47.99.174.185:8761/eureka"
+      # 关键：不写这两行，名册里这条实例的地址会是容器内的 172.x，
+      # A 机网关永远连不进 B 机，表现为「一半请求 500」
+      EUREKA_INSTANCE_IP_ADDRESS: "47.94.110.198"
+      EUREKA_INSTANCE_NON_SECURE_PORT: 8081
+      # 生产环境关闭接口文档
+      SPRINGDOC_ENABLED: "false"
+    healthcheck:
+      # 探 actuator：含 db / redis 检查，health 通过才说明跨公网的数据链路是通的
+      test: ["CMD", "wget", "-q", "-O-", "--timeout=3", "http://127.0.0.1:8081/api/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
